@@ -15,23 +15,28 @@ function LayerNodeComponent({ data, width, height }: NodeProps) {
 
   return (
     <div
-      className="rounded-2xl border-2 border-dashed relative"
+      className="rounded-2xl relative pointer-events-none"
       style={{
         width: w,
         height: h,
-        borderColor: `${color}40`,
-        backgroundColor: `${color}06`,
+        border: `1.5px solid ${color}30`,
+        backgroundColor: `${color}05`,
+        boxShadow: `inset 0 0 0 1px ${color}08`,
       }}
     >
-      {/* Layer label */}
+      {/* Layer label pill */}
       <div
-        className="absolute -top-3 left-4 px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider"
+        className="absolute -top-3 left-3 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-[0.08em] leading-none whitespace-nowrap"
         style={{
-          backgroundColor: `${color}15`,
+          backgroundColor: `${color}12`,
           color: color,
-          border: `1px solid ${color}30`,
+          border: `1px solid ${color}25`,
         }}
       >
+        <span
+          className="w-1.5 h-1.5 rounded-full"
+          style={{ backgroundColor: color }}
+        />
         {label}
       </div>
     </div>

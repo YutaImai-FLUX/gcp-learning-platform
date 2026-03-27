@@ -20,97 +20,118 @@ import type { Architecture } from "@/lib/data/architectures"
 
 import "@xyflow/react/dist/style.css"
 
-const NODE_WIDTH = 170
-const NODE_HEIGHT = 60
-const LAYER_PAD_X = 30
-const LAYER_PAD_Y = 40
-const LAYER_TOP_PAD = 32
+const NODE_W = 170
+const NODE_H = 64
+const LAYER_PAD = 28
+const LAYER_LABEL_H = 28
 
 const nodeTypes = {
   gcpNode: GcpNode,
   layerNode: LayerNode,
 }
 
+/* ─── Build a nodeId → layerId lookup ─── */
+function buildLayerMap(arch: Architecture): Map<string, string> {
+  const m = new Map<string, string>()
+  for (const layer of arch.layers ?? []) {
+    for (const nid of layer.nodeIds) m.set(nid, layer.id)
+  }
+  return m
+}
+
+/* ─── Layout using dagre compound graph ─── */
 function getLayoutedElements(arch: Architecture) {
-  // --- 1. dagre layout for actual service nodes ---
-  const g = new dagre.graphlib.Graph()
+  const layers = arch.layers ?? []
+  const layerMap = buildLayerMap(arch)
+
+  // 1. Create compound graph
+  const g = new dagre.graphlib.Graph({ compound: true })
   g.setDefaultEdgeLabel(() => ({}))
   g.setGraph({
     rankdir: "LR",
-    ranksep: 90,
-    nodesep: 45,
-    marginx: 60,
-    marginy: 60,
+    ranksep: 70,
+    nodesep: 30,
+    marginx: 30,
+    marginy: 30,
   })
 
+  // 2. Add layer (group) nodes
+  for (const layer of layers) {
+    g.setNode(layer.id, {})
+  }
+
+  // 3. Add service nodes, set parent to layer
   for (const node of arch.nodes) {
-    g.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT })
-  }
-  for (const edge of arch.edges) {
-    g.setEdge(edge.from, edge.to)
-  }
-  dagre.layout(g)
-
-  // Build a map of nodeId -> dagre position
-  const posMap = new Map<string, { x: number; y: number }>()
-  for (const node of arch.nodes) {
-    const pos = g.node(node.id)
-    posMap.set(node.id, {
-      x: pos.x - NODE_WIDTH / 2,
-      y: pos.y - NODE_HEIGHT / 2,
-    })
-  }
-
-  // --- 2. Compute layer bounding boxes ---
-  const layerNodes: Node[] = []
-  const serviceNodes: Node[] = []
-
-  if (arch.layers && arch.layers.length > 0) {
-    for (const layer of arch.layers) {
-      const memberPositions = layer.nodeIds
-        .map((nid) => posMap.get(nid))
-        .filter((p): p is { x: number; y: number } => !!p)
-
-      if (memberPositions.length === 0) continue
-
-      const minX = Math.min(...memberPositions.map((p) => p.x)) - LAYER_PAD_X
-      const minY = Math.min(...memberPositions.map((p) => p.y)) - LAYER_TOP_PAD
-      const maxX = Math.max(...memberPositions.map((p) => p.x + NODE_WIDTH)) + LAYER_PAD_X
-      const maxY = Math.max(...memberPositions.map((p) => p.y + NODE_HEIGHT)) + LAYER_PAD_Y
-
-      layerNodes.push({
-        id: layer.id,
-        type: "layerNode",
-        position: { x: minX, y: minY },
-        data: { label: layer.label, color: layer.color },
-        style: { width: maxX - minX, height: maxY - minY },
-        selectable: false,
-        draggable: false,
-        connectable: false,
-        zIndex: -1,
-      })
+    g.setNode(node.id, { width: NODE_W, height: NODE_H })
+    const parentLayer = layerMap.get(node.id)
+    if (parentLayer) {
+      g.setParent(node.id, parentLayer)
     }
   }
 
-  // --- 3. Build service nodes (absolute positions, no parentId for simplicity) ---
+  // 4. Add edges
+  for (const edge of arch.edges) {
+    g.setEdge(edge.from, edge.to)
+  }
+
+  dagre.layout(g)
+
+  // 5. Build layer bounding boxes from positioned children
+  const layerBounds = new Map<string, { minX: number; minY: number; maxX: number; maxY: number }>()
+  for (const node of arch.nodes) {
+    const lid = layerMap.get(node.id)
+    if (!lid) continue
+    const pos = g.node(node.id)
+    const nx = pos.x - NODE_W / 2
+    const ny = pos.y - NODE_H / 2
+    const cur = layerBounds.get(lid)
+    if (!cur) {
+      layerBounds.set(lid, { minX: nx, minY: ny, maxX: nx + NODE_W, maxY: ny + NODE_H })
+    } else {
+      cur.minX = Math.min(cur.minX, nx)
+      cur.minY = Math.min(cur.minY, ny)
+      cur.maxX = Math.max(cur.maxX, nx + NODE_W)
+      cur.maxY = Math.max(cur.maxY, ny + NODE_H)
+    }
+  }
+
+  // 6. Build React Flow nodes — layers first (z-index -1), then service nodes
+  const rfNodes: Node[] = []
+
+  for (const layer of layers) {
+    const bounds = layerBounds.get(layer.id)
+    if (!bounds) continue
+    const x = bounds.minX - LAYER_PAD
+    const y = bounds.minY - LAYER_PAD - LAYER_LABEL_H
+    const w = bounds.maxX - bounds.minX + LAYER_PAD * 2
+    const h = bounds.maxY - bounds.minY + LAYER_PAD * 2 + LAYER_LABEL_H
+
+    rfNodes.push({
+      id: layer.id,
+      type: "layerNode",
+      position: { x, y },
+      data: { label: layer.label, color: layer.color },
+      style: { width: w, height: h },
+      selectable: false,
+      draggable: false,
+      connectable: false,
+      zIndex: -1,
+    })
+  }
+
   for (const n of arch.nodes) {
-    const pos = posMap.get(n.id)!
-    serviceNodes.push({
+    const pos = g.node(n.id)
+    rfNodes.push({
       id: n.id,
       type: "gcpNode",
-      position: { x: pos.x, y: pos.y },
-      data: {
-        label: n.label,
-        service: n.service,
-        color: n.color,
-        icon: n.icon,
-      },
+      position: { x: pos.x - NODE_W / 2, y: pos.y - NODE_H / 2 },
+      data: { label: n.label, service: n.service, color: n.color, icon: n.icon },
       zIndex: 1,
     })
   }
 
-  // --- 4. Build edges ---
-  const edges: Edge[] = arch.edges.map((e, i) => ({
+  // 7. Build edges
+  const rfEdges: Edge[] = arch.edges.map((e, i) => ({
     id: `e-${i}`,
     source: e.from,
     target: e.to,
@@ -118,7 +139,7 @@ function getLayoutedElements(arch: Architecture) {
     animated: !e.dashed,
     label: e.label || undefined,
     labelStyle: { fontSize: 10, fill: "#64748b", fontWeight: 500 },
-    labelBgStyle: { fill: "white", fillOpacity: 0.85 },
+    labelBgStyle: { fill: "white", fillOpacity: 0.9 },
     labelBgPadding: [4, 2] as [number, number],
     style: {
       stroke: e.dashed ? "#94a3b8" : "#4285F4",
@@ -127,14 +148,14 @@ function getLayoutedElements(arch: Architecture) {
     },
     markerEnd: {
       type: MarkerType.ArrowClosed,
-      width: 16,
-      height: 16,
+      width: 14,
+      height: 14,
       color: e.dashed ? "#94a3b8" : "#4285F4",
     },
     zIndex: 2,
   }))
 
-  return { nodes: [...layerNodes, ...serviceNodes], edges }
+  return { nodes: rfNodes, edges: rfEdges }
 }
 
 interface Props {
@@ -157,7 +178,7 @@ export default function ArchDiagram({ architecture }: Props) {
   }, [])
 
   return (
-    <div className="w-full h-[520px] rounded-xl overflow-hidden border border-border bg-[#fafbff] dark:bg-[#13141f]">
+    <div className="w-full h-[540px] rounded-xl overflow-hidden border border-border bg-[#fafbff] dark:bg-[#13141f]">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -165,8 +186,8 @@ export default function ArchDiagram({ architecture }: Props) {
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.3}
+        fitViewOptions={{ padding: 0.18 }}
+        minZoom={0.25}
         maxZoom={2}
         attributionPosition="bottom-left"
         proOptions={{ hideAttribution: true }}
