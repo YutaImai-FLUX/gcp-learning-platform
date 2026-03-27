@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getArchById } from "@/lib/data/architectures"
+import ArchDiagram from "@/components/architecture/ArchDiagram"
 
 export default function ArchDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -24,7 +25,7 @@ export default function ArchDetailPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6 max-w-6xl">
       <Link
         href="/architecture"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -34,120 +35,36 @@ export default function ArchDetailPage() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-bold text-foreground">{arch.name}</h1>
-        <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">{arch.description}</p>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-2xl font-bold text-foreground">{arch.name}</h1>
+          <Badge variant="secondary">{arch.category}</Badge>
+        </div>
+        <p className="text-muted-foreground leading-relaxed max-w-3xl">{arch.description}</p>
       </div>
 
-      {/* Architecture Diagram */}
+      {/* Architecture Diagram — React Flow */}
       <Card className="border-border">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">アーキテクチャ図</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm">アーキテクチャ図</CardTitle>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <div className="w-6 h-0.5 bg-gcp-blue rounded" />
+                <span>データフロー</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-6 h-0.5 rounded" style={{ borderTop: "2px dashed #94a3b8" }} />
+                <span>非同期 / オプション</span>
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="bg-[#f8f9ff] dark:bg-[#1a1b2e] rounded-xl overflow-hidden">
-            <svg
-              viewBox="0 0 700 420"
-              className="w-full"
-              style={{ maxHeight: 420 }}
-            >
-              {/* Grid background */}
-              <defs>
-                <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-                  <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#e8eaf6" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="700" height="420" fill="url(#grid)" />
-
-              {/* Draw edges */}
-              {arch.edges.map((edge, i) => {
-                const from = arch.nodes.find((n) => n.id === edge.from)
-                const to = arch.nodes.find((n) => n.id === edge.to)
-                if (!from || !to) return null
-                const x1 = from.x + 50
-                const y1 = from.y + 30
-                const x2 = to.x + 50
-                const y2 = to.y + 30
-                const mx = (x1 + x2) / 2
-                const my = (y1 + y2) / 2
-                return (
-                  <g key={i}>
-                    <path
-                      d={`M ${x1} ${y1} Q ${mx} ${y1} ${x2} ${y2}`}
-                      fill="none"
-                      stroke={edge.dashed ? "#94a3b8" : "#4285F4"}
-                      strokeWidth={edge.dashed ? 1.5 : 2}
-                      strokeDasharray={edge.dashed ? "5,4" : undefined}
-                      markerEnd="url(#arrow)"
-                      opacity={0.7}
-                    />
-                    {edge.label && (
-                      <text x={mx} y={my - 6} textAnchor="middle" fontSize="9" fill="#64748b">
-                        {edge.label}
-                      </text>
-                    )}
-                  </g>
-                )
-              })}
-
-              {/* Arrow marker */}
-              <defs>
-                <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                  <path d="M 0 0 L 0 6 L 9 3 z" fill="#4285F4" />
-                </marker>
-              </defs>
-
-              {/* Draw nodes */}
-              {arch.nodes.map((node) => {
-                const lines = node.label.split("\n")
-                return (
-                  <g key={node.id} transform={`translate(${node.x}, ${node.y})`}>
-                    {/* Node box */}
-                    <rect
-                      x="0" y="0" width="100" height="56"
-                      rx="10" ry="10"
-                      fill="white"
-                      stroke={node.color}
-                      strokeWidth="2"
-                      style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}
-                    />
-                    {/* Color accent top bar */}
-                    <rect x="0" y="0" width="100" height="8" rx="10" ry="10" fill={node.color} />
-                    <rect x="0" y="4" width="100" height="4" fill={node.color} />
-                    {/* Text */}
-                    {lines.map((line, li) => (
-                      <text
-                        key={li}
-                        x="50" y={24 + li * 14}
-                        textAnchor="middle"
-                        fontSize="10"
-                        fontWeight={li === 0 ? "600" : "400"}
-                        fill={li === 0 ? "#202124" : "#5f6368"}
-                        fontFamily="sans-serif"
-                      >
-                        {line}
-                      </text>
-                    ))}
-                  </g>
-                )
-              })}
-            </svg>
-          </div>
-
-          {/* Legend */}
-          <div className="flex flex-wrap gap-4 mt-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5 bg-gcp-blue" />
-              <span>データフロー</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5 bg-gray-400 border-dashed" style={{ borderTop: "2px dashed #94a3b8", background: "none" }} />
-              <span>非同期・オプション接続</span>
-            </div>
-          </div>
+          <ArchDiagram architecture={arch} />
         </CardContent>
       </Card>
 
-      {/* Node details */}
+      {/* Details grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="border-border">
           <CardHeader className="pb-3">
