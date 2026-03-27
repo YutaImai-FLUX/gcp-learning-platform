@@ -1,3 +1,10 @@
+export interface ArchLayer {
+  id: string
+  label: string
+  color: string
+  nodeIds: string[]
+}
+
 export interface ArchNode {
   id: string
   label: string
@@ -21,6 +28,7 @@ export interface Architecture {
   description: string
   category: string
   tags: string[]
+  layers: ArchLayer[]
   nodes: ArchNode[]
   edges: ArchEdge[]
   useCases: string[]
@@ -35,6 +43,12 @@ export const ARCHITECTURES: Architecture[] = [
       "Cloud Load Balancing → Cloud Run → Cloud SQL という定番の3層Webアーキテクチャ。スケーラブルで管理が容易。",
     category: "Web",
     tags: ["web", "cloud-run", "cloud-sql", "basic"],
+    layers: [
+      { id: "l-client", label: "Client Layer", color: "#5f6368", nodeIds: ["internet"] },
+      { id: "l-edge", label: "Edge / Security", color: "#34A853", nodeIds: ["lb", "cdn", "armor"] },
+      { id: "l-app", label: "Application Layer", color: "#4285F4", nodeIds: ["run", "gcs", "secrets"] },
+      { id: "l-data", label: "Data Layer", color: "#EA4335", nodeIds: ["sql"] },
+    ],
     nodes: [
       { id: "internet", label: "Internet", service: "Internet", x: 300, y: 30, color: "#5f6368", icon: "Globe" },
       { id: "lb", label: "Cloud Load\nBalancing", service: "Load Balancer", x: 300, y: 120, color: "#34A853", icon: "SplitSquareHorizontal" },
@@ -64,6 +78,13 @@ export const ARCHITECTURES: Architecture[] = [
       "Pub/Sub → Dataflow → BigQuery → Looker によるリアルタイムストリーミング分析パイプライン。IoTデータや行動ログの分析に最適。",
     category: "Analytics",
     tags: ["analytics", "streaming", "bigquery", "pubsub"],
+    layers: [
+      { id: "l-ingest", label: "Ingestion", color: "#5f6368", nodeIds: ["sources"] },
+      { id: "l-messaging", label: "Messaging", color: "#FBBC05", nodeIds: ["pubsub"] },
+      { id: "l-processing", label: "Processing", color: "#4285F4", nodeIds: ["dataflow", "dls"] },
+      { id: "l-storage", label: "Storage / Analytics", color: "#4285F4", nodeIds: ["bq", "bigtable"] },
+      { id: "l-viz", label: "Visualization", color: "#34A853", nodeIds: ["looker"] },
+    ],
     nodes: [
       { id: "sources", label: "Data Sources\n(IoT/App/Logs)", service: "Source", x: 60, y: 200, color: "#5f6368", icon: "Radio" },
       { id: "pubsub", label: "Pub/Sub", service: "Pub/Sub", x: 200, y: 200, color: "#FBBC05", icon: "Radio" },
@@ -91,6 +112,13 @@ export const ARCHITECTURES: Architecture[] = [
       "Cloud Storage → Vertex AI Training → Vertex AI Endpoint → Cloud Run によるエンドツーエンドのML本番パイプライン。",
     category: "AI/ML",
     tags: ["ml", "vertex-ai", "mlops", "ai"],
+    layers: [
+      { id: "l-data-src", label: "Data Sources", color: "#4285F4", nodeIds: ["gcs-data", "bq-data"] },
+      { id: "l-feature", label: "Feature Engineering", color: "#34A853", nodeIds: ["fs"] },
+      { id: "l-train", label: "Training & Evaluation", color: "#4285F4", nodeIds: ["training", "eval"] },
+      { id: "l-deploy", label: "Deployment", color: "#EA4335", nodeIds: ["registry", "endpoint", "batch"] },
+      { id: "l-ops", label: "Monitoring / MLOps", color: "#FBBC05", nodeIds: ["monitoring"] },
+    ],
     nodes: [
       { id: "gcs-data", label: "Cloud Storage\n(Training Data)", service: "Storage", x: 80, y: 180, color: "#4285F4", icon: "HardDrive" },
       { id: "bq-data", label: "BigQuery\n(Features)", service: "BigQuery", x: 80, y: 280, color: "#4285F4", icon: "BarChart3" },
@@ -122,6 +150,12 @@ export const ARCHITECTURES: Architecture[] = [
       "GKE上で複数サービスを運用し、Pub/SubとCloud SQLでデータを管理する疎結合マイクロサービス。",
     category: "Architecture",
     tags: ["microservices", "gke", "kubernetes", "event-driven"],
+    layers: [
+      { id: "l-ingress", label: "Ingress / Gateway", color: "#34A853", nodeIds: ["lb2", "gateway"] },
+      { id: "l-services", label: "Application Services (GKE)", color: "#4285F4", nodeIds: ["svc-a", "svc-b", "svc-c"] },
+      { id: "l-middleware", label: "Middleware", color: "#FBBC05", nodeIds: ["pubsub2", "cache"] },
+      { id: "l-data", label: "Data Layer", color: "#EA4335", nodeIds: ["db-user", "db-order"] },
+    ],
     nodes: [
       { id: "lb2", label: "Cloud Load\nBalancing", service: "LB", x: 300, y: 30, color: "#34A853", icon: "SplitSquareHorizontal" },
       { id: "gateway", label: "API Gateway\n/Istio", service: "GKE", x: 300, y: 120, color: "#4285F4", icon: "Router" },
@@ -154,6 +188,12 @@ export const ARCHITECTURES: Architecture[] = [
       "Cloud Functions + Firestore + Firebase Hosting による完全サーバーレス構成。インフラ管理が不要。",
     category: "Serverless",
     tags: ["serverless", "cloud-functions", "firestore", "firebase"],
+    layers: [
+      { id: "l-client", label: "Client", color: "#5f6368", nodeIds: ["browser"] },
+      { id: "l-hosting", label: "Hosting / Auth", color: "#FBBC05", nodeIds: ["firebase", "auth"] },
+      { id: "l-backend", label: "Backend Services", color: "#FBBC05", nodeIds: ["firestore2", "functions"] },
+      { id: "l-infra", label: "Infrastructure", color: "#4285F4", nodeIds: ["pubsub3", "gcs3"] },
+    ],
     nodes: [
       { id: "browser", label: "Browser / Mobile", service: "Client", x: 300, y: 30, color: "#5f6368", icon: "Monitor" },
       { id: "firebase", label: "Firebase Hosting\n(Static Files)", service: "Firebase", x: 300, y: 120, color: "#FBBC05", icon: "Globe" },
@@ -182,6 +222,12 @@ export const ARCHITECTURES: Architecture[] = [
       "Cloud Interconnect / Cloud VPN でオンプレミスとGCPを接続する企業向けハイブリッドアーキテクチャ。",
     category: "Networking",
     tags: ["hybrid", "vpn", "interconnect", "enterprise"],
+    layers: [
+      { id: "l-onprem", label: "On-Premises", color: "#5f6368", nodeIds: ["onprem"] },
+      { id: "l-connectivity", label: "Connectivity", color: "#34A853", nodeIds: ["interconnect", "vpn"] },
+      { id: "l-network", label: "GCP Network", color: "#34A853", nodeIds: ["vpc2", "iam2"] },
+      { id: "l-workload", label: "GCP Workloads", color: "#4285F4", nodeIds: ["gce2", "gke2", "sql2"] },
+    ],
     nodes: [
       { id: "onprem", label: "On-Premises\nDatacenter", service: "On-Prem", x: 80, y: 200, color: "#5f6368", icon: "Building2" },
       { id: "interconnect", label: "Cloud\nInterconnect", service: "Network", x: 230, y: 150, color: "#34A853", icon: "Cable" },
@@ -212,6 +258,12 @@ export const ARCHITECTURES: Architecture[] = [
       "Gemini ベースのオーケストレーターが複数の専門エージェント（検索・コード・データ）を協調させるマルチエージェントシステム。",
     category: "AI/ML",
     tags: ["adk", "agents", "gemini", "ai", "multi-agent"],
+    layers: [
+      { id: "l-input", label: "Input", color: "#5f6368", nodeIds: ["user-input"] },
+      { id: "l-orchestration", label: "Orchestration Layer", color: "#4285F4", nodeIds: ["orchestrator", "vertex-llm"] },
+      { id: "l-agents", label: "Specialist Agents", color: "#34A853", nodeIds: ["search-agent", "code-agent", "data-agent"] },
+      { id: "l-tools", label: "Tool Layer", color: "#FBBC05", nodeIds: ["google-search", "code-exec", "bigquery-tool"] },
+    ],
     nodes: [
       { id: "user-input", label: "User Input", service: "User", x: 60, y: 200, color: "#5f6368", icon: "MessageSquare" },
       { id: "orchestrator", label: "Orchestrator\n(Gemini)", service: "ADK", x: 220, y: 200, color: "#4285F4", icon: "Brain" },
@@ -246,6 +298,12 @@ export const ARCHITECTURES: Architecture[] = [
       "ドキュメントをベクトル化して Vector Search に格納し、Gemini が検索結果を基に回答するRAGアーキテクチャ。ハルシネーション低減に効果的。",
     category: "AI/ML",
     tags: ["rag", "gemini", "vector-search", "genai", "llm"],
+    layers: [
+      { id: "l-ingest", label: "Document Ingestion", color: "#5f6368", nodeIds: ["docs", "gcs"] },
+      { id: "l-embedding", label: "Embedding / Index", color: "#4285F4", nodeIds: ["embeddings", "vector-search"] },
+      { id: "l-query", label: "Query / Retrieval", color: "#34A853", nodeIds: ["user-query", "reranker"] },
+      { id: "l-generation", label: "Generation / Monitoring", color: "#4285F4", nodeIds: ["gemini", "monitoring"] },
+    ],
     nodes: [
       { id: "docs", label: "Documents", service: "Source", x: 40, y: 200, color: "#5f6368", icon: "HardDrive" },
       { id: "gcs", label: "Cloud Storage\n(GCS)", service: "Storage", x: 180, y: 200, color: "#4285F4", icon: "HardDrive" },
@@ -275,6 +333,12 @@ export const ARCHITECTURES: Architecture[] = [
       "Eventarc がクラウドサービスのイベントをトリガーし、Cloud Functions / Cloud Run / Pub/Sub で疎結合に処理するイベント駆動アーキテクチャ。",
     category: "Architecture",
     tags: ["event-driven", "eventarc", "serverless", "cloud-functions"],
+    layers: [
+      { id: "l-sources", label: "Event Sources", color: "#4285F4", nodeIds: ["gcs-event", "gce-event", "firestore-event"] },
+      { id: "l-router", label: "Event Router", color: "#34A853", nodeIds: ["eventarc"] },
+      { id: "l-handlers", label: "Event Handlers", color: "#FBBC05", nodeIds: ["cf-handler", "run-handler", "pubsub"] },
+      { id: "l-sinks", label: "Data Sinks", color: "#EA4335", nodeIds: ["bq-sink", "firestore-sink", "notification"] },
+    ],
     nodes: [
       { id: "gcs-event", label: "Cloud Storage\n(Event)", service: "Storage", x: 60, y: 120, color: "#4285F4", icon: "HardDrive" },
       { id: "gce-event", label: "Compute Engine\n(Event)", service: "Compute", x: 60, y: 240, color: "#4285F4", icon: "Server" },
@@ -308,6 +372,13 @@ export const ARCHITECTURES: Architecture[] = [
       "GitHub → Cloud Build → Artifact Registry → Cloud Deploy → GKE による自動化されたCI/CDパイプライン。dev/staging/prod 環境への段階的デプロイに対応。",
     category: "DevOps",
     tags: ["cicd", "cloud-build", "gke", "cloud-deploy", "devops"],
+    layers: [
+      { id: "l-source", label: "Source", color: "#5f6368", nodeIds: ["github"] },
+      { id: "l-ci", label: "CI (Build & Test)", color: "#34A853", nodeIds: ["cloud-build", "sonar"] },
+      { id: "l-registry", label: "Artifact Management", color: "#4285F4", nodeIds: ["artifact-reg"] },
+      { id: "l-cd", label: "CD (Delivery)", color: "#34A853", nodeIds: ["cloud-deploy", "monitoring"] },
+      { id: "l-env", label: "Target Environments", color: "#4285F4", nodeIds: ["gke-dev", "gke-staging", "gke-prod"] },
+    ],
     nodes: [
       { id: "github", label: "GitHub\n(Source)", service: "GitHub", x: 40, y: 200, color: "#5f6368", icon: "Code2" },
       { id: "cloud-build", label: "Cloud Build\n(CI)", service: "Cloud Build", x: 180, y: 200, color: "#34A853", icon: "GitBranch" },
@@ -339,6 +410,13 @@ export const ARCHITECTURES: Architecture[] = [
       "複数ソースからデータレイク（GCS）に集約し、Dataproc/Dataflow で加工、BigQuery + Looker でBI分析する統合データプラットフォーム。",
     category: "Analytics",
     tags: ["analytics", "bigquery", "dataproc", "looker", "data-platform"],
+    layers: [
+      { id: "l-sources", label: "Data Sources", color: "#5f6368", nodeIds: ["db-source", "api-source"] },
+      { id: "l-lake", label: "Data Lake", color: "#4285F4", nodeIds: ["gcs-lake", "dataplex"] },
+      { id: "l-processing", label: "Processing / Transform", color: "#4285F4", nodeIds: ["dataproc", "dataflow", "dbt"] },
+      { id: "l-warehouse", label: "Data Warehouse", color: "#4285F4", nodeIds: ["bq-raw", "bq-dwh"] },
+      { id: "l-bi", label: "BI / Visualization", color: "#34A853", nodeIds: ["looker"] },
+    ],
     nodes: [
       { id: "db-source", label: "DB Sources\n(RDB/SaaS)", service: "Source", x: 40, y: 140, color: "#5f6368", icon: "Database" },
       { id: "api-source", label: "API Sources\n(REST/Stream)", service: "Source", x: 40, y: 260, color: "#5f6368", icon: "Globe" },

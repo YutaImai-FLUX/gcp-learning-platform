@@ -61,6 +61,27 @@ export default function ArchDetailPage() {
         </CardHeader>
         <CardContent>
           <ArchDiagram architecture={arch} />
+
+          {/* Layer legend */}
+          {arch.layers && arch.layers.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-4">
+              {arch.layers.map((layer) => (
+                <div
+                  key={layer.id}
+                  className="flex items-center gap-1.5 text-xs"
+                >
+                  <div
+                    className="w-4 h-3 rounded border-2 border-dashed"
+                    style={{
+                      borderColor: `${layer.color}50`,
+                      backgroundColor: `${layer.color}10`,
+                    }}
+                  />
+                  <span className="text-muted-foreground font-medium">{layer.label}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
