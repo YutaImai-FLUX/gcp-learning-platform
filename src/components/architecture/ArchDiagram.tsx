@@ -125,7 +125,7 @@ function getLayoutedElements(arch: Architecture) {
       id: n.id,
       type: "gcpNode",
       position: { x: pos.x - NODE_W / 2, y: pos.y - NODE_H / 2 },
-      data: { label: n.label, service: n.service, color: n.color, icon: n.icon },
+      data: { label: n.label, service: n.service, color: n.color, icon: n.icon, role: n.role },
       zIndex: 1,
     })
   }
