@@ -22,6 +22,7 @@ import {
   Key,
   Building2,
   FileSearch,
+  Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
@@ -73,6 +74,11 @@ const navItems = [
     label: "資格学習センター",
     href: "/learn",
     icon: GraduationCap,
+  },
+  {
+    label: "アップデート情報",
+    href: "/updates",
+    icon: Sparkles,
   },
 ]
 
