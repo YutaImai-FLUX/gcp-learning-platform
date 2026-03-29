@@ -46,6 +46,93 @@ const CATEGORY_CONFIG: Record<NewsCategory, { label: string; color: string; icon
 
 const NEWS_ITEMS: NewsItem[] = [
   {
+    id: "gemini-3-1-flash-lite-preview",
+    date: "2026-03",
+    category: "ai",
+    title: "Gemini 3.1 Flash-Lite プレビュー公開 & Flash Live リアルタイム音声モデル登場",
+    description:
+      "Gemini 3 シリーズ初の軽量モデル「Gemini 3.1 Flash-Lite」がプレビュー公開。低コスト・高速推論を実現し、大量処理タスクに最適化されています。同時に、リアルタイム音声対話向けの「Gemini 3.1 Flash Live」もリリースされ、音声AIアプリケーション開発が加速しました。",
+    highlights: [
+      "Gemini 3.1 Flash-Lite がプレビュー公開、Gemini 3シリーズの低コストモデルとして位置づけ",
+      "リアルタイム音声to音声対話向け Gemini 3.1 Flash Live が新登場",
+      "Computer Use ツールサポートが gemini-3-pro-preview と gemini-3-flash-preview に追加",
+    ],
+    sourceUrl: "https://ai.google.dev/gemini-api/docs/changelog",
+    sourceLabel: "Gemini API Release Notes",
+    icon: Sparkles,
+    color: "#4285F4",
+    isHighlight: true,
+  },
+  {
+    id: "lyria-3-music-generation",
+    date: "2026-03",
+    category: "ai",
+    title: "Lyria 3 音楽生成モデル公開 -- テキスト・画像から高品質音楽を生成",
+    description:
+      "Google が Lyria 3 音楽生成モデルをプレビューリリース。テキストと画像を入力として 48kHz ステレオの高品質音楽を生成可能。30秒クリップ用の「lyria-3-clip-preview」とフルレングス曲用の「lyria-3-pro-preview」の2モデルが公開されました。",
+    highlights: [
+      "30秒クリップ生成 (lyria-3-clip-preview) とフルソング生成 (lyria-3-pro-preview) の2モデルを提供",
+      "テキスト・画像入力から 48kHz ステレオ高品質音声を生成",
+      "Lyria 3 Pro で最長3分のトラック作成が可能",
+    ],
+    sourceUrl: "https://ai.google.dev/gemini-api/docs/changelog",
+    sourceLabel: "Gemini API Release Notes",
+    icon: Brain,
+    color: "#4285F4",
+  },
+  {
+    id: "gemini-workspace-march-2026",
+    date: "2026-03",
+    category: "ai",
+    title: "Gemini が Google Workspace を大幅強化 -- Drive・Docs・Sheets・Slides に AI 概要機能",
+    description:
+      "Gemini が Google Docs・Sheets・Slides・Drive において大幅アップグレード。ファイル・メール・Web の情報を統合参照する個人化機能がベータ公開。Google Drive では AI 概要が検索結果上部に表示され、ファイル内容を引用付きで要約します。",
+    highlights: [
+      "Google Drive の AI 概要機能で検索結果を引用付き自動要約",
+      "Docs・Sheets・Slides でファイル・メール・Web の情報を横断参照",
+      "Google AI Ultra/Pro サブスクライバー向けにまずグローバルでベータ提供開始",
+    ],
+    sourceUrl: "https://blog.google/products-and-platforms/products/workspace/gemini-workspace-updates-march-2026/",
+    sourceLabel: "Google Blog",
+    icon: Sparkles,
+    color: "#34A853",
+    isHighlight: true,
+  },
+  {
+    id: "compute-engine-instance-flexibility-ga",
+    date: "2026-03",
+    category: "cloud",
+    title: "Compute Engine「Instance Flexibility」GA & Hyperdisk スループット倍増",
+    description:
+      "Compute Engine の Instance Flexibility が一般提供（GA）開始。複数の適切なマシンタイプを指定すると、リージョン内のキャパシティ・クォータに基づいて VM を自動プロビジョニングします。また Hyperdisk Balanced High Availability の最大スループットが 1,200 MiB/s から 2,400 MiB/s に倍増しました。",
+    highlights: [
+      "複数マシンタイプ指定によるキャパシティ自動選択プロビジョニングが GA",
+      "Hyperdisk Balanced High Availability の最大スループットが 2,400 MiB/s に倍増",
+      "Compute Engine アルファ API がプロジェクトレベルでセルフサービス GA",
+    ],
+    sourceUrl: "https://cloud.google.com/release-notes",
+    sourceLabel: "Google Cloud Release Notes",
+    icon: Cpu,
+    color: "#34A853",
+  },
+  {
+    id: "dataflow-parallel-update",
+    date: "2026-03",
+    category: "data",
+    title: "Dataflow ストリーミングジョブの自動並列アップデートワークフローをサポート",
+    description:
+      "Dataflow がストリーミングジョブ向けの自動並列アップデートワークフローをリリース。新しい置き換えジョブを既存ジョブと並行して起動し、完了後に旧ジョブを自動ドレインすることで、更新時の中断を最小化します。",
+    highlights: [
+      "新ジョブを並行起動→自動ドレインによるゼロダウンタイム更新を実現",
+      "ストリーミングジョブ更新時のデータ処理中断を大幅に削減",
+      "手動更新と比較してオペレーション負荷を大幅軽減",
+    ],
+    sourceUrl: "https://cloud.google.com/release-notes",
+    sourceLabel: "Google Cloud Release Notes",
+    icon: Database,
+    color: "#FBBC05",
+  },
+  {
     id: "gemini-3-1-pro-preview",
     date: "2026-03",
     category: "ai",
@@ -220,91 +307,6 @@ const NEWS_ITEMS: NewsItem[] = [
     sourceLabel: "Google Blog",
     icon: Network,
     color: "#4285F4",
-  },
-  {
-    id: "vertex-ai-agent-engine",
-    date: "2025-04",
-    category: "ai",
-    title: "Vertex AI Agent Engine の提供開始",
-    description:
-      "旧 Vertex AI Agent Builder を刷新・拡張した Vertex AI Agent Engine を発表。ADK やその他フレームワークで構築したAIエージェントをマネージドランタイムとしてデプロイできます。セッション管理、Google Search によるグラウンディング、エンタープライズセキュリティ機能を内蔵。",
-    highlights: [
-      "フルマネージドなエージェント実行環境",
-      "Google Search グラウンディングによる回答精度向上",
-      "エンタープライズ向けセキュリティ・セッション管理",
-    ],
-    sourceUrl: "https://cloud.google.com/products/agent-engine",
-    sourceLabel: "Google Cloud",
-    icon: Brain,
-    color: "#4285F4",
-  },
-  {
-    id: "ironwood-tpu",
-    date: "2025-04",
-    category: "cloud",
-    title: "Ironwood TPU (第7世代) 発表",
-    description:
-      "大規模AI推論ワークロードに特化した第7世代 TPU「Ironwood」を発表。前世代比で大幅な電力効率改善を達成し、最大9,216チップのポッドにスケールアウト可能。AI推論のコスト効率と性能を両立する設計です。",
-    highlights: [
-      "AI推論に特化した設計で電力効率を大幅改善",
-      "最大 9,216 チップのポッドスケール",
-      "大規模言語モデルの推論コスト削減に貢献",
-    ],
-    sourceUrl: "https://cloud.google.com/blog/products/ai-machine-learning/ironwood-tpu-google-cloud-next-2025",
-    sourceLabel: "Google Cloud Blog",
-    icon: Cpu,
-    color: "#34A853",
-  },
-  {
-    id: "gemini-in-bigquery",
-    date: "2025-Q1",
-    category: "data",
-    title: "Gemini in BigQuery が GA (一般提供) に",
-    description:
-      "BigQuery の Gemini 搭載機能が一般提供開始。自然言語から SQL への変換、AI によるデータ探索、SQL クエリから直接 Gemini モデルを呼び出す ML.GENERATE_TEXT 機能を利用可能に。ベクトル検索や Vertex AI との深い統合も追加されました。",
-    highlights: [
-      "自然言語 → SQL 自動変換で分析を高速化",
-      "ML.GENERATE_TEXT で SQL から LLM を直接呼び出し",
-      "ベクトル検索機能と Vertex AI パイプライン連携",
-    ],
-    sourceUrl: "https://cloud.google.com/bigquery/docs/generate-text",
-    sourceLabel: "BigQuery Documentation",
-    icon: Database,
-    color: "#FBBC05",
-  },
-  {
-    id: "security-command-center",
-    date: "2025-Q1",
-    category: "security",
-    title: "Security Command Center Enterprise の強化",
-    description:
-      "Gemini を活用した脅威検出、Mandiant 脅威インテリジェンス統合、自動修復ワークフローを搭載。SIEM・SOAR・クラウドセキュリティポスチャ管理を統合した Google SecOps ブランドでの統合セキュリティ運用を実現しました。",
-    highlights: [
-      "Gemini による AI 脅威検出",
-      "Mandiant インテリジェンスとの統合",
-      "SIEM / SOAR / CSPM の統合セキュリティ運用",
-    ],
-    sourceUrl: "https://cloud.google.com/security/products/security-command-center",
-    sourceLabel: "Google Cloud Security",
-    icon: Shield,
-    color: "#EA4335",
-  },
-  {
-    id: "gke-autopilot",
-    date: "2025-Q1",
-    category: "devops",
-    title: "GKE Autopilot の GPU / AI ワークロード強化",
-    description:
-      "Google Kubernetes Engine Autopilot が GPU ワークロード対応を大幅に強化。AI/ML トレーニングジョブへのネイティブサポート、GPU シェアリングの簡素化、動的ワークロードスケジューリング、コスト最適化レコメンデーション機能が追加されました。",
-    highlights: [
-      "GPU ワークロードの Autopilot ネイティブサポート",
-      "AI/ML トレーニングジョブの簡素化",
-      "マルチクラスター管理の GKE Enterprise 統合",
-    ],
-    sourceUrl: "https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview",
-    sourceLabel: "GKE Documentation",
-    icon: Box,
-    color: "#5f6368",
   },
 ]
 
