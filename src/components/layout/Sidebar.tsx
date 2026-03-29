@@ -8,6 +8,7 @@ import {
   PlayCircle,
   Network,
   GraduationCap,
+  FileText,
   Server,
   HardDrive,
   BarChart3,
@@ -52,6 +53,11 @@ const navItems = [
     label: "アーキテクチャ図",
     href: "/architecture",
     icon: Network,
+  },
+  {
+    label: "提案シミュレーター",
+    href: "/proposal",
+    icon: FileText,
   },
   {
     label: "資格学習センター",
