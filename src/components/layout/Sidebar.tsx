@@ -76,7 +76,7 @@ const navItems = [
     icon: GraduationCap,
   },
   {
-    label: "アップデート情報",
+    label: "最新アップデート",
     href: "/updates",
     icon: Sparkles,
   },
