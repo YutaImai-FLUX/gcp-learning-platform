@@ -18,6 +18,10 @@ import {
   Zap,
   ChevronDown,
   Bot,
+  Shield,
+  Key,
+  Building2,
+  FileSearch,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
@@ -47,6 +51,12 @@ const navItems = [
       { label: "Vertex AI", href: "/demos/vertex-ai", icon: Brain },
       { label: "Cloud Functions", href: "/demos/cloud-functions", icon: Zap },
       { label: "ADK (AI Agents)", href: "/demos/adk", icon: Bot },
+      { label: "─ Security ─", href: "", icon: Shield, separator: true },
+      { label: "IAM ポリシー", href: "/demos/iam", icon: Shield },
+      { label: "VPC & Firewall", href: "/demos/vpc-firewall", icon: Network },
+      { label: "サービスアカウント", href: "/demos/service-accounts", icon: Key },
+      { label: "Org Policy", href: "/demos/org-policy", icon: Building2 },
+      { label: "Audit Logs", href: "/demos/audit-logs", icon: FileSearch },
     ],
   },
   {
@@ -111,6 +121,13 @@ export function Sidebar() {
                 {expandedDemos && (
                   <div className="ml-4 mt-1 space-y-1 border-l border-border pl-3">
                     {item.children.map((child) => {
+                      if ((child as { separator?: boolean }).separator) {
+                        return (
+                          <div key={child.label} className="pt-2 pb-1 px-1">
+                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{child.label.replace(/─/g, "").trim()}</span>
+                          </div>
+                        )
+                      }
                       const ChildIcon = child.icon
                       const childActive = pathname === child.href
                       return (
