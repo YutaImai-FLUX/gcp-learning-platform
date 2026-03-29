@@ -9,8 +9,6 @@ import {
   Shield,
   Database,
   Box,
-  Code2,
-  Flame,
   Bot,
   Network,
   Search,
@@ -47,6 +45,94 @@ const CATEGORY_CONFIG: Record<NewsCategory, { label: string; color: string; icon
 }
 
 const NEWS_ITEMS: NewsItem[] = [
+  {
+    id: "gemini-3-1-pro-preview",
+    date: "2026-03",
+    category: "ai",
+    title: "Gemini 3.1 Pro プレビュー公開 -- 強化された推論とエージェント機能",
+    description:
+      "Google が Gemini 3.1 Pro をプレビューリリース。複雑な問題解決に特化した最先端の推論モデルで、Vertex AI・Google AI Studio・Gemini CLI からアクセス可能。ソフトウェアエンジニアリングと金融・スプレッドシート分野のエージェント性能が大幅向上しました。",
+    highlights: [
+      "MEDIUM 思考レベルパラメータ追加でコスト・性能・速度のバランスを最適化",
+      "SWEベンチマークで最高水準スコアを達成した高度なコーディング能力",
+      "100万トークンコンテキストウィンドウで長文・大規模コードリポジトリに対応",
+    ],
+    sourceUrl: "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-1-pro",
+    sourceLabel: "Vertex AI Documentation",
+    icon: Sparkles,
+    color: "#4285F4",
+    isHighlight: true,
+  },
+  {
+    id: "vector-search-2-ga",
+    date: "2026-03",
+    category: "data",
+    title: "Vector Search 2.0 が一般提供 (GA) 開始 -- ハイブリッド検索統合",
+    description:
+      "Vertex AI Vector Search 2.0 が正式に一般提供開始。ベクトル検索・全文検索・セマンティック再ランキングを単一の並列クエリで実行するハイブリッド検索機能を搭載。AI アプリケーションの知識コアとして機能する高度な検索エンジンです。",
+    highlights: [
+      "ベクトル検索・全文検索・セマンティック再ランキングの単一クエリ統合",
+      "コレクション単位でデータとベクトルを一元管理するシンプルなデータモデル",
+      "自動埋め込み生成 (Auto-Embeddings) でベクトルフィールドの自動設定が可能",
+    ],
+    sourceUrl: "https://cloud.google.com/vertex-ai/docs/vector-search/overview",
+    sourceLabel: "Google Cloud Documentation",
+    icon: Database,
+    color: "#FBBC05",
+    isHighlight: true,
+  },
+  {
+    id: "cloud-run-gpu-networking-march26",
+    date: "2026-03",
+    category: "devops",
+    title: "Cloud Run に NVIDIA RTX PRO 6000 Blackwell GPU とIPv6デュアルスタック対応",
+    description:
+      "Cloud Run が NVIDIA RTX PRO 6000 Blackwell GPU のプレビューサポートを追加し、GPU on Cloud Run Jobs が一般提供へ昇格。ネットワーク面では IPv6 デュアルスタックサブネット対応が GA に、Direct VPC Egress で VPC Flow Logs とプライベート NAT もサポートされました。",
+    highlights: [
+      "NVIDIA RTX PRO 6000 Blackwell GPU がサービス・ジョブ・ワーカープールで利用可能 (Preview)",
+      "IPv6デュアルスタックサブネット対応 GA で外部IPv6トラフィックを直接処理",
+      "Python ADK (Agent Development Kit) フレームワーク対応がソースデプロイで GA に",
+    ],
+    sourceUrl: "https://docs.cloud.google.com/run/docs/release-notes",
+    sourceLabel: "Cloud Run Release Notes",
+    icon: Box,
+    color: "#5f6368",
+  },
+  {
+    id: "gke-openssl-security-bulletin",
+    date: "2026-03",
+    category: "security",
+    title: "GKE OpenSSL脆弱性パッチ (GCP-2026-006) とMCP IAM制御の変更",
+    description:
+      "GKE が OpenSSL の重大な脆弱性 CVE-2025-15467 (リモートコード実行の可能性) に対処するセキュリティアップデートをリリース。また、2026年3月17日以降 GKE の MCP サーバー制御が組織ポリシーから IAM 拒否ポリシーに移行しました。",
+    highlights: [
+      "CVE-2025-15467 (OpenSSL RCE) を含む複数のカーネル脆弱性を修正",
+      "GKE Regularチャンネルのデフォルトバージョンが 1.35.1-gke.1396002 に更新",
+      "MCP サーバーの利用制御が組織ポリシーから IAM 拒否ポリシーに移行",
+    ],
+    sourceUrl: "https://cloud.google.com/support/bulletins",
+    sourceLabel: "Google Cloud Security Bulletins",
+    icon: Shield,
+    color: "#EA4335",
+  },
+  {
+    id: "bigquery-conversational-analytics-march26",
+    date: "2026-03",
+    category: "data",
+    title: "BigQuery に会話型アナリティクスとMigration Service MCPサーバーが追加",
+    description:
+      "BigQuery Studio に自然言語でデータを分析できる「会話型アナリティクス」エージェントが導入。さらに BigQuery Migration Service MCP サーバー (Preview) が公開され、AIエージェントが SQL 翻訳・DDL生成・クエリ説明を直接実行できるようになりました。",
+    highlights: [
+      "会話型アナリティクスエージェントがクエリ生成・実行・可視化をワンストップで対応",
+      "BigQuery Migration Service MCPサーバーでレガシーSQL→GoogleSQL の AI 翻訳が可能",
+      "BigQuery→Spanner へのリバース ETL が EXPORT DATA 文経由で GA に",
+    ],
+    sourceUrl: "https://mwpro.co.uk/blog/2026/03/27/gcp-release-notes-march-26-2026/",
+    sourceLabel: "GCP Release Notes (March 26, 2026)",
+    icon: Database,
+    color: "#FBBC05",
+    isHighlight: true,
+  },
   {
     id: "gemini-2-5-pro",
     date: "2025-03",
@@ -219,92 +305,6 @@ const NEWS_ITEMS: NewsItem[] = [
     sourceLabel: "GKE Documentation",
     icon: Box,
     color: "#5f6368",
-  },
-  {
-    id: "gemini-code-assist",
-    date: "2025-03",
-    category: "ai",
-    title: "Gemini Code Assist Enterprise の拡張",
-    description:
-      "組織のプライベートコードベースに基づくカスタマイズ、コードベース全体を考慮した高精度なサジェスト、アプリケーション開発ライフサイクルツールとの統合など、エンタープライズ向け機能を大幅に強化。VS Code、JetBrains、Cloud Shell Editor に対応しています。",
-    highlights: [
-      "プライベートコードベースに基づくカスタマイズ",
-      "リポジトリ全体の文脈を理解した高精度サジェスト",
-      "VS Code / JetBrains / Cloud Shell Editor 対応",
-    ],
-    sourceUrl: "https://cloud.google.com/products/gemini-code-assist",
-    sourceLabel: "Google Cloud",
-    icon: Code2,
-    color: "#4285F4",
-  },
-  {
-    id: "firestore-vector-search",
-    date: "2025-Q1",
-    category: "data",
-    title: "Cloud Firestore にベクトル検索機能追加",
-    description:
-      "Cloud Firestore にネイティブのベクトル検索機能が追加。ドキュメントデータと一緒にベクトル埋め込みを保存し、Firestore 内で直接近傍探索を実行可能に。RAG アプリケーション構築において別途ベクトルDBが不要になりました。",
-    highlights: [
-      "ドキュメントとベクトル埋め込みの統合管理",
-      "Firestore 内でのネイティブ近傍探索",
-      "RAG アプリ構築の簡素化（別途ベクトルDB不要）",
-    ],
-    sourceUrl: "https://firebase.google.com/docs/firestore/vector-search",
-    sourceLabel: "Firebase Documentation",
-    icon: Flame,
-    color: "#FBBC05",
-  },
-  {
-    id: "gemini-2-0-flash-ga",
-    date: "2025-02",
-    category: "ai",
-    title: "Gemini 2.0 Flash が一般提供開始",
-    description:
-      "2024年12月のプレビューを経て Gemini 2.0 Flash が GA に。テキスト・画像・音声のネイティブマルチモーダル出力、ネイティブツール使用、100万トークンのコンテキストウィンドウを備えたモデルとして、Gemini 消費者向け製品のデフォルトモデルに採用されました。",
-    highlights: [
-      "テキスト・画像・音声のマルチモーダル出力",
-      "ネイティブツール使用 (Function Calling)",
-      "100万トークンのコンテキストウィンドウ",
-    ],
-    sourceUrl: "https://developers.googleblog.com/en/gemini-2-family-expands/",
-    sourceLabel: "Google Developers Blog",
-    icon: Sparkles,
-    color: "#4285F4",
-  },
-  {
-    id: "alloydb-ai",
-    date: "2025-04",
-    category: "data",
-    title: "AlloyDB AI -- データベース内蔵AIの強化",
-    description:
-      "PostgreSQL 互換の AlloyDB に AI 機能を大幅強化。ベクトル埋め込み生成のビルトインサポート、自然言語クエリの LLM 統合、AI/ML ワークロード向けのパフォーマンス最適化を実現。AlloyDB Omni のハイブリッド/マルチクラウド展開も拡充しました。",
-    highlights: [
-      "ベクトル埋め込み生成のビルトインサポート",
-      "自然言語クエリの LLM 統合",
-      "AlloyDB Omni によるハイブリッド / マルチクラウド対応",
-    ],
-    sourceUrl: "https://cloud.google.com/alloydb/docs/ai",
-    sourceLabel: "AlloyDB Documentation",
-    icon: Database,
-    color: "#FBBC05",
-  },
-  {
-    id: "unified-security",
-    date: "2025-04",
-    category: "security",
-    title: "Google 統合セキュリティプラットフォーム",
-    description:
-      "Google Threat Intelligence、Security Command Center、Security Operations (Chronicle SIEM/SOAR)、Mandiant の専門知識を単一プラットフォームに統合。Gemini を活用したセキュリティエージェントがアラートトリアージ・調査・対応自動化を支援します。",
-    highlights: [
-      "脅威インテリジェンス・SIEM・SOAR・CSPM の統合",
-      "Gemini セキュリティエージェントによる自動化",
-      "Mandiant の専門知識をプラットフォームに内蔵",
-    ],
-    sourceUrl: "https://cloud.google.com/security",
-    sourceLabel: "Google Cloud Security",
-    icon: Shield,
-    color: "#EA4335",
-    isHighlight: true,
   },
 ]
 
