@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useState, useRef, useCallback } from "react"
+import { memo, useState, useRef, useCallback, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import type { LucideIcon } from "lucide-react"
@@ -45,6 +45,13 @@ function GcpNodeComponent({ data }: NodeProps) {
   const productName = lines[0]
   const description = getServiceDescription(label)
   const hasTooltip = description || role
+
+  // W4 fix: clear timer on unmount to avoid memory leak
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [])
 
   const handleMouseEnter = useCallback(() => {
     if (!hasTooltip || !nodeRef.current) return

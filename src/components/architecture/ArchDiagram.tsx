@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useCallback } from "react"
+import { useMemo, useCallback, useEffect } from "react"
 import {
   ReactFlow,
   Background,
@@ -168,8 +168,14 @@ export default function ArchDiagram({ architecture }: Props) {
     [architecture]
   )
 
-  const [nodes, , onNodesChange] = useNodesState(layoutedNodes)
-  const [edges, , onEdgesChange] = useEdgesState(layoutedEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges)
+
+  // W1 fix: sync state when architecture prop changes
+  useEffect(() => {
+    setNodes(layoutedNodes)
+    setEdges(layoutedEdges)
+  }, [layoutedNodes, layoutedEdges, setNodes, setEdges])
 
   const miniMapNodeColor = useCallback((node: Node) => {
     if (node.type === "layerNode") return "transparent"

@@ -64,7 +64,10 @@ export const SERVICE_PRICING: Record<string, ServicePricing> = {
 
 export function getServiceCost(productId: string, scale: ProjectScale): number {
   const p = SERVICE_PRICING[productId]
-  if (!p) return 50 // fallback
+  if (!p) {
+    console.warn(`[Pricing] Unknown productId: "${productId}" — using fallback $50`)
+    return 50
+  }
   return Math.round(p.baseMonthlyCost * p.scaleMultipliers[scale])
 }
 

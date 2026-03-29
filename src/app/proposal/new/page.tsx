@@ -90,9 +90,14 @@ export default function ProposalNewPage() {
   const handleGenerate = () => {
     setGenerating(true)
     setTimeout(() => {
-      const result = generateProposal(input)
-      setProposal(result)
-      setGenerating(false)
+      try {
+        const result = generateProposal(input)
+        setProposal(result)
+      } catch {
+        // 生成失敗時もUIを復帰させる
+      } finally {
+        setGenerating(false)
+      }
     }, 1500)
   }
 
@@ -179,7 +184,7 @@ export default function ProposalNewPage() {
               <Card>
                 <CardHeader><CardTitle className="text-sm">業種</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {(Object.entries(INDUSTRY_META) as [Industry, typeof INDUSTRY_META[Industry]][]).map(([key, meta]) => {
                       const Ic = ICON_MAP[meta.icon] || Box
                       const selected = input.industry === key
@@ -281,7 +286,7 @@ export default function ProposalNewPage() {
               <Card>
                 <CardHeader><CardTitle className="text-sm">予算レンジ</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {(Object.entries(BUDGET_META) as [string, typeof BUDGET_META[string]][]).map(([key, meta]) => {
                       const selected = input.budgetRange === key
                       return (
@@ -527,7 +532,7 @@ function ProposalResult({
           {resultTab === "cost" && (
             <div className="space-y-4">
               {/* Cost summary cards */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Card className="text-center">
                   <CardContent className="pt-4">
                     <div className="text-2xl font-bold text-gcp-blue">${proposal.costBreakdown.totalMonthlyCost.toLocaleString()}</div>

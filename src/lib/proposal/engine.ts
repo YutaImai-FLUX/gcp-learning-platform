@@ -53,6 +53,7 @@ const PRODUCT_ICON_MAP: Record<string, string> = {
   "firebase-hosting": "Globe",
   "firebase-auth": "Lock",
   "looker-studio": "LineChart",
+  "app-engine": "Play",
 }
 
 const PRODUCT_COLOR_MAP: Record<string, string> = {
@@ -85,6 +86,8 @@ const PRODUCT_COLOR_MAP: Record<string, string> = {
   "cloud-interconnect": "#34A853",
   "cloud-vpn": "#34A853",
   "cloud-iam": "#EA4335",
+  "cloud-dns": "#34A853",
+  "app-engine": "#4285F4",
 }
 
 /* ─── Scale duration multipliers ─── */
@@ -232,7 +235,7 @@ export function generateProposal(input: ProposalInput): GeneratedProposal {
     monthlyCost: s.estimatedMonthlyCost,
   }))
   const totalMonthlyCost = costServices.reduce((sum, s) => sum + s.monthlyCost, 0)
-  const annualCost = totalMonthlyCost * 12
+  const annualCost = Math.round(totalMonthlyCost * 12)
   const cudSavings = recommendedServices.reduce(
     (sum, s) => sum + s.estimatedMonthlyCost * getCudDiscount(s.productId),
     0,
