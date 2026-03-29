@@ -278,6 +278,7 @@ export default function OrgPolicyDemo() {
       description="組織ポリシーでリソース作成を制御し、階層的なガバナンスを体験する"
       service="Resource Manager"
       color="#FBBC05"
+      demoId="org-policy"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ── Left Column: Hierarchy Tree ── */}

@@ -252,6 +252,7 @@ export default function VertexAIDemo() {
       description="機械学習モデルのデプロイと予測リクエストを体験します"
       service="Vertex AI"
       color="#4285F4"
+      demoId="vertex-ai"
     >
       <div className="space-y-4">
         {/* Tab bar */}

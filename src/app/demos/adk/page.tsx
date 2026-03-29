@@ -238,6 +238,7 @@ export default function ADKDemo() {
       description="Geminiを活用したAIエージェントの構築・マルチエージェントオーケストレーションを体験"
       service="Vertex AI ADK"
       color="#4285F4"
+      demoId="adk"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* ════════════════════════════════════════

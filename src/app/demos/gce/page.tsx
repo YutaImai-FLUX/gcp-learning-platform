@@ -126,6 +126,7 @@ export default function GCEDemo() {
       description="仮想マシンインスタンスを作成・管理します"
       service="Compute Engine"
       color="#4285F4"
+      demoId="gce"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Create form */}

@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getProductById, GCP_PRODUCTS, CATEGORY_COLORS } from "@/lib/data/products"
+import { getCertsForProduct, getArchsForProduct, getDemosForProduct } from "@/lib/data/cross-references"
+import { RelatedCerts, RelatedArchitectures, RelatedDemos } from "@/components/shared/RelatedContent"
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -131,6 +133,25 @@ export default function ProductDetailPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Related Certs, Architectures, Demos */}
+      {(() => {
+        const certIds = getCertsForProduct(product.id)
+        const archIds = getArchsForProduct(product.id)
+        const demoIds = getDemosForProduct(product.id)
+        return (certIds.length > 0 || archIds.length > 0 || demoIds.length > 0) ? (
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">学習・実践リソース</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {demoIds.length > 0 && <RelatedDemos demoIds={demoIds} title="デモで体験する" />}
+              {certIds.length > 0 && <RelatedCerts certIds={certIds} title="この製品が出題される資格" />}
+              {archIds.length > 0 && <RelatedArchitectures archIds={archIds} title="使用されるアーキテクチャ" />}
+            </CardContent>
+          </Card>
+        ) : null
+      })()}
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (

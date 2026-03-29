@@ -3,16 +3,21 @@
 import Link from "next/link"
 import { ArrowLeft, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { getDemoContext } from "@/lib/data/cross-references"
+import { RelatedContentSection } from "@/components/shared/RelatedContent"
 
 interface DemoShellProps {
   title: string
   description: string
   service: string
   color: string
+  demoId?: string
   children: React.ReactNode
 }
 
-export function DemoShell({ title, description, service, color, children }: DemoShellProps) {
+export function DemoShell({ title, description, service, color, demoId, children }: DemoShellProps) {
+  const ctx = demoId ? getDemoContext(demoId) : undefined
+
   return (
     <div className="space-y-4">
       {/* Back nav */}
@@ -58,6 +63,16 @@ export function DemoShell({ title, description, service, color, children }: Demo
           {children}
         </div>
       </div>
+
+      {/* Related content (auto-populated from cross-reference registry) */}
+      {ctx && (
+        <RelatedContentSection
+          certIds={ctx.certIds}
+          archIds={ctx.archIds}
+          productIds={ctx.productIds}
+          title="関連する学習コンテンツ"
+        />
+      )}
     </div>
   )
 }

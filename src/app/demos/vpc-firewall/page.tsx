@@ -200,6 +200,7 @@ export default function VpcFirewallDemo() {
       description="VPC / サブネット / ファイアウォールルールを構築し、パケットフローを視覚的にシミュレート"
       service="VPC Network"
       color="#34A853"
+      demoId="vpc-firewall"
     >
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* ===== Left: Network Topology ===== */}

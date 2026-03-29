@@ -130,6 +130,7 @@ export default function AuditLogsDemo() {
       description="監査ログのリアルタイム分析とセキュリティインシデントの調査を体験する"
       service="Cloud Logging"
       color="#4285F4"
+      demoId="audit-logs"
     >
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border mb-4">

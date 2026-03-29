@@ -503,6 +503,7 @@ export default function ServiceAccountsDemo() {
       description="SA鍵管理 vs Workload Identity の比較体験。セキュリティリスクと推奨パターンを学ぶ"
       service="IAM - Service Accounts"
       color="#EA4335"
+      demoId="service-accounts"
     >
       {/* Tab bar */}
       <div className="flex gap-1 border-b border-border mb-4">

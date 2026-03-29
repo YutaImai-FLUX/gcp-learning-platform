@@ -149,6 +149,7 @@ export default function BigQueryDemo() {
       description="SQLクエリを実行してペタバイト規模のデータを分析します"
       service="BigQuery"
       color="#4285F4"
+      demoId="bigquery"
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
         {/* Left: Dataset explorer */}

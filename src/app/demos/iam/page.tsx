@@ -232,6 +232,7 @@ export default function IAMDemoPage() {
       description="GCP IAMのロール・ポリシーをインタラクティブにシミュレーション。リソース階層の継承やアクセス評価を体験できます。"
       service="IAM & Admin"
       color="#EA4335"
+      demoId="iam"
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Column - Resource Hierarchy & Configuration */}

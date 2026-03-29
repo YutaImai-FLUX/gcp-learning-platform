@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { getArchById } from "@/lib/data/architectures"
 import ArchDiagram from "@/components/architecture/ArchDiagram"
+import { getDemosForArch } from "@/lib/data/cross-references"
+import { RelatedDemos, RelatedCerts } from "@/components/shared/RelatedContent"
+import { DEMO_CONTEXTS } from "@/lib/data/cross-references"
 
 export default function ArchDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -84,6 +87,22 @@ export default function ArchDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Related demos & certs */}
+      {(() => {
+        const demoIds = getDemosForArch(id)
+        const certIds = Array.from(new Set(
+          DEMO_CONTEXTS.filter((d) => d.archIds.includes(id)).flatMap((d) => d.certIds)
+        ))
+        return (demoIds.length > 0 || certIds.length > 0) ? (
+          <Card className="border-border">
+            <CardContent className="p-5 space-y-4">
+              {demoIds.length > 0 && <RelatedDemos demoIds={demoIds} title="このアーキテクチャをデモで体験" />}
+              {certIds.length > 0 && <RelatedCerts certIds={certIds} title="このパターンが出題される資格" />}
+            </CardContent>
+          </Card>
+        ) : null
+      })()}
 
       {/* Details grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

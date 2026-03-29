@@ -90,6 +90,7 @@ export default function CloudRunDemo() {
       description="コンテナをサーバーレスでデプロイ・管理します"
       service="Cloud Run"
       color="#34A853"
+      demoId="cloud-run"
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Deploy form */}

@@ -62,6 +62,7 @@ export default function CloudFunctionsDemo() {
       description="サーバーレス関数の作成・デプロイ・テストを体験します"
       service="Cloud Functions"
       color="#FBBC05"
+      demoId="cloud-functions"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Left: Code editor + config */}

@@ -48,6 +48,9 @@ import ModuleReader from "@/components/learn/ModuleReader"
 import InfographicViewer from "@/components/infographics/InfographicViewer"
 import type { StudyModule } from "@/lib/types/study-module"
 import type { Infographic } from "@/lib/types/infographic"
+import { getDemosForCert, serviceNameToProductId, PRODUCT_TO_DEMO } from "@/lib/data/cross-references"
+import { RelatedDemos, RelatedArchitectures } from "@/components/shared/RelatedContent"
+import { DEMO_CONTEXTS } from "@/lib/data/cross-references"
 
 type TabKey = "overview" | "exam" | "plan" | "resources" | "labs" | "modules" | "security"
 
@@ -553,7 +556,7 @@ export default function CertDetailPage() {
                 </CardContent>
               </Card>
 
-              {/* Key services */}
+              {/* Key services - clickable links */}
               <Card className="border-border">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -563,18 +566,51 @@ export default function CertDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
-                    {cert.keyServices.map((svc) => (
-                      <Badge
-                        key={svc}
-                        className="text-xs border-0"
-                        style={{ backgroundColor: `${cert.color}18`, color: cert.color }}
-                      >
-                        {svc}
-                      </Badge>
-                    ))}
+                    {cert.keyServices.map((svc) => {
+                      const productId = serviceNameToProductId(svc)
+                      const demoPath = productId ? PRODUCT_TO_DEMO[productId] : undefined
+                      return productId ? (
+                        <Link key={svc} href={`/products/${productId}`}>
+                          <Badge
+                            className="text-xs border-0 cursor-pointer hover:opacity-80 transition-opacity"
+                            style={{ backgroundColor: `${cert.color}18`, color: cert.color }}
+                          >
+                            {svc}
+                            {demoPath && <Play size={9} className="ml-1" />}
+                          </Badge>
+                        </Link>
+                      ) : (
+                        <Badge
+                          key={svc}
+                          className="text-xs border-0"
+                          style={{ backgroundColor: `${cert.color}18`, color: cert.color }}
+                        >
+                          {svc}
+                        </Badge>
+                      )
+                    })}
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Related demos & architectures for this cert */}
+              {(() => {
+                const demoIds = getDemosForCert(cert.id)
+                const archIds = Array.from(new Set(
+                  DEMO_CONTEXTS.filter((d) => d.certIds.includes(cert.id)).flatMap((d) => d.archIds)
+                ))
+                return (demoIds.length > 0 || archIds.length > 0) ? (
+                  <Card className="border-border border-l-4" style={{ borderLeftColor: cert.color }}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">ハンズオンで体験する</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {demoIds.length > 0 && <RelatedDemos demoIds={demoIds} title="関連デモ" />}
+                      {archIds.length > 0 && <RelatedArchitectures archIds={archIds} title="出題されるアーキテクチャパターン" />}
+                    </CardContent>
+                  </Card>
+                ) : null
+              })()}
             </div>
           </div>
 

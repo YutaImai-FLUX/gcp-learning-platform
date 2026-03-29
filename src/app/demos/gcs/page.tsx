@@ -86,6 +86,7 @@ export default function GCSDemo() {
       description="オブジェクトストレージのバケットとファイルを管理します"
       service="Cloud Storage"
       color="#4285F4"
+      demoId="gcs"
     >
       {/* Notification */}
       <AnimatePresence>

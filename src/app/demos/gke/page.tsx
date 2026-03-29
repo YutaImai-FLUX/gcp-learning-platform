@@ -112,6 +112,7 @@ export default function GKEDemo() {
       description="Kubernetesクラスターを管理し、アプリケーションをオーケストレーションします"
       service="GKE"
       color="#4285F4"
+      demoId="gke"
     >
       <div className="space-y-5">
         {/* Cluster status */}

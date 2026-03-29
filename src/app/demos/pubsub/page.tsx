@@ -95,6 +95,7 @@ export default function PubSubDemo() {
       description="メッセージのパブリッシュとサブスクライブをリアルタイムで体験します"
       service="Pub/Sub"
       color="#FBBC05"
+      demoId="pubsub"
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left: Topics & Subscriptions */}
