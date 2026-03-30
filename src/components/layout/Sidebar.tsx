@@ -116,6 +116,14 @@ export function Sidebar() {
   const pathname = usePathname()
   const [expandedDemos, setExpandedDemos] = useState(pathname.startsWith("/demos"))
   const { collapsed, toggle } = useSidebarStore()
+  const { hasNew: hasNewUpdate, markAsSeen: markUpdatesSeen } = useUpdatesBadge()
+
+  // /updates ページ表示時に既読にする
+  useEffect(() => {
+    if (pathname === "/updates") {
+      markUpdatesSeen()
+    }
+  }, [pathname, markUpdatesSeen])
 
   return (
     <aside
@@ -219,6 +227,8 @@ export function Sidebar() {
                   )
                 }
 
+                const showBadge = item.href === "/updates" && hasNewUpdate
+
                 return (
                   <Link
                     key={item.href}
@@ -230,8 +240,20 @@ export function Sidebar() {
                     )}
                     title={collapsed ? item.label : undefined}
                   >
-                    <Icon size={18} className="shrink-0" />
-                    {!collapsed && <span>{item.label}</span>}
+                    <div className="relative shrink-0">
+                      <Icon size={18} />
+                      {showBadge && collapsed && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-gcp-red ring-2 ring-white dark:ring-[#292a2d]" />
+                      )}
+                    </div>
+                    {!collapsed && (
+                      <>
+                        <span>{item.label}</span>
+                        {showBadge && (
+                          <span className="ml-auto w-2 h-2 rounded-full bg-gcp-red animate-pulse" />
+                        )}
+                      </>
+                    )}
                   </Link>
                 )
               })}
