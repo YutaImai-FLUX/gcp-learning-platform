@@ -19,6 +19,7 @@ const INITIAL_STATE: GameState = {
   unlockedAchievements: [],
   quizHistory: [],
   demoCompletions: {},
+  dungeonProgress: {},
   notifications: [],
   lastActiveAt: Date.now(),
   createdAt: Date.now(),
@@ -204,6 +205,24 @@ export const useGameStore = create<GameStore>()(
         get().addXP(XP_REWARDS.demoFirstInteraction, "demo")
       },
 
+      clearDungeonRoom: (certId, roomId, score) => {
+        const state = get()
+        if (state.dungeonProgress[roomId]?.cleared) return
+
+        set({
+          dungeonProgress: {
+            ...state.dungeonProgress,
+            [roomId]: {
+              roomId,
+              certId,
+              cleared: true,
+              clearedAt: Date.now(),
+              bestScore: score,
+            },
+          },
+        })
+      },
+
       recordActivity: (xpEarned) => {
         const state = get()
         set({
@@ -277,6 +296,7 @@ export const useGameStore = create<GameStore>()(
         unlockedAchievements: state.unlockedAchievements,
         quizHistory: state.quizHistory,
         demoCompletions: state.demoCompletions,
+        dungeonProgress: state.dungeonProgress,
         lastActiveAt: state.lastActiveAt,
         createdAt: state.createdAt,
       }),

@@ -51,6 +51,7 @@ import type { Infographic } from "@/lib/types/infographic"
 import { getDemosForCert, serviceNameToProductId, PRODUCT_TO_DEMO } from "@/lib/data/cross-references"
 import { RelatedDemos, RelatedArchitectures } from "@/components/shared/RelatedContent"
 import { DEMO_CONTEXTS } from "@/lib/data/cross-references"
+import { useGameStore } from "@/lib/stores/useGameStore"
 
 type TabKey = "overview" | "exam" | "plan" | "resources" | "labs" | "modules" | "security"
 
@@ -81,8 +82,10 @@ function LabRunner({
     const next = currentStep + 1
     if (next >= lab.steps.length) {
       setLabCompleted(true)
+      useGameStore.getState().completeLab(lab.certId, lab.id)
       return
     }
+    useGameStore.getState().completeLabStep(lab.certId, `${lab.id}-step-${currentStep}`)
     const updated = [...stepStates]
     updated[currentStep] = "done"
     updated[next] = "active"
@@ -1011,11 +1014,12 @@ export default function CertDetailPage() {
               module={selectedModule}
               certColor={cert.color}
               completedSectionIds={completedSectionIds}
-              onSectionComplete={(sectionId) =>
+              onSectionComplete={(sectionId) => {
                 setCompletedSectionIds((prev) =>
                   prev.includes(sectionId) ? prev : [...prev, sectionId]
                 )
-              }
+                useGameStore.getState().completeModuleSection(cert.id, sectionId)
+              }}
               onClose={() => setSelectedModule(null)}
             />
           ) : modules.length > 0 ? (

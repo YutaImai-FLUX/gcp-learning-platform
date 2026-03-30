@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { Header } from "@/components/layout/Header"
+import { MainContent } from "@/components/layout/MainContent"
+import { GameNotifications } from "@/components/game/GameNotifications"
 
 export const metadata: Metadata = {
   title: "GCP Interactive Learning Platform",
@@ -18,9 +20,8 @@ export default function RootLayout({
       <body className="bg-background text-foreground antialiased">
         <Sidebar />
         <Header />
-        <main className="ml-64 mt-14 min-h-[calc(100vh-3.5rem)] bg-[#f8f9fa] dark:bg-[#202124]">
-          <div className="p-6 max-w-[1400px]">{children}</div>
-        </main>
+        <MainContent>{children}</MainContent>
+        <GameNotifications />
       </body>
     </html>
   )

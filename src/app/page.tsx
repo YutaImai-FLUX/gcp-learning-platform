@@ -3,30 +3,20 @@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
-  Package,
-  PlayCircle,
-  GraduationCap,
-  Network,
-  Server,
-  BarChart3,
-  Brain,
-  Bot,
-  ArrowRight,
-  Award,
-  Code2,
-  Building2,
+  Package, PlayCircle, GraduationCap,
+  Server, BarChart3, Brain, Bot, ArrowRight, Award, Code2, Building2,
+  Trophy,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { GCP_PRODUCTS } from "@/lib/data/products"
 import { CERTIFICATIONS } from "@/lib/data/certifications"
-
-const STATS = [
-  { label: "GCP製品", value: `${GCP_PRODUCTS.length}+`, icon: Package, color: "text-gcp-blue", bg: "bg-gcp-blue-light" },
-  { label: "インタラクティブデモ", value: "9", icon: PlayCircle, color: "text-gcp-green", bg: "bg-[#e6f4ea]" },
-  { label: "資格コース", value: String(CERTIFICATIONS.length), icon: GraduationCap, color: "text-gcp-yellow", bg: "bg-[#fef7e0]" },
-  { label: "アーキテクチャパターン", value: "11", icon: Network, color: "text-gcp-red", bg: "bg-[#fce8e6]" },
-]
+import { XPProgressBar } from "@/components/game/XPProgressBar"
+import { StreakDisplay } from "@/components/game/StreakDisplay"
+import { ActivityHeatmap } from "@/components/game/ActivityHeatmap"
+import { CertProgressCards } from "@/components/game/CertProgressCard"
+import { useGameStore } from "@/lib/stores/useGameStore"
+import { getRecommendedCerts } from "@/lib/game/xp-config"
 
 const QUICK_DEMOS = [
   { name: "Compute Engine", desc: "VM作成シミュレーター", href: "/demos/gce", icon: Server, color: "#4285F4" },
@@ -37,17 +27,21 @@ const QUICK_DEMOS = [
 ]
 
 const CERT_ICONS: Record<string, React.ElementType> = {
-  cdl: Award,
-  ace: Code2,
-  pca: Building2,
-  pde: BarChart3,
-  pmle: Brain,
+  cdl: Award, ace: Code2, pca: Building2, pde: BarChart3, pmle: Brain,
 }
 
 export default function DashboardPage() {
+  const level = useGameStore((s) => s.level)
+  const xp = useGameStore((s) => s.xp)
+  const unlockedAchievements = useGameStore((s) => s.unlockedAchievements)
+  const demoCompletions = useGameStore((s) => s.demoCompletions)
+  const recommendation = getRecommendedCerts(level)
+
+  const hasStarted = xp > 0
+
   return (
-    <div className="space-y-8">
-      {/* Hero */}
+    <div className="space-y-6">
+      {/* Hero with XP */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -84,37 +78,93 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map((stat, i) => {
-          const Icon = stat.icon
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-            >
-              <Card className="border-border hover:shadow-md transition-shadow">
-                <CardContent className="pt-5 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2.5 rounded-lg ${stat.bg}`}>
-                      <Icon size={20} className={stat.color} />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                      <div className="text-xs text-muted-foreground">{stat.label}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )
-        })}
+      {/* XP, Streak, Achievements row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <Card className="border-border h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">経験値 & レベル</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <XPProgressBar />
+              {recommendation.labelJa && (
+                <p className="text-[10px] text-gcp-green mt-2 font-medium">{recommendation.labelJa}</p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card className="border-border h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">学習ストリーク</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <StreakDisplay />
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+          <Card className="border-border h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Trophy size={14} className="text-gcp-yellow" />
+                実績
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-2xl font-bold text-foreground">{unlockedAchievements.length}</span>
+                <span className="text-xs text-muted-foreground">/ 26 解除済み</span>
+              </div>
+              <div className="flex items-center gap-1 mb-2">
+                <span className="text-xs text-muted-foreground">デモ体験:</span>
+                <span className="text-xs font-medium text-foreground">{Object.keys(demoCompletions).length} / 14</span>
+              </div>
+              {!hasStarted && (
+                <p className="text-[10px] text-muted-foreground">学習を開始して実績を解除しよう</p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
+      {/* Cert Progress & Activity Heatmap */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <GraduationCap size={14} className="text-gcp-green" />
+                資格学習の進捗
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CertProgressCards />
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+          <Card className="border-border">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm">学習アクティビティ (6ヶ月)</CardTitle>
+                <span className="text-[10px] text-muted-foreground">
+                  累計 {xp.toLocaleString()} XP
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ActivityHeatmap />
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Quick Demos & Certs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Demos */}
         <Card className="border-border">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -130,6 +180,7 @@ export default function DashboardPage() {
           <CardContent className="space-y-2">
             {QUICK_DEMOS.map((demo) => {
               const Icon = demo.icon
+              const completed = demo.href.split("/demos/")[1] in demoCompletions
               return (
                 <Link
                   key={demo.href}
@@ -146,6 +197,9 @@ export default function DashboardPage() {
                     <div className="font-medium text-sm text-foreground">{demo.name}</div>
                     <div className="text-xs text-muted-foreground">{demo.desc}</div>
                   </div>
+                  {completed && (
+                    <Badge className="bg-gcp-green/10 text-gcp-green border-0 text-[10px]">体験済み</Badge>
+                  )}
                   <ArrowRight size={14} className="text-muted-foreground group-hover:text-foreground transition-colors" />
                 </Link>
               )
@@ -153,7 +207,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Certifications */}
         <Card className="border-border">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -167,7 +220,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
-            {CERTIFICATIONS.map((cert) => {
+            {CERTIFICATIONS.slice(0, 5).map((cert) => {
               const Icon = CERT_ICONS[cert.id] ?? Award
               return (
                 <Link

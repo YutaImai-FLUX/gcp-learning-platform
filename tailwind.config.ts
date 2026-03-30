@@ -74,6 +74,7 @@ const config: Config = {
       fontFamily: {
         sans: ["Google Sans", "Roboto", "system-ui", "sans-serif"],
         mono: ["Roboto Mono", "monospace"],
+        pixel: ["'Press Start 2P'", "monospace"],
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",
@@ -81,6 +82,8 @@ const config: Config = {
         "pulse-dot": "pulseDot 1.5s ease-in-out infinite",
         "spin-slow": "spin 3s linear infinite",
         typing: "typing 1s steps(40, end)",
+        shake: "shake 0.3s ease-in-out",
+        "flash-hit": "flashHit 0.2s ease-out",
       },
       keyframes: {
         fadeIn: {
@@ -98,6 +101,15 @@ const config: Config = {
         typing: {
           from: { width: "0" },
           to: { width: "100%" },
+        },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "25%": { transform: "translateX(-4px)" },
+          "75%": { transform: "translateX(4px)" },
+        },
+        flashHit: {
+          "0%": { opacity: "1", filter: "brightness(2)" },
+          "100%": { opacity: "1", filter: "brightness(1)" },
         },
       },
     },

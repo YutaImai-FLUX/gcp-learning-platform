@@ -3,6 +3,8 @@
 import { create } from "zustand"
 import type { QuizSession, QuizResult, QuizQuestion } from "@/lib/types/quiz"
 import { CERTIFICATIONS } from "@/lib/data/certifications"
+import { useGameStore } from "@/lib/stores/useGameStore"
+import { quizXP } from "@/lib/game/xp-utils"
 
 interface QuizStore {
   session: QuizSession | null
@@ -81,6 +83,27 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
       session: { ...session, endTime, completed: true },
       result,
     })
+
+    // ─── Wire to Game Store ───
+    const gameStore = useGameStore.getState()
+
+    // Record each question attempt for spaced repetition
+    session.questions.forEach((q, i) => {
+      const isCorrect = session.answers[i] === q.correctIndex
+      gameStore.addQuizAttempt({
+        certId: session.certId,
+        questionId: q.id,
+        correct: isCorrect,
+        difficulty: q.difficulty,
+        domain: q.domain,
+      })
+      if (isCorrect) {
+        gameStore.addXP(quizXP(q.difficulty), "quiz")
+      }
+    })
+
+    // Update high score & domain scores
+    gameStore.updateQuizScore(session.certId, score, domainScores)
   },
 
   resetSession: () => set({ session: null, result: null }),

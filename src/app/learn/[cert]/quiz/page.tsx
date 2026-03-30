@@ -1,9 +1,10 @@
 "use client"
 
 import { useParams, useSearchParams, useRouter } from "next/navigation"
-import { useEffect, useState, useMemo, Suspense } from "react"
+import { useEffect, useState, useMemo, useCallback, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, ArrowRight, Clock, CheckCircle, XCircle, Award, BarChart3 } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock, CheckCircle, XCircle, Award, BarChart3, Filter, Zap, Layers } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -11,16 +12,37 @@ import { Card, CardContent } from "@/components/ui/card"
 import { getCertById } from "@/lib/data/certifications"
 import { getQuestionsByCert, shuffleQuestions } from "@/lib/data/quiz-questions"
 import type { QuizQuestion } from "@/lib/types/quiz"
+import { DomainFilter } from "@/components/quiz/DomainFilter"
+import { TimerBar } from "@/components/quiz/TimerBar"
+import { useGameStore } from "@/lib/stores/useGameStore"
+import { suggestDifficulty } from "@/lib/game/adaptive-difficulty"
+
+const TIMER_SECONDS_PER_QUESTION = 60
 
 function QuizContent() {
   const { cert: certId } = useParams<{ cert: string }>()
   const searchParams = useSearchParams()
   const router = useRouter()
-  const mode = (searchParams.get("mode") ?? "practice") as "practice" | "exam"
+  const mode = (searchParams.get("mode") ?? "practice") as "practice" | "exam" | "review" | "timed"
+  const domainParam = searchParams.get("domain")
 
   const cert = getCertById(certId)
   const allQuestions = useMemo(() => getQuestionsByCert(certId), [certId])
+  const quizHistory = useGameStore((s) => s.quizHistory)
 
+  // Adaptive difficulty
+  const suggestedDifficulty = useMemo(
+    () => suggestDifficulty(quizHistory.filter((h) => h.certId === certId)),
+    [quizHistory, certId]
+  )
+
+  const domains = useMemo(() => {
+    const set = new Set(allQuestions.map((q) => q.domain))
+    return Array.from(set)
+  }, [allQuestions])
+
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(domainParam)
+  const [showDomainFilter, setShowDomainFilter] = useState(false)
   const [questions, setQuestions] = useState<QuizQuestion[]>([])
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState<(number | null)[]>([])
@@ -28,20 +50,59 @@ function QuizContent() {
   const [completed, setCompleted] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [startTime] = useState(Date.now())
+  const [timerRunning, setTimerRunning] = useState(mode === "timed")
 
+  // Initialize questions
   useEffect(() => {
-    const shuffled = shuffleQuestions(allQuestions)
-    const count = mode === "exam" ? Math.min(allQuestions.length, 10) : Math.min(allQuestions.length, 5)
+    let filtered = allQuestions
+
+    // Domain filter
+    if (selectedDomain) {
+      filtered = filtered.filter((q) => q.domain === selectedDomain)
+    }
+
+    // Difficulty filter for adaptive mode
+    if (mode === "review") {
+      // Review mode: focus on questions the user got wrong before
+      const wrongIds = new Set(
+        quizHistory.filter((h) => h.certId === certId && !h.correct).map((h) => h.questionId)
+      )
+      const reviewQ = filtered.filter((q) => wrongIds.has(q.id))
+      if (reviewQ.length >= 3) {
+        filtered = reviewQ
+      }
+    }
+
+    const shuffled = shuffleQuestions(filtered)
+    const count = mode === "exam" ? Math.min(filtered.length, 10) : Math.min(filtered.length, 5)
     const selected = shuffled.slice(0, count)
     setQuestions(selected)
     setAnswers(new Array(selected.length).fill(null))
-  }, [certId, mode, allQuestions])
+    setCurrent(0)
+    setCompleted(false)
+    setShowExplanation(false)
+  }, [certId, mode, allQuestions, selectedDomain, quizHistory])
 
   useEffect(() => {
-    if (completed) return
+    if (completed || mode === "timed") return
     const interval = setInterval(() => setSeconds((s) => s + 1), 1000)
     return () => clearInterval(interval)
-  }, [completed])
+  }, [completed, mode])
+
+  const handleTimeUp = useCallback(() => {
+    // Auto-advance on time up
+    if (answers[current] === null) {
+      const next = [...answers]
+      next[current] = -1 // timeout marker
+      setAnswers(next)
+    }
+    if (current < questions.length - 1) {
+      setCurrent((prev) => prev + 1)
+      setTimerRunning(true)
+    } else {
+      setCompleted(true)
+    }
+  }, [current, answers, questions.length])
 
   if (!cert || questions.length === 0) {
     return (
@@ -58,16 +119,17 @@ function QuizContent() {
   const progress = ((current + (isAnswered ? 1 : 0)) / questions.length) * 100
 
   function answer(idx: number) {
-    if (isAnswered && mode === "exam") return
-    if (isAnswered && mode === "practice") return
+    if (isAnswered) return
     const next = [...answers]
     next[current] = idx
     setAnswers(next)
-    if (mode === "practice") setShowExplanation(true)
+    if (mode === "practice" || mode === "review") setShowExplanation(true)
+    if (mode === "timed") setTimerRunning(false)
   }
 
   function goNext() {
     setShowExplanation(false)
+    setTimerRunning(mode === "timed")
     if (current < questions.length - 1) {
       setCurrent(current + 1)
     } else {
@@ -94,11 +156,11 @@ function QuizContent() {
     const timeTaken = Math.round((Date.now() - startTime) / 1000)
 
     const domainMap: Record<string, { correct: number; total: number }> = {}
-    questions.forEach((q, i) => {
-      const d = q.domain
+    questions.forEach((qq, i) => {
+      const d = qq.domain
       if (!domainMap[d]) domainMap[d] = { correct: 0, total: 0 }
       domainMap[d].total++
-      if (answers[i] === q.correctIndex) domainMap[d].correct++
+      if (answers[i] === qq.correctIndex) domainMap[d].correct++
     })
 
     return (
@@ -109,7 +171,7 @@ function QuizContent() {
         >
           <div className="text-5xl font-bold mb-2">{score}%</div>
           <div className="text-xl font-semibold mb-1">
-            {passed ? "🎉 合格！" : "不合格"}
+            {passed ? "合格！" : "不合格"}
           </div>
           <div className="text-white/80 text-sm">
             {correct}/{questions.length} 正解 · {Math.floor(timeTaken/60)}分{timeTaken%60}秒
@@ -117,6 +179,18 @@ function QuizContent() {
           <div className="mt-3 text-sm text-white/70">
             合格ライン: {cert.passingScore}%
           </div>
+          {mode === "review" && (
+            <div className="mt-2 text-xs text-white/60">復習モード</div>
+          )}
+        </div>
+
+        {/* Adaptive difficulty suggestion */}
+        <div className="rounded-lg bg-muted/50 p-3 flex items-center gap-2 text-xs">
+          <Zap size={14} className="text-gcp-yellow" />
+          <span className="text-muted-foreground">
+            推奨難易度: <span className="font-bold text-foreground">{suggestedDifficulty}</span>
+            （直近の正答率に基づく）
+          </span>
         </div>
 
         {/* Domain breakdown */}
@@ -142,35 +216,35 @@ function QuizContent() {
         </Card>
 
         {/* Wrong questions review */}
-        {questions.filter((q, i) => answers[i] !== q.correctIndex).length > 0 && (
+        {questions.filter((qq, i) => answers[i] !== qq.correctIndex).length > 0 && (
           <Card className="border-border">
             <CardContent className="p-4 space-y-4">
               <h3 className="font-semibold text-sm text-red-500">間違えた問題</h3>
-              {questions.filter((q, i) => answers[i] !== q.correctIndex).map((q) => (
-                <div key={q.id} className="p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900 text-sm space-y-2">
-                  <p className="font-medium text-foreground">{q.question}</p>
+              {questions.filter((qq, i) => answers[i] !== qq.correctIndex).map((qq) => (
+                <div key={qq.id} className="p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-900 text-sm space-y-2">
+                  <p className="font-medium text-foreground">{qq.question}</p>
                   <div className="space-y-1">
-                    {q.options.map((opt, i) => (
+                    {qq.options.map((opt, i) => (
                       <div
                         key={i}
                         className={`px-3 py-1.5 rounded text-xs ${
-                          i === q.correctIndex
+                          i === qq.correctIndex
                             ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 font-medium"
                             : "text-muted-foreground"
                         }`}
                       >
-                        {i === q.correctIndex && "✓ "}{opt}
+                        {i === qq.correctIndex && "✓ "}{opt}
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-muted-foreground bg-muted px-3 py-2 rounded">{q.explanation}</p>
+                  <p className="text-xs text-muted-foreground bg-muted px-3 py-2 rounded">{qq.explanation}</p>
                 </div>
               ))}
             </CardContent>
           </Card>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={() => router.push(`/learn/${certId}`)}>
             <ArrowLeft size={15} className="mr-1.5" />学習ページへ戻る
           </Button>
@@ -188,10 +262,22 @@ function QuizContent() {
           >
             もう一度挑戦
           </Button>
+          <Link href={`/learn/${certId}/quiz?mode=review`}>
+            <Button variant="outline" className="text-xs">
+              復習モードで再挑戦
+            </Button>
+          </Link>
+          <Link href={`/flashcards/${certId}`}>
+            <Button variant="outline" className="text-xs">
+              <Layers size={13} className="mr-1" />フラッシュカード
+            </Button>
+          </Link>
         </div>
       </motion.div>
     )
   }
+
+  const modeLabel = mode === "exam" ? "模擬試験" : mode === "review" ? "復習モード" : mode === "timed" ? "タイマーモード" : "練習モード"
 
   return (
     <div className="space-y-5 max-w-2xl">
@@ -201,20 +287,54 @@ function QuizContent() {
           <Button variant="ghost" size="sm" onClick={() => router.push(`/learn/${certId}`)} className="h-8 text-xs">
             <ArrowLeft size={14} className="mr-1" />終了
           </Button>
-          <Badge variant="secondary" className="text-xs">
-            {mode === "exam" ? "模擬試験" : "練習モード"}
-          </Badge>
+          <Badge variant="secondary" className="text-xs">{modeLabel}</Badge>
           <Badge style={{ backgroundColor: cert.bgColor, color: cert.color }} className="text-xs border-0">
             {cert.shortName}
           </Badge>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <Clock size={14} className="text-muted-foreground" />
-          <span className="font-mono text-muted-foreground">
-            {Math.floor(seconds / 60).toString().padStart(2, "0")}:{(seconds % 60).toString().padStart(2, "0")}
-          </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowDomainFilter(!showDomainFilter)}
+            className="p-1.5 rounded hover:bg-muted transition-colors"
+            title="ドメインフィルタ"
+          >
+            <Filter size={14} className={selectedDomain ? "text-gcp-blue" : "text-muted-foreground"} />
+          </button>
+          {mode !== "timed" && (
+            <div className="flex items-center gap-1 text-sm">
+              <Clock size={14} className="text-muted-foreground" />
+              <span className="font-mono text-muted-foreground">
+                {Math.floor(seconds / 60).toString().padStart(2, "0")}:{(seconds % 60).toString().padStart(2, "0")}
+              </span>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Domain filter */}
+      {showDomainFilter && (
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
+          <DomainFilter
+            domains={domains}
+            selected={selectedDomain}
+            onSelect={(d) => {
+              setSelectedDomain(d)
+              setShowDomainFilter(false)
+            }}
+            color={cert.color}
+          />
+        </motion.div>
+      )}
+
+      {/* Timer bar for timed mode */}
+      {mode === "timed" && (
+        <TimerBar
+          durationSeconds={TIMER_SECONDS_PER_QUESTION}
+          isRunning={timerRunning && !isAnswered}
+          onTimeUp={handleTimeUp}
+          color={cert.color}
+        />
+      )}
 
       {/* Progress */}
       <div className="space-y-1.5">
@@ -289,7 +409,7 @@ function QuizContent() {
                 })}
               </div>
 
-              {/* Explanation (practice mode) */}
+              {/* Explanation */}
               <AnimatePresence>
                 {showExplanation && isAnswered && (
                   <motion.div
@@ -302,7 +422,7 @@ function QuizContent() {
                     }`}
                   >
                     <p className={`font-semibold mb-1 ${isCorrect ? "text-green-700 dark:text-green-300" : "text-blue-700 dark:text-blue-300"}`}>
-                      {isCorrect ? "✓ 正解！" : "解説"}
+                      {isCorrect ? "正解！" : "解説"}
                     </p>
                     <p className="text-foreground leading-relaxed">{q.explanation}</p>
                   </motion.div>
@@ -330,7 +450,7 @@ function QuizContent() {
               次の問題 <ArrowRight size={14} className="ml-1" />
             </Button>
           )}
-          {mode === "practice" && current === questions.length - 1 && isAnswered && (
+          {(mode === "practice" || mode === "review" || mode === "timed") && current === questions.length - 1 && isAnswered && (
             <Button onClick={finishExam} style={{ backgroundColor: cert.color }} className="text-white" size="sm">
               <Award size={14} className="mr-1.5" />結果を見る
             </Button>

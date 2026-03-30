@@ -1,10 +1,12 @@
 "use client"
 
+import { useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Info } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { getDemoContext } from "@/lib/data/cross-references"
 import { RelatedContentSection } from "@/components/shared/RelatedContent"
+import { useGameStore } from "@/lib/stores/useGameStore"
 
 interface DemoShellProps {
   title: string
@@ -17,6 +19,11 @@ interface DemoShellProps {
 
 export function DemoShell({ title, description, service, color, demoId, children }: DemoShellProps) {
   const ctx = demoId ? getDemoContext(demoId) : undefined
+  const trackDemo = useGameStore((s) => s.trackDemoInteraction)
+
+  useEffect(() => {
+    if (demoId) trackDemo(demoId)
+  }, [demoId, trackDemo])
 
   return (
     <div className="space-y-4">
