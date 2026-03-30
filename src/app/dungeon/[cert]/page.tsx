@@ -3,8 +3,8 @@
 import { useMemo, useState, useCallback } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import { ArrowLeft, Sword } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ArrowLeft, Sword, BookOpen, FlaskConical, PlayCircle, Gift, Map } from "lucide-react"
 import type { CertificationId } from "@/lib/types/quiz"
 import type { BattleState } from "@/lib/types/dungeon"
 import { getDungeonMap } from "@/lib/game/dungeon-config"
@@ -17,6 +17,13 @@ import { BattleScreen } from "@/components/dungeon/BattleScreen"
 import { BattleResult } from "@/components/dungeon/BattleResult"
 
 type Phase = "map" | "battle" | "result"
+
+const ROOM_TYPE_INFO: Record<string, { icon: React.ElementType; description: string }> = {
+  study: { icon: BookOpen, description: "学習モジュールを読んで知識を深めよう" },
+  lab: { icon: FlaskConical, description: "ハンズオンラボで実践しよう" },
+  demo: { icon: PlayCircle, description: "インタラクティブデモを体験しよう" },
+  treasure: { icon: Gift, description: "コンセプトカードを獲得！" },
+}
 
 export default function DungeonCertPage() {
   const params = useParams()
@@ -109,84 +116,130 @@ export default function DungeonCertPage() {
         >
           <ArrowLeft size={18} />
         </Link>
-        <div className="flex items-center gap-2">
-          <Sword size={20} style={{ color: theme.accentColor }} />
-          <h1 className="text-lg font-bold" style={{ color: theme.accentColor }}>
-            {dungeon.name}
-          </h1>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+            style={{ backgroundColor: theme.accentColor + "20" }}
+          >
+            <Sword size={16} style={{ color: theme.accentColor }} />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-lg font-bold truncate" style={{ color: theme.accentColor }}>
+              {dungeon.name}
+            </h1>
+            <p className="text-xs text-muted-foreground truncate">{theme.nameJa}</p>
+          </div>
         </div>
+
+        {/* Back to map button when in battle */}
+        {phase !== "map" && (
+          <button
+            onClick={handleBackToMap}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:bg-muted"
+          >
+            <Map size={14} />
+            マップ
+          </button>
+        )}
       </motion.div>
 
       {/* HUD */}
       <DungeonHUD certId={certId} dungeon={dungeon} theme={theme} />
 
       {/* Main content */}
-      {phase === "map" && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-4`}
-        >
-          <DungeonMapView
-            dungeon={dungeon}
-            theme={theme}
-            onRoomSelect={handleRoomSelect}
-          />
-        </motion.div>
-      )}
+      <AnimatePresence mode="wait">
+        {phase === "map" && (
+          <motion.div
+            key="map"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+          >
+            <DungeonMapView
+              dungeon={dungeon}
+              theme={theme}
+              onRoomSelect={handleRoomSelect}
+            />
+          </motion.div>
+        )}
 
-      {phase === "battle" && activeRoom && battleQuestions.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-4`}
-        >
-          <BattleScreen
-            certId={certId}
-            roomLabel={activeRoom.label}
-            questions={battleQuestions}
-            theme={theme}
-            isBoss={activeRoom.type === "boss"}
-            onComplete={handleBattleComplete}
-          />
-        </motion.div>
-      )}
+        {phase === "battle" && activeRoom && battleQuestions.length > 0 && (
+          <motion.div
+            key="battle"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+          >
+            <BattleScreen
+              certId={certId}
+              roomLabel={activeRoom.label}
+              questions={battleQuestions}
+              theme={theme}
+              isBoss={activeRoom.type === "boss"}
+              onComplete={handleBattleComplete}
+            />
+          </motion.div>
+        )}
 
-      {phase === "result" && battleResult && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-4`}
-        >
-          <BattleResult
-            battle={battleResult}
-            theme={theme}
-            onContinue={handleBackToMap}
-            onRetry={handleRetry}
-          />
-        </motion.div>
-      )}
+        {phase === "result" && battleResult && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+          >
+            <BattleResult
+              battle={battleResult}
+              theme={theme}
+              onContinue={handleBackToMap}
+              onRetry={handleRetry}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Room info panel */}
       {phase === "map" && activeRoom && activeRoom.type !== "quiz" && activeRoom.type !== "boss" && activeRoom.type !== "start" && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg p-4 text-sm"
-          style={{ backgroundColor: theme.tileColor, color: theme.textColor, border: `1px solid ${theme.tileBorder}` }}
+          className="rounded-xl overflow-hidden"
+          style={{ border: `1px solid ${theme.tileBorder}` }}
         >
-          <p className="font-bold mb-1">{activeRoom.label}</p>
-          <p className="text-xs opacity-70">
-            {activeRoom.type === "study" && "学習モジュールを読んで知識を深めよう"}
-            {activeRoom.type === "lab" && "ハンズオンラボで実践しよう"}
-            {activeRoom.type === "demo" && "インタラクティブデモを体験しよう"}
-            {activeRoom.type === "treasure" && "コンセプトカードを獲得！"}
-          </p>
-          {activeRoom.xpReward > 0 && (
-            <p className="text-xs mt-1" style={{ color: theme.accentColor }}>
-              +{activeRoom.xpReward} XP
-            </p>
-          )}
+          <div
+            className="px-4 py-3 flex items-center gap-3"
+            style={{ backgroundColor: theme.tileColor, color: theme.textColor }}
+          >
+            {(() => {
+              const info = ROOM_TYPE_INFO[activeRoom.type]
+              const RoomIcon = info?.icon ?? BookOpen
+              return (
+                <>
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: theme.accentColor + "20" }}
+                  >
+                    <RoomIcon size={16} style={{ color: theme.accentColor }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm">{activeRoom.label}</p>
+                    <p className="text-xs opacity-70">{info?.description}</p>
+                  </div>
+                  {activeRoom.xpReward > 0 && (
+                    <span
+                      className="text-xs font-bold px-2 py-1 rounded-lg shrink-0"
+                      style={{ backgroundColor: theme.accentColor + "20", color: theme.accentColor }}
+                    >
+                      +{activeRoom.xpReward} XP
+                    </span>
+                  )}
+                </>
+              )
+            })()}
+          </div>
         </motion.div>
       )}
     </div>
