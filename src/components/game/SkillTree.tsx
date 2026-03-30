@@ -8,10 +8,15 @@ import { CERTIFICATIONS } from "@/lib/data/certifications"
 import { DUNGEON_MAPS } from "@/lib/game/dungeon-config"
 import { Lock, CheckCircle } from "lucide-react"
 
-const CELL_W = 140
-const CELL_H = 110
-const NODE_W = 100
-const NODE_H = 56
+/**
+ * Horizontal (left-to-right) skill tree.
+ * Original config: x = horizontal column, y = vertical level (top-to-bottom).
+ * For LTR layout: col = y (becomes X), row = x (becomes Y).
+ */
+const CELL_W = 180
+const CELL_H = 100
+const NODE_W = 130
+const NODE_H = 60
 
 export function SkillTree() {
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
@@ -47,7 +52,6 @@ export function SkillTree() {
     return statuses
   }, [dungeonProgress, certProgress])
 
-  // Calculate dungeon progress per cert
   const certProgressPct = useMemo(() => {
     const pcts: Record<string, number> = {}
     for (const node of SKILL_TREE_NODES) {
@@ -60,13 +64,22 @@ export function SkillTree() {
     return pcts
   }, [dungeonProgress])
 
-  const maxX = Math.max(...SKILL_TREE_NODES.map((n) => n.x)) + 1
-  const maxY = Math.max(...SKILL_TREE_NODES.map((n) => n.y)) + 1
-  const svgW = maxX * CELL_W + 40
-  const svgH = maxY * CELL_H + 40
+  // LTR layout: original y → X (column/level), original x → Y (row/spread)
+  const maxCol = Math.max(...SKILL_TREE_NODES.map((n) => n.y)) + 1
+  const maxRow = Math.max(...SKILL_TREE_NODES.map((n) => n.x)) + 1
+  const svgW = maxCol * CELL_W + 40
+  const svgH = maxRow * CELL_H + 40
+
+  /** Convert node grid position to SVG center coordinates (LTR) */
+  function nodeCenter(node: { x: number; y: number }) {
+    return {
+      cx: node.y * CELL_W + 20 + CELL_W / 2,  // y → horizontal
+      cy: node.x * CELL_H + 20 + CELL_H / 2,  // x → vertical
+    }
+  }
 
   return (
-    <div className="overflow-x-auto py-2">
+    <div className="overflow-x-auto py-2 scrollbar-thin">
       <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="mx-auto">
         {/* Edges */}
         {SKILL_TREE_EDGES.map((edge) => {
@@ -78,31 +91,27 @@ export function SkillTree() {
           const toStatus = nodeStatuses[to.id]
           const isActive = fromStatus === "complete" || toStatus === "in_progress" || toStatus === "complete"
 
-          const x1 = from.x * CELL_W + 20 + CELL_W / 2
-          const y1 = from.y * CELL_H + 20 + CELL_H / 2
-          const x2 = to.x * CELL_W + 20 + CELL_W / 2
-          const y2 = to.y * CELL_H + 20 + CELL_H / 2
-
-          const midY = (y1 + y2) / 2
+          const { cx: x1, cy: y1 } = nodeCenter(from)
+          const { cx: x2, cy: y2 } = nodeCenter(to)
+          const midX = (x1 + x2) / 2
 
           return (
             <g key={`${edge.from}-${edge.to}`}>
-              {/* Glow */}
               {isActive && (
                 <path
-                  d={`M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`}
+                  d={`M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`}
                   stroke={(() => {
                     const cert = to.certId ? CERTIFICATIONS.find((c) => c.id === to.certId) : null
                     return cert?.color ?? "var(--primary)"
                   })()}
                   strokeWidth={8}
                   fill="none"
-                  opacity={0.1}
+                  opacity={0.08}
                   strokeLinecap="round"
                 />
               )}
               <path
-                d={`M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`}
+                d={`M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`}
                 stroke={isActive ? (() => {
                   const cert = to.certId ? CERTIFICATIONS.find((c) => c.id === to.certId) : null
                   return cert?.color ?? "var(--primary)"
@@ -119,16 +128,13 @@ export function SkillTree() {
 
         {/* Nodes */}
         {SKILL_TREE_NODES.map((node) => {
-          const cx = node.x * CELL_W + 20 + CELL_W / 2
-          const cy = node.y * CELL_H + 20 + CELL_H / 2
+          const { cx, cy } = nodeCenter(node)
           const status = nodeStatuses[node.id]
           const cert = node.certId ? CERTIFICATIONS.find((c) => c.id === node.certId) : null
           const pct = node.certId ? (certProgressPct[node.certId] ?? 0) : 0
-
           const nodeColor = cert?.color ?? "var(--primary)"
           const isStart = node.id === "start"
 
-          // Background & border colors per status
           let fill = "var(--muted)"
           let stroke = "var(--border)"
           let textFill = "var(--muted-foreground)"
@@ -159,10 +165,9 @@ export function SkillTree() {
               key={node.id}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity }}
-              transition={{ delay: node.y * 0.08 + node.x * 0.02 }}
+              transition={{ delay: node.y * 0.1 + node.x * 0.02 }}
               style={{ cursor: status !== "locked" && node.certId ? "pointer" : "default" }}
             >
-              {/* Link wrapper — using onClick for navigation */}
               <a href={node.certId ? `/dungeon/${node.certId}` : undefined}>
                 {/* Outer glow for in_progress */}
                 {status === "in_progress" && (
@@ -171,7 +176,7 @@ export function SkillTree() {
                     y={ry - 3}
                     width={NODE_W + 6}
                     height={NODE_H + 6}
-                    rx={14}
+                    rx={16}
                     fill="none"
                     stroke={nodeColor}
                     strokeWidth={1.5}
@@ -187,29 +192,29 @@ export function SkillTree() {
                   y={ry}
                   width={NODE_W}
                   height={NODE_H}
-                  rx={isStart ? NODE_H / 2 : 12}
+                  rx={isStart ? NODE_H / 2 : 14}
                   fill={fill}
                   stroke={stroke}
                   strokeWidth={status === "in_progress" ? 2.5 : 2}
                 />
 
-                {/* Progress bar inside node (for in_progress) */}
+                {/* Progress bar (in_progress) */}
                 {status === "in_progress" && pct > 0 && (
                   <>
                     <rect
-                      x={rx + 8}
-                      y={ry + NODE_H - 12}
-                      width={NODE_W - 16}
-                      height={4}
-                      rx={2}
+                      x={rx + 10}
+                      y={ry + NODE_H - 14}
+                      width={NODE_W - 20}
+                      height={5}
+                      rx={2.5}
                       fill={nodeColor + "30"}
                     />
                     <rect
-                      x={rx + 8}
-                      y={ry + NODE_H - 12}
-                      width={Math.max(4, (NODE_W - 16) * (pct / 100))}
-                      height={4}
-                      rx={2}
+                      x={rx + 10}
+                      y={ry + NODE_H - 14}
+                      width={Math.max(5, (NODE_W - 20) * (pct / 100))}
+                      height={5}
+                      rx={2.5}
                       fill={nodeColor}
                     />
                   </>
@@ -218,10 +223,10 @@ export function SkillTree() {
                 {/* Cert abbreviation */}
                 <text
                   x={cx}
-                  y={cy - (status === "in_progress" && pct > 0 ? 4 : 0)}
+                  y={cy - (status === "in_progress" && pct > 0 ? 5 : 0)}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize={isStart ? 10 : 13}
+                  fontSize={isStart ? 12 : 15}
                   fontWeight={800}
                   fill={textFill}
                   letterSpacing={1}
@@ -229,15 +234,15 @@ export function SkillTree() {
                   {node.label}
                 </text>
 
-                {/* Status icon */}
+                {/* Status icons */}
                 {status === "complete" && (
-                  <foreignObject x={rx + NODE_W - 16} y={ry - 4} width={18} height={18}>
-                    <CheckCircle size={16} color="#fff" />
+                  <foreignObject x={rx + NODE_W - 18} y={ry - 5} width={20} height={20}>
+                    <CheckCircle size={18} color="#fff" />
                   </foreignObject>
                 )}
                 {status === "locked" && (
-                  <foreignObject x={cx - 7} y={ry + NODE_H - 16} width={14} height={14}>
-                    <Lock size={12} color="#888" />
+                  <foreignObject x={cx - 8} y={ry + NODE_H - 18} width={16} height={16}>
+                    <Lock size={14} color="#888" />
                   </foreignObject>
                 )}
               </a>
@@ -245,23 +250,23 @@ export function SkillTree() {
               {/* Label below node */}
               <text
                 x={cx}
-                y={cy + NODE_H / 2 + 14}
+                y={cy + NODE_H / 2 + 15}
                 textAnchor="middle"
-                fontSize={9}
+                fontSize={10}
                 fill="var(--muted-foreground)"
                 opacity={status === "locked" ? 0.3 : 0.8}
                 fontWeight={500}
               >
-                {node.labelJa.length > 18 ? node.labelJa.slice(0, 17) + "…" : node.labelJa}
+                {node.labelJa.length > 22 ? node.labelJa.slice(0, 21) + "…" : node.labelJa}
               </text>
 
-              {/* Level label below */}
+              {/* Level label */}
               {cert && (
                 <text
                   x={cx}
-                  y={cy + NODE_H / 2 + 26}
+                  y={cy + NODE_H / 2 + 28}
                   textAnchor="middle"
-                  fontSize={7}
+                  fontSize={8}
                   fill="var(--muted-foreground)"
                   opacity={0.5}
                 >

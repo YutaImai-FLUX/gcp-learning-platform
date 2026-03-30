@@ -26,13 +26,9 @@ interface DungeonMapProps {
 const NODE_TYPES = { dungeon: DungeonFlowNode }
 const EDGE_TYPES = { dungeon: DungeonFlowEdge }
 
-const COL_X = { left: 0, center: 160, right: 320 }
-const ROW_H = 100
-
-/** Convert pathSide to flow X position */
-function sideToX(side: PathSide): number {
-  return COL_X[side]
-}
+/** Horizontal layout: pathIndex → X axis, pathSide → Y axis */
+const COL_W = 220
+const ROW_Y: Record<PathSide, number> = { left: 0, center: 100, right: 200 }
 
 export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps) {
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
@@ -69,14 +65,14 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     onRoomSelect(roomId)
   }, [dungeon.rooms, dungeonProgress, onRoomSelect])
 
-  // Build React Flow nodes
+  // Build React Flow nodes — horizontal: X = pathIndex * COL_W, Y = pathSide
   const nodes: Node[] = useMemo(() => {
     return dungeon.rooms.map((room) => ({
       id: room.id,
       type: "dungeon",
       position: {
-        x: sideToX(room.pathSide),
-        y: room.pathIndex * ROW_H,
+        x: room.pathIndex * COL_W,
+        y: ROW_Y[room.pathSide],
       },
       data: {
         label: room.label,
@@ -112,17 +108,13 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     })
   }, [dungeon.connections, dungeonProgress, roomStatuses, theme.accentColor])
 
-  // Calculate viewport to fit all nodes
-  const maxIndex = Math.max(...dungeon.rooms.map((r) => r.pathIndex))
-  const mapHeight = (maxIndex + 1) * ROW_H + 40
-
   const npcRoom = showNPC ? dungeon.rooms.find((r) => r.id === showNPC) : null
 
   return (
     <div className="relative">
       <div
         className="rounded-lg border border-border overflow-hidden bg-card"
-        style={{ height: Math.min(mapHeight, 600) }}
+        style={{ height: 380 }}
       >
         <ReactFlow
           nodes={nodes}
@@ -130,26 +122,31 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
           nodeTypes={NODE_TYPES}
           edgeTypes={EDGE_TYPES}
           fitView
-          fitViewOptions={{ padding: 0.3 }}
-          panOnDrag={false}
+          fitViewOptions={{ padding: 0.15 }}
+          panOnDrag
+          panOnScroll
           zoomOnScroll={false}
-          zoomOnPinch={false}
+          zoomOnPinch
           zoomOnDoubleClick={false}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
-          minZoom={0.5}
+          minZoom={0.3}
           maxZoom={1.5}
         >
           <Background
             variant={BackgroundVariant.Dots}
-            gap={20}
+            gap={24}
             size={1}
             color="var(--border)"
           />
         </ReactFlow>
       </div>
+
+      <p className="text-[10px] text-muted-foreground text-center mt-1.5">
+        ドラッグでスクロール・ピンチでズーム
+      </p>
 
       {/* NPC Dialog */}
       {npcRoom?.npc && showNPC && (

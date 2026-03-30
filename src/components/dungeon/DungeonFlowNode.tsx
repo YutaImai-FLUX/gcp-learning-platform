@@ -20,7 +20,7 @@ interface DungeonNodeData {
   onClick: () => void
 }
 
-/** Custom React Flow node for dungeon rooms */
+/** Custom React Flow node for dungeon rooms — horizontal (LTR) layout */
 export const DungeonFlowNode = memo(function DungeonFlowNode({
   data,
 }: {
@@ -30,39 +30,38 @@ export const DungeonFlowNode = memo(function DungeonFlowNode({
   const Icon = ROOM_ICONS[roomType] ?? BookOpen
   const isLocked = status === "locked"
   const isCleared = status === "cleared"
-
-  // Minimal sizing per type
   const isBoss = roomType === "boss"
-  const isStudy = roomType === "study"
 
   return (
     <>
-      <Handle type="target" position={Position.Top} className="!bg-transparent !border-0 !w-0 !h-0" />
+      {/* Left handle (incoming) */}
+      <Handle type="target" position={Position.Left} className="!bg-transparent !border-0 !w-0 !h-0" />
 
       <button
         onClick={isLocked ? undefined : onClick}
         disabled={isLocked}
         className={`
-          group relative flex items-center gap-2 transition-all duration-200
-          ${isLocked ? "cursor-not-allowed opacity-40" : "cursor-pointer hover:scale-[1.03] hover:-translate-y-0.5 active:scale-[0.97]"}
-          ${isBoss ? "px-5 py-3" : isStudy ? "px-3.5 py-2.5" : "px-3 py-2.5"}
-          rounded-lg border
+          group relative flex items-center gap-3 transition-all duration-200
+          ${isLocked ? "cursor-not-allowed opacity-40" : "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"}
+          ${isBoss ? "px-5 py-3.5" : "px-4 py-3"}
+          rounded-xl border
           ${isPlayerHere
-            ? "border-current shadow-lg"
+            ? "border-current shadow-lg ring-2 ring-current/20"
             : isCleared
               ? "border-border bg-card"
-              : "border-border bg-card hover:border-current"
+              : "border-border bg-card hover:border-current hover:shadow-md"
           }
         `}
         style={{
           color: accentColor,
-          boxShadow: isPlayerHere ? `0 0 16px ${accentColor}25` : undefined,
+          boxShadow: isPlayerHere ? `0 0 20px ${accentColor}20` : undefined,
+          minWidth: isBoss ? 160 : 140,
         }}
       >
-        {/* Player indicator dot */}
+        {/* Player indicator */}
         {isPlayerHere && (
           <span
-            className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full animate-pulse"
+            className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full animate-pulse"
             style={{ backgroundColor: accentColor }}
           />
         )}
@@ -70,48 +69,46 @@ export const DungeonFlowNode = memo(function DungeonFlowNode({
         {/* Cleared check badge */}
         {isCleared && (
           <span
-            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+            className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center"
             style={{ backgroundColor: accentColor }}
           >
-            <Check size={10} color="#fff" strokeWidth={3} />
+            <Check size={12} color="#fff" strokeWidth={3} />
           </span>
         )}
 
         {/* Icon */}
         <div
-          className={`
-            shrink-0 flex items-center justify-center rounded-md
-            ${isBoss ? "w-8 h-8" : "w-6 h-6"}
-          `}
+          className={`shrink-0 flex items-center justify-center rounded-lg ${isBoss ? "w-10 h-10" : "w-8 h-8"}`}
           style={{
-            backgroundColor: isLocked ? "var(--muted)" : isCleared ? accentColor + "15" : accentColor + "15",
+            backgroundColor: isLocked ? "var(--muted)" : accentColor + "15",
           }}
         >
           {isLocked ? (
-            <Lock size={isBoss ? 16 : 12} className="text-muted-foreground" />
+            <Lock size={isBoss ? 18 : 16} className="text-muted-foreground" />
           ) : (
-            <Icon
-              size={isBoss ? 16 : 12}
-              style={{ color: isCleared ? accentColor : accentColor }}
-            />
+            <Icon size={isBoss ? 18 : 16} style={{ color: accentColor }} />
           )}
         </div>
 
         {/* Label */}
         <div className="min-w-0 text-left">
           <p
-            className={`font-medium leading-tight truncate ${isBoss ? "text-xs" : "text-[11px]"}`}
+            className={`font-semibold leading-tight ${isBoss ? "text-sm" : "text-xs"}`}
             style={{ color: isLocked ? "var(--muted-foreground)" : isCleared ? "var(--muted-foreground)" : "var(--foreground)" }}
           >
             {label}
           </p>
           {!isLocked && !isCleared && xpReward > 0 && (
-            <p className="text-[9px] text-muted-foreground mt-0.5">+{xpReward} XP</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">+{xpReward} XP</p>
+          )}
+          {isBoss && !isLocked && (
+            <p className="text-[10px] font-medium mt-0.5" style={{ color: accentColor }}>BOSS</p>
           )}
         </div>
       </button>
 
-      <Handle type="source" position={Position.Bottom} className="!bg-transparent !border-0 !w-0 !h-0" />
+      {/* Right handle (outgoing) */}
+      <Handle type="source" position={Position.Right} className="!bg-transparent !border-0 !w-0 !h-0" />
     </>
   )
 })
