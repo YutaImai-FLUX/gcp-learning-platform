@@ -7,7 +7,6 @@ import {
   BackgroundVariant,
   type Node,
   type Edge,
-  type Viewport,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import type { DungeonMap as DungeonMapType, RoomStatus, PathSide } from "@/lib/types/dungeon"
@@ -27,13 +26,8 @@ interface DungeonMapProps {
 const NODE_TYPES = { dungeon: DungeonFlowNode }
 const EDGE_TYPES = { dungeon: DungeonFlowEdge }
 
-/**
- * Layout constants — horizontal LTR flow.
- * Tighter spacing so nodes appear larger at default zoom.
- */
-const COL_W = 200
-const ROW_Y: Record<PathSide, number> = { left: 0, center: 90, right: 180 }
-const NODE_W = 180 // approximate node width for viewport centering
+const COL_W = 210
+const ROW_Y: Record<PathSide, number> = { left: 0, center: 100, right: 200 }
 
 export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps) {
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
@@ -70,7 +64,6 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     onRoomSelect(roomId)
   }, [dungeon.rooms, dungeonProgress, onRoomSelect])
 
-  // Build nodes
   const nodes: Node[] = useMemo(() => {
     return dungeon.rooms.map((room) => ({
       id: room.id,
@@ -94,7 +87,6 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     }))
   }, [dungeon.rooms, roomStatuses, currentRoomId, theme.accentColor, handleRoomClick])
 
-  // Build edges
   const edges: Edge[] = useMemo(() => {
     return dungeon.connections.map((conn) => {
       const fromCleared = dungeonProgress[conn.from]?.cleared ?? false
@@ -113,20 +105,6 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     })
   }, [dungeon.connections, dungeonProgress, roomStatuses, theme.accentColor])
 
-  // Center viewport on the current active room at zoom=1
-  const defaultViewport: Viewport = useMemo(() => {
-    const activeRoom = dungeon.rooms.find((r) => r.id === currentRoomId)
-    if (!activeRoom) return { x: 0, y: 0, zoom: 1 }
-    const nodeX = activeRoom.pathIndex * COL_W
-    const nodeY = ROW_Y[activeRoom.pathSide]
-    // Center the active room in the container (assume ~700px wide, 420px tall container)
-    return {
-      x: -nodeX + 260 - NODE_W / 2,
-      y: -nodeY + 170,
-      zoom: 1,
-    }
-  }, [dungeon.rooms, currentRoomId])
-
   const npcRoom = showNPC ? dungeon.rooms.find((r) => r.id === showNPC) : null
 
   return (
@@ -140,7 +118,8 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
           edges={edges}
           nodeTypes={NODE_TYPES}
           edgeTypes={EDGE_TYPES}
-          defaultViewport={defaultViewport}
+          fitView
+          fitViewOptions={{ padding: 0.08 }}
           panOnDrag
           panOnScroll
           zoomOnScroll
@@ -150,7 +129,7 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
           nodesConnectable={false}
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
-          minZoom={0.4}
+          minZoom={0.3}
           maxZoom={2}
         >
           <Background
@@ -161,10 +140,6 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
           />
         </ReactFlow>
       </div>
-
-      <p className="text-[10px] text-muted-foreground text-center mt-1.5 opacity-60">
-        ドラッグでスクロール・スクロールでズーム
-      </p>
 
       {npcRoom?.npc && showNPC && (
         <DungeonNPCDialog

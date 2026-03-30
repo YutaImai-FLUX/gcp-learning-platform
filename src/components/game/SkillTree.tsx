@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useGameStore } from "@/lib/stores/useGameStore"
 import { SKILL_TREE_NODES, SKILL_TREE_EDGES } from "@/lib/game/skill-tree-config"
@@ -19,6 +20,7 @@ const NODE_W = 130
 const NODE_H = 60
 
 export function SkillTree() {
+  const router = useRouter()
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
   const certProgress = useGameStore((s) => s.certProgress)
 
@@ -168,7 +170,10 @@ export function SkillTree() {
               transition={{ delay: node.y * 0.1 + node.x * 0.02 }}
               style={{ cursor: status !== "locked" && node.certId ? "pointer" : "default" }}
             >
-              <a href={node.certId ? `/dungeon/${node.certId}` : undefined}>
+              <g
+                onClick={node.certId && status !== "locked" ? () => router.push(`/dungeon/${node.certId}`) : undefined}
+                role={node.certId && status !== "locked" ? "button" : undefined}
+              >
                 {/* Outer glow for in_progress */}
                 {status === "in_progress" && (
                   <motion.rect
@@ -245,7 +250,7 @@ export function SkillTree() {
                     <Lock size={14} color="#888" />
                   </foreignObject>
                 )}
-              </a>
+              </g>
 
               {/* Label below node */}
               <text
