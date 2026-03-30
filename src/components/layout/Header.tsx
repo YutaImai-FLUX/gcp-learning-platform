@@ -1,19 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Moon, Sun, Bell, HelpCircle, Command } from "lucide-react"
+import { Search, Moon, Sun, Command } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { useSidebarStore } from "@/lib/stores/useSidebarStore"
 import { CommandPalette } from "@/components/search/CommandPalette"
-import { useGameStore } from "@/lib/stores/useGameStore"
 
 export function Header() {
   const [dark, setDark] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const collapsed = useSidebarStore((s) => s.collapsed)
-  const level = useGameStore((s) => s.level)
-  const streakDays = useGameStore((s) => s.streaks.currentStreak)
 
   useEffect(() => {
     const saved = localStorage.getItem("theme")
@@ -59,34 +55,8 @@ export function Header() {
 
         <div className="flex-1" />
 
-        {/* Level & Streak badges */}
-        <div className="flex items-center gap-2 text-xs">
-          <Badge variant="secondary" className="font-bold">
-            Lv.{level}
-          </Badge>
-          {streakDays > 0 && (
-            <Badge variant="secondary" className="text-orange-500">
-              {streakDays}日連続
-            </Badge>
-          )}
-        </div>
-
-        {/* Project selector */}
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-muted-foreground">プロジェクト:</span>
-          <Badge variant="secondary" className="font-mono text-xs">
-            my-gcp-project
-          </Badge>
-        </div>
-
         {/* Actions */}
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-9 w-9" title="通知">
-            <Bell size={18} />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9" title="ヘルプ">
-            <HelpCircle size={18} />
-          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -96,11 +66,6 @@ export function Header() {
           >
             {dark ? <Sun size={18} /> : <Moon size={18} />}
           </Button>
-
-          {/* Avatar */}
-          <div className="w-8 h-8 rounded-full bg-gcp-blue flex items-center justify-center text-white text-xs font-bold ml-1">
-            GC
-          </div>
         </div>
       </header>
 

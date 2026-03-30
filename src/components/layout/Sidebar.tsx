@@ -28,6 +28,7 @@ import {
   Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
+  Target,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
@@ -35,78 +36,77 @@ import { XPProgressBar } from "@/components/game/XPProgressBar"
 import { StreakDisplay } from "@/components/game/StreakDisplay"
 import { useSidebarStore } from "@/lib/stores/useSidebarStore"
 
-const navItems = [
+interface NavChild {
+  label: string
+  href: string
+  icon: React.ElementType
+  separator?: boolean
+}
+
+interface NavItem {
+  label: string
+  href: string
+  icon: React.ElementType
+  children?: NavChild[]
+}
+
+interface NavSection {
+  label: string
+  items: NavItem[]
+}
+
+const NAV_SECTIONS: NavSection[] = [
   {
-    label: "ダッシュボード",
-    href: "/",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "製品カタログ",
-    href: "/products",
-    icon: Package,
-  },
-  {
-    label: "インタラクティブデモ",
-    href: "/demos",
-    icon: PlayCircle,
-    children: [
-      { label: "Compute Engine", href: "/demos/gce", icon: Server },
-      { label: "Cloud Storage", href: "/demos/gcs", icon: HardDrive },
-      { label: "BigQuery", href: "/demos/bigquery", icon: BarChart3 },
-      { label: "Cloud Run", href: "/demos/cloud-run", icon: PlayCircle },
-      { label: "GKE", href: "/demos/gke", icon: Box },
-      { label: "Pub/Sub", href: "/demos/pubsub", icon: Radio },
-      { label: "Vertex AI", href: "/demos/vertex-ai", icon: Brain },
-      { label: "Cloud Functions", href: "/demos/cloud-functions", icon: Zap },
-      { label: "ADK (AI Agents)", href: "/demos/adk", icon: Bot },
-      { label: "─ Security ─", href: "", icon: Shield, separator: true },
-      { label: "IAM ポリシー", href: "/demos/iam", icon: Shield },
-      { label: "VPC & Firewall", href: "/demos/vpc-firewall", icon: Network },
-      { label: "サービスアカウント", href: "/demos/service-accounts", icon: Key },
-      { label: "Org Policy", href: "/demos/org-policy", icon: Building2 },
-      { label: "Audit Logs", href: "/demos/audit-logs", icon: FileSearch },
+    label: "",
+    items: [
+      { label: "ダッシュボード", href: "/", icon: LayoutDashboard },
     ],
   },
   {
-    label: "アーキテクチャ図",
-    href: "/architecture",
-    icon: Network,
+    label: "学習",
+    items: [
+      { label: "資格学習センター", href: "/learn", icon: GraduationCap },
+      { label: "ダンジョン冒険", href: "/dungeon", icon: Sword },
+      { label: "フラッシュカード", href: "/flashcards", icon: Layers },
+      { label: "デイリーチャレンジ", href: "/daily", icon: Target },
+      { label: "資格ロードマップ", href: "/roadmap", icon: Map },
+    ],
   },
   {
-    label: "提案シミュレーター",
-    href: "/proposal",
-    icon: FileText,
+    label: "探索",
+    items: [
+      { label: "製品カタログ", href: "/products", icon: Package },
+      {
+        label: "インタラクティブデモ",
+        href: "/demos",
+        icon: PlayCircle,
+        children: [
+          { label: "Compute Engine", href: "/demos/gce", icon: Server },
+          { label: "Cloud Storage", href: "/demos/gcs", icon: HardDrive },
+          { label: "BigQuery", href: "/demos/bigquery", icon: BarChart3 },
+          { label: "Cloud Run", href: "/demos/cloud-run", icon: PlayCircle },
+          { label: "GKE", href: "/demos/gke", icon: Box },
+          { label: "Pub/Sub", href: "/demos/pubsub", icon: Radio },
+          { label: "Vertex AI", href: "/demos/vertex-ai", icon: Brain },
+          { label: "Cloud Functions", href: "/demos/cloud-functions", icon: Zap },
+          { label: "ADK (AI Agents)", href: "/demos/adk", icon: Bot },
+          { label: "─ Security ─", href: "", icon: Shield, separator: true },
+          { label: "IAM ポリシー", href: "/demos/iam", icon: Shield },
+          { label: "VPC & Firewall", href: "/demos/vpc-firewall", icon: Network },
+          { label: "サービスアカウント", href: "/demos/service-accounts", icon: Key },
+          { label: "Org Policy", href: "/demos/org-policy", icon: Building2 },
+          { label: "Audit Logs", href: "/demos/audit-logs", icon: FileSearch },
+        ],
+      },
+      { label: "アーキテクチャ図", href: "/architecture", icon: Network },
+    ],
   },
   {
-    label: "ダンジョン冒険",
-    href: "/dungeon",
-    icon: Sword,
-  },
-  {
-    label: "フラッシュカード",
-    href: "/flashcards",
-    icon: Layers,
-  },
-  {
-    label: "資格学習センター",
-    href: "/learn",
-    icon: GraduationCap,
-  },
-  {
-    label: "デイリーチャレンジ",
-    href: "/daily",
-    icon: Zap,
-  },
-  {
-    label: "資格ロードマップ",
-    href: "/roadmap",
-    icon: Map,
-  },
-  {
-    label: "最新アップデート",
-    href: "/updates",
-    icon: Sparkles,
+    label: "ツール",
+    items: [
+      { label: "提案シミュレーター", href: "/proposal", icon: FileText },
+      { label: "最新アップデート", href: "/updates", icon: Sparkles },
+    ],
   },
 ]
 
@@ -136,86 +136,106 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className={cn("flex-1 overflow-y-auto py-4 space-y-1 scrollbar-thin", collapsed ? "px-2" : "px-3")}>
-        {navItems.map((item) => {
-          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
-          const Icon = item.icon
+      <nav className={cn("flex-1 overflow-y-auto py-2 scrollbar-thin", collapsed ? "px-2" : "px-3")}>
+        {NAV_SECTIONS.map((section, sectionIdx) => (
+          <div key={section.label || "home"} className={sectionIdx > 0 ? "mt-4" : ""}>
+            {/* Section label */}
+            {section.label && !collapsed && (
+              <div className="px-3 mb-1.5">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  {section.label}
+                </span>
+              </div>
+            )}
+            {section.label && collapsed && sectionIdx > 0 && (
+              <div className="mx-2 mb-2 border-t border-border" />
+            )}
 
-          if (item.children) {
-            return (
-              <div key={item.href}>
-                <button
-                  onClick={() => {
-                    if (collapsed) {
-                      toggle()
-                      setExpandedDemos(true)
-                    } else {
-                      setExpandedDemos(!expandedDemos)
-                    }
-                  }}
-                  className={cn(
-                    "gcp-nav-item w-full",
-                    collapsed ? "justify-center px-0" : "justify-between",
-                    isActive && "active"
-                  )}
-                  title={collapsed ? item.label : undefined}
-                >
-                  <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+                const Icon = item.icon
+
+                if (item.children) {
+                  return (
+                    <div key={item.href}>
+                      <button
+                        onClick={() => {
+                          if (collapsed) {
+                            toggle()
+                            setExpandedDemos(true)
+                          } else {
+                            setExpandedDemos(!expandedDemos)
+                          }
+                        }}
+                        className={cn(
+                          "gcp-nav-item w-full",
+                          collapsed ? "justify-center px-0" : "justify-between",
+                          isActive && "active"
+                        )}
+                        title={collapsed ? item.label : undefined}
+                      >
+                        <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
+                          <Icon size={18} className="shrink-0" />
+                          {!collapsed && <span>{item.label}</span>}
+                        </div>
+                        {!collapsed && (
+                          <ChevronDown
+                            size={16}
+                            className={cn("transition-transform", expandedDemos && "rotate-180")}
+                          />
+                        )}
+                      </button>
+                      {expandedDemos && !collapsed && (
+                        <div className="ml-4 mt-1 space-y-0.5 border-l border-border pl-3">
+                          {item.children.map((child) => {
+                            if (child.separator) {
+                              return (
+                                <div key={child.label} className="pt-2 pb-1 px-1">
+                                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                    {child.label.replace(/─/g, "").trim()}
+                                  </span>
+                                </div>
+                              )
+                            }
+                            const ChildIcon = child.icon
+                            const childActive = pathname === child.href
+                            return (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                className={cn("gcp-nav-item text-xs", childActive && "active")}
+                              >
+                                <ChildIcon size={15} />
+                                <span>{child.label}</span>
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "gcp-nav-item",
+                      collapsed ? "justify-center px-0" : "",
+                      isActive && "active"
+                    )}
+                    title={collapsed ? item.label : undefined}
+                  >
                     <Icon size={18} className="shrink-0" />
                     {!collapsed && <span>{item.label}</span>}
-                  </div>
-                  {!collapsed && (
-                    <ChevronDown
-                      size={16}
-                      className={cn("transition-transform", expandedDemos && "rotate-180")}
-                    />
-                  )}
-                </button>
-                {expandedDemos && !collapsed && (
-                  <div className="ml-4 mt-1 space-y-1 border-l border-border pl-3">
-                    {item.children.map((child) => {
-                      if ((child as { separator?: boolean }).separator) {
-                        return (
-                          <div key={child.label} className="pt-2 pb-1 px-1">
-                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{child.label.replace(/─/g, "").trim()}</span>
-                          </div>
-                        )
-                      }
-                      const ChildIcon = child.icon
-                      const childActive = pathname === child.href
-                      return (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          className={cn("gcp-nav-item text-xs", childActive && "active")}
-                        >
-                          <ChildIcon size={15} />
-                          <span>{child.label}</span>
-                        </Link>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            )
-          }
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "gcp-nav-item",
-                collapsed ? "justify-center px-0" : "",
-                isActive && "active"
-              )}
-              title={collapsed ? item.label : undefined}
-            >
-              <Icon size={18} className="shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
-          )
-        })}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* Footer */}
