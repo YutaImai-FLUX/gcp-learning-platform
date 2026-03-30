@@ -10,6 +10,11 @@ const ROOM_ICONS: Record<string, React.ElementType> = {
   demo: PlayCircle, treasure: Gift, boss: Crown,
 }
 
+const ROOM_TYPE_LABEL: Record<string, string> = {
+  start: "開始", study: "学習", quiz: "バトル", lab: "実習",
+  demo: "デモ", treasure: "宝箱", boss: "ボス",
+}
+
 interface DungeonNodeData {
   label: string
   roomType: string
@@ -20,7 +25,6 @@ interface DungeonNodeData {
   onClick: () => void
 }
 
-/** Custom React Flow node for dungeon rooms — horizontal (LTR) layout */
 export const DungeonFlowNode = memo(function DungeonFlowNode({
   data,
 }: {
@@ -34,80 +38,99 @@ export const DungeonFlowNode = memo(function DungeonFlowNode({
 
   return (
     <>
-      {/* Left handle (incoming) */}
       <Handle type="target" position={Position.Left} className="!bg-transparent !border-0 !w-0 !h-0" />
 
       <button
         onClick={isLocked ? undefined : onClick}
         disabled={isLocked}
         className={`
-          group relative flex items-center gap-3 transition-all duration-200
-          ${isLocked ? "cursor-not-allowed opacity-40" : "cursor-pointer hover:scale-[1.02] active:scale-[0.98]"}
-          ${isBoss ? "px-5 py-3.5" : "px-4 py-3"}
-          rounded-xl border
+          group relative transition-all duration-200
+          ${isLocked ? "cursor-not-allowed" : "cursor-pointer hover:scale-[1.03] active:scale-[0.97]"}
+          rounded-2xl border-2 overflow-hidden
           ${isPlayerHere
-            ? "border-current shadow-lg ring-2 ring-current/20"
+            ? "shadow-xl"
             : isCleared
-              ? "border-border bg-card"
-              : "border-border bg-card hover:border-current hover:shadow-md"
+              ? "bg-card shadow-sm"
+              : "bg-card shadow-sm hover:shadow-lg"
           }
         `}
         style={{
-          color: accentColor,
-          boxShadow: isPlayerHere ? `0 0 20px ${accentColor}20` : undefined,
-          minWidth: isBoss ? 160 : 140,
-        }}
+          width: isBoss ? 200 : 180,
+          borderColor: isPlayerHere ? accentColor : isCleared ? accentColor + "40" : "var(--border)",
+          opacity: isLocked ? 0.35 : 1,
+          boxShadow: isPlayerHere
+            ? `0 0 0 3px var(--background), 0 0 0 5px ${accentColor}40, 0 8px 24px ${accentColor}15`
+            : undefined,
+        } as React.CSSProperties}
       >
-        {/* Player indicator */}
+        {/* Top accent bar */}
+        <div
+          className="h-1.5 w-full"
+          style={{
+            backgroundColor: isLocked ? "var(--muted)" : isCleared ? accentColor + "60" : accentColor,
+          }}
+        />
+
+        <div className="px-4 py-3 flex items-center gap-3">
+          {/* Icon circle */}
+          <div
+            className={`shrink-0 flex items-center justify-center rounded-xl ${isBoss ? "w-12 h-12" : "w-10 h-10"}`}
+            style={{
+              backgroundColor: isLocked ? "var(--muted)" : isCleared ? accentColor + "12" : accentColor + "15",
+            }}
+          >
+            {isLocked ? (
+              <Lock size={isBoss ? 22 : 18} className="text-muted-foreground" />
+            ) : (
+              <Icon
+                size={isBoss ? 22 : 18}
+                style={{ color: accentColor }}
+              />
+            )}
+          </div>
+
+          {/* Text content */}
+          <div className="min-w-0 flex-1 text-left">
+            {/* Type label */}
+            <p
+              className="text-[10px] font-semibold uppercase tracking-wider mb-0.5"
+              style={{ color: isLocked ? "var(--muted-foreground)" : accentColor }}
+            >
+              {ROOM_TYPE_LABEL[roomType] ?? roomType}
+            </p>
+            {/* Room name */}
+            <p
+              className={`font-bold leading-tight truncate ${isBoss ? "text-sm" : "text-xs"}`}
+              style={{ color: isLocked ? "var(--muted-foreground)" : "var(--foreground)" }}
+            >
+              {label}
+            </p>
+            {/* XP reward */}
+            {!isLocked && !isCleared && xpReward > 0 && (
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">+{xpReward} XP</p>
+            )}
+          </div>
+        </div>
+
+        {/* Player indicator pulse bar */}
         {isPlayerHere && (
-          <span
-            className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full animate-pulse"
+          <div
+            className="h-0.5 w-full animate-pulse"
             style={{ backgroundColor: accentColor }}
           />
         )}
 
-        {/* Cleared check badge */}
+        {/* Cleared badge */}
         {isCleared && (
-          <span
-            className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center"
+          <div
+            className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
             style={{ backgroundColor: accentColor }}
           >
-            <Check size={12} color="#fff" strokeWidth={3} />
-          </span>
+            <Check size={14} color="#fff" strokeWidth={3} />
+          </div>
         )}
-
-        {/* Icon */}
-        <div
-          className={`shrink-0 flex items-center justify-center rounded-lg ${isBoss ? "w-10 h-10" : "w-8 h-8"}`}
-          style={{
-            backgroundColor: isLocked ? "var(--muted)" : accentColor + "15",
-          }}
-        >
-          {isLocked ? (
-            <Lock size={isBoss ? 18 : 16} className="text-muted-foreground" />
-          ) : (
-            <Icon size={isBoss ? 18 : 16} style={{ color: accentColor }} />
-          )}
-        </div>
-
-        {/* Label */}
-        <div className="min-w-0 text-left">
-          <p
-            className={`font-semibold leading-tight ${isBoss ? "text-sm" : "text-xs"}`}
-            style={{ color: isLocked ? "var(--muted-foreground)" : isCleared ? "var(--muted-foreground)" : "var(--foreground)" }}
-          >
-            {label}
-          </p>
-          {!isLocked && !isCleared && xpReward > 0 && (
-            <p className="text-[10px] text-muted-foreground mt-0.5">+{xpReward} XP</p>
-          )}
-          {isBoss && !isLocked && (
-            <p className="text-[10px] font-medium mt-0.5" style={{ color: accentColor }}>BOSS</p>
-          )}
-        </div>
       </button>
 
-      {/* Right handle (outgoing) */}
       <Handle type="source" position={Position.Right} className="!bg-transparent !border-0 !w-0 !h-0" />
     </>
   )

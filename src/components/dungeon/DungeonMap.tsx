@@ -7,6 +7,7 @@ import {
   BackgroundVariant,
   type Node,
   type Edge,
+  type Viewport,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import type { DungeonMap as DungeonMapType, RoomStatus, PathSide } from "@/lib/types/dungeon"
@@ -26,9 +27,13 @@ interface DungeonMapProps {
 const NODE_TYPES = { dungeon: DungeonFlowNode }
 const EDGE_TYPES = { dungeon: DungeonFlowEdge }
 
-/** Horizontal layout: pathIndex → X axis, pathSide → Y axis */
-const COL_W = 220
-const ROW_Y: Record<PathSide, number> = { left: 0, center: 100, right: 200 }
+/**
+ * Layout constants — horizontal LTR flow.
+ * Tighter spacing so nodes appear larger at default zoom.
+ */
+const COL_W = 200
+const ROW_Y: Record<PathSide, number> = { left: 0, center: 90, right: 180 }
+const NODE_W = 180 // approximate node width for viewport centering
 
 export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps) {
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
@@ -65,7 +70,7 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     onRoomSelect(roomId)
   }, [dungeon.rooms, dungeonProgress, onRoomSelect])
 
-  // Build React Flow nodes — horizontal: X = pathIndex * COL_W, Y = pathSide
+  // Build nodes
   const nodes: Node[] = useMemo(() => {
     return dungeon.rooms.map((room) => ({
       id: room.id,
@@ -89,7 +94,7 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     }))
   }, [dungeon.rooms, roomStatuses, currentRoomId, theme.accentColor, handleRoomClick])
 
-  // Build React Flow edges
+  // Build edges
   const edges: Edge[] = useMemo(() => {
     return dungeon.connections.map((conn) => {
       const fromCleared = dungeonProgress[conn.from]?.cleared ?? false
@@ -108,32 +113,45 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     })
   }, [dungeon.connections, dungeonProgress, roomStatuses, theme.accentColor])
 
+  // Center viewport on the current active room at zoom=1
+  const defaultViewport: Viewport = useMemo(() => {
+    const activeRoom = dungeon.rooms.find((r) => r.id === currentRoomId)
+    if (!activeRoom) return { x: 0, y: 0, zoom: 1 }
+    const nodeX = activeRoom.pathIndex * COL_W
+    const nodeY = ROW_Y[activeRoom.pathSide]
+    // Center the active room in the container (assume ~700px wide, 420px tall container)
+    return {
+      x: -nodeX + 260 - NODE_W / 2,
+      y: -nodeY + 170,
+      zoom: 1,
+    }
+  }, [dungeon.rooms, currentRoomId])
+
   const npcRoom = showNPC ? dungeon.rooms.find((r) => r.id === showNPC) : null
 
   return (
     <div className="relative">
       <div
-        className="rounded-lg border border-border overflow-hidden bg-card"
-        style={{ height: 380 }}
+        className="rounded-xl border border-border overflow-hidden bg-card/50"
+        style={{ height: 420 }}
       >
         <ReactFlow
           nodes={nodes}
           edges={edges}
           nodeTypes={NODE_TYPES}
           edgeTypes={EDGE_TYPES}
-          fitView
-          fitViewOptions={{ padding: 0.15 }}
+          defaultViewport={defaultViewport}
           panOnDrag
           panOnScroll
-          zoomOnScroll={false}
+          zoomOnScroll
           zoomOnPinch
           zoomOnDoubleClick={false}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
-          minZoom={0.3}
-          maxZoom={1.5}
+          minZoom={0.4}
+          maxZoom={2}
         >
           <Background
             variant={BackgroundVariant.Dots}
@@ -144,11 +162,10 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
         </ReactFlow>
       </div>
 
-      <p className="text-[10px] text-muted-foreground text-center mt-1.5">
-        ドラッグでスクロール・ピンチでズーム
+      <p className="text-[10px] text-muted-foreground text-center mt-1.5 opacity-60">
+        ドラッグでスクロール・スクロールでズーム
       </p>
 
-      {/* NPC Dialog */}
       {npcRoom?.npc && showNPC && (
         <DungeonNPCDialog
           npc={npcRoom.npc}
