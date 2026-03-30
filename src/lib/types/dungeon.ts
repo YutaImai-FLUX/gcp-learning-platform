@@ -9,6 +9,8 @@ export interface DungeonNPC {
   dialogues: string[]
 }
 
+export type PathSide = "left" | "center" | "right"
+
 export interface DungeonRoom {
   id: string
   label: string
@@ -16,6 +18,8 @@ export interface DungeonRoom {
   type: RoomType
   gridX: number
   gridY: number
+  pathIndex: number
+  pathSide: PathSide
   moduleIds?: string[]
   labIds?: string[]
   demoId?: string

@@ -1,4 +1,4 @@
-import type { DungeonMap, DungeonRoom, DungeonConnection, DungeonTheme } from "@/lib/types/dungeon"
+import type { DungeonMap, DungeonRoom, DungeonConnection, DungeonTheme, PathSide } from "@/lib/types/dungeon"
 import type { CertificationId } from "@/lib/types/quiz"
 import { CERTIFICATIONS } from "@/lib/data/certifications"
 
@@ -27,54 +27,47 @@ const CERT_DUNGEON_NAMES: Record<CertificationId, string> = {
 const NPC_DIALOGUES: Record<CertificationId, string[]> = {
   cdl: [
     "ようこそ、冒険者よ！ここは Google Cloud の基礎を学ぶ森だ。",
-    "まずはクラウドの概念を理解することから始めよう。",
     "各部屋で学習を進め、ボスを倒して資格の知識を手に入れるのだ！",
   ],
   ace: [
     "テックラボへようこそ。ここではGCPインフラの実践スキルを磨く。",
-    "gcloudコマンドを使いこなし、リソースを管理する力を身につけよ。",
     "最後のボス戦では全ドメインの知識が試される！",
   ],
   pca: [
     "城砦の門をくぐったか。ここはアーキテクト達の修練場だ。",
     "ケーススタディを読み解き、最適な設計を導き出せ。",
-    "DR戦略、コスト最適化、セキュリティ...全てを統合する力が必要だ。",
   ],
   pde: [
     "データの溶岩が流れるこの火山で、パイプラインの設計を学べ。",
     "BigQuery、Dataflow、Pub/Sub...データの流れを制御する力を身につけよ。",
-    "ボスはデータ全ドメインの複合問題を出してくるぞ！",
   ],
   pmle: [
-    "氷結研究所へようこそ。ここではMLの精密な知識を冷静に学ぶ。",
+    "氷結研究所へようこそ。MLの精密な知識を冷静に学ぶのだ。",
     "Vertex AI、特徴量エンジニアリング、MLOps...全てを習得せよ。",
-    "モデルの訓練・デプロイ・監視の全プロセスを理解するのだ。",
   ],
   pcne: [
     "深海へようこそ。ネットワークの海底ケーブルの世界だ。",
     "VPC、ロードバランシング、ハイブリッド接続の全てを理解せよ。",
-    "パケットの流れを制御する力が、この海の鍵となる。",
   ],
   pcse: [
-    "暗号洞窟へ足を踏み入れたか。ここはセキュリティの聖域だ。",
+    "暗号洞窟へ足を踏み入れたか。セキュリティの聖域だ。",
     "IAM、暗号化、脅威検出...多層防御の全てを学べ。",
-    "ゼロトラストの原則を理解し、守りの力を完成させよ。",
   ],
   pcd: [
     "天空都市へようこそ、デベロッパーよ。",
     "Cloud Native開発、CI/CD、マイクロサービスの極意を学べ。",
-    "12-Factor Appの原則を武器に、スケーラブルなアプリを構築するのだ。",
   ],
 }
 
-/** Shorten long domain names for display in dungeon rooms */
-function shortenDomainName(name: string): string {
+/** Shorten long domain names for room labels */
+function shortenDomain(name: string): string {
   return name
     .replace(/Google Cloud\s*(による|の)\s*/g, "")
     .replace(/インフラストラクチャの/g, "インフラ")
     .replace(/アプリケーションの近代化/g, "アプリ近代化")
     .replace(/データ価値の最大化/g, "データ活用")
     .replace(/モダナイズ/g, "近代化")
+    .replace(/デジタルトランスフォーメーションと/g, "DX基礎: ")
 }
 
 function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
@@ -82,34 +75,34 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
   if (!cert) return []
 
   const rooms: DungeonRoom[] = []
+  let idx = 0
 
-  // Start room — always row 0
+  // Start room — center
   rooms.push({
     id: `${certId}-start`,
     label: "入口",
     type: "start",
-    gridX: 1,
-    gridY: 0,
+    gridX: 1, gridY: 0,
+    pathIndex: idx++,
+    pathSide: "center",
     xpReward: 0,
-    npc: {
-      name: "案内人",
-      dialogues: NPC_DIALOGUES[certId],
-    },
+    npc: { name: "案内人", dialogues: NPC_DIALOGUES[certId] },
   })
 
-  // Generate rooms per domain — compact: 2 rows per domain (study + quiz side by side)
+  // Generate rooms per domain — zigzag left/right
   cert.domains.forEach((domain, domainIdx) => {
-    const baseY = 1 + domainIdx * 2
-    const shortName = shortenDomainName(domain.name)
+    const side: PathSide = domainIdx % 2 === 0 ? "left" : "right"
+    const shortName = shortenDomain(domain.name)
 
-    // Study room — left side
+    // Study room
     rooms.push({
       id: `${certId}-study-${domainIdx}`,
       label: shortName,
       domainName: domain.name,
       type: "study",
-      gridX: 0,
-      gridY: baseY,
+      gridX: side === "left" ? 0 : 2, gridY: idx,
+      pathIndex: idx++,
+      pathSide: side,
       moduleIds: [`${certId}-module-${domainIdx}`],
       unlockRequires: domainIdx === 0
         ? [`${certId}-start`]
@@ -117,14 +110,15 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
       xpReward: 15,
     })
 
-    // Quiz room — right side
+    // Quiz room — same side as study
     rooms.push({
       id: `${certId}-quiz-${domainIdx}`,
-      label: `${shortName}`,
+      label: "バトル",
       domainName: domain.name,
       type: "quiz",
-      gridX: 2,
-      gridY: baseY,
+      gridX: side === "left" ? 0 : 2, gridY: idx,
+      pathIndex: idx++,
+      pathSide: side,
       quizDomain: domain.name,
       quizCount: 5,
       unlockRequires: [`${certId}-study-${domainIdx}`],
@@ -137,22 +131,23 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
         id: `${certId}-treasure-${domainIdx}`,
         label: "宝箱",
         type: "treasure",
-        gridX: 1,
-        gridY: baseY + 1,
+        gridX: 1, gridY: idx,
+        pathIndex: idx++,
+        pathSide: "center",
         unlockRequires: [`${certId}-quiz-${domainIdx}`],
         xpReward: 30,
       })
     }
   })
 
-  // Boss room — final row
-  const bossY = 1 + cert.domains.length * 2
+  // Boss room — center
   rooms.push({
     id: `${certId}-boss`,
-    label: "ボス戦",
+    label: "BOSS",
     type: "boss",
-    gridX: 1,
-    gridY: bossY,
+    gridX: 1, gridY: idx,
+    pathIndex: idx,
+    pathSide: "center",
     quizDomain: "all",
     quizCount: 20,
     unlockRequires: [`${certId}-quiz-${cert.domains.length - 1}`],
@@ -164,7 +159,6 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
 
 function generateConnections(rooms: DungeonRoom[]): DungeonConnection[] {
   const connections: DungeonConnection[] = []
-
   for (const room of rooms) {
     if (room.unlockRequires) {
       for (const reqId of room.unlockRequires) {
@@ -172,15 +166,12 @@ function generateConnections(rooms: DungeonRoom[]): DungeonConnection[] {
       }
     }
   }
-
   return connections
 }
 
 function generateDungeonMap(certId: CertificationId): DungeonMap {
   const cert = CERTIFICATIONS.find((c) => c.id === certId)
-  if (!cert) {
-    throw new Error(`Certification ${certId} not found`)
-  }
+  if (!cert) throw new Error(`Certification ${certId} not found`)
 
   const rooms = generateDungeonRooms(certId)
   const connections = generateConnections(rooms)

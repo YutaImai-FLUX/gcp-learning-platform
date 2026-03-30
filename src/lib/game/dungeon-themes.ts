@@ -10,6 +10,8 @@ export interface ThemeConfig {
   accentColor: string
   textColor: string
   fontClass: string
+  ambientEmoji: string[]
+  bgPattern: string
   roomColors: {
     locked: string
     available: string
@@ -29,6 +31,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#34A853",
     textColor: "#c8e6c9",
     fontClass: "font-pixel",
+    ambientEmoji: ["🌿", "🍄", "🦎"],
+    bgPattern: "radial-gradient(circle at 20% 30%, rgba(52,168,83,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(52,168,83,0.04) 0%, transparent 40%)",
     roomColors: {
       locked: "#2a332a",
       available: "#1b5e20",
@@ -46,6 +50,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#4285F4",
     textColor: "#bbdefb",
     fontClass: "font-pixel",
+    ambientEmoji: ["⚡", "🔧", "💡"],
+    bgPattern: "linear-gradient(rgba(66,133,244,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(66,133,244,0.03) 1px, transparent 1px)",
     roomColors: {
       locked: "#1a2332",
       available: "#1565c0",
@@ -63,6 +69,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#EA4335",
     textColor: "#ffcdd2",
     fontClass: "font-pixel",
+    ambientEmoji: ["🏰", "⚔️", "🛡"],
+    bgPattern: "repeating-linear-gradient(90deg, rgba(234,67,53,0.03) 0px, rgba(234,67,53,0.03) 40px, transparent 40px, transparent 80px)",
     roomColors: {
       locked: "#2a1a1a",
       available: "#b71c1c",
@@ -80,6 +88,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#FBBC05",
     textColor: "#fff9c4",
     fontClass: "font-pixel",
+    ambientEmoji: ["🔥", "🌋", "💎"],
+    bgPattern: "radial-gradient(circle at 50% 100%, rgba(251,188,5,0.08) 0%, transparent 60%)",
     roomColors: {
       locked: "#2a2010",
       available: "#e65100",
@@ -97,6 +107,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#00897b",
     textColor: "#b2dfdb",
     fontClass: "font-pixel",
+    ambientEmoji: ["❄️", "🧊", "💠"],
+    bgPattern: "repeating-linear-gradient(135deg, rgba(0,137,123,0.03) 0px, transparent 2px, transparent 20px)",
     roomColors: {
       locked: "#1a2a2a",
       available: "#00695c",
@@ -114,6 +126,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#0097A7",
     textColor: "#b2ebf2",
     fontClass: "font-pixel",
+    ambientEmoji: ["🐚", "🐠", "🫧"],
+    bgPattern: "repeating-linear-gradient(0deg, rgba(0,151,167,0.02) 0px, transparent 2px, transparent 30px)",
     roomColors: {
       locked: "#0a1a2a",
       available: "#00838f",
@@ -123,7 +137,7 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
   },
   cave: {
     name: "Security Cave",
-    nameJa: "セキュリティ暗号洞窟",
+    nameJa: "セキュリティ洞窟",
     bgGradient: "from-red-950 via-gray-900 to-red-950",
     tileColor: "#1a0e0e",
     tileBorder: "#2a1a1a",
@@ -131,6 +145,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#C62828",
     textColor: "#ffcdd2",
     fontClass: "font-pixel",
+    ambientEmoji: ["🦇", "🔒", "💀"],
+    bgPattern: "radial-gradient(circle at 30% 20%, rgba(198,40,40,0.06) 0%, transparent 40%), radial-gradient(circle at 70% 80%, rgba(198,40,40,0.04) 0%, transparent 40%)",
     roomColors: {
       locked: "#1a1212",
       available: "#b71c1c",
@@ -140,7 +156,7 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
   },
   sky: {
     name: "Developer Sky City",
-    nameJa: "デベロッパー天空都市",
+    nameJa: "天空都市",
     bgGradient: "from-purple-950 via-indigo-900 to-purple-900",
     tileColor: "#1a0e30",
     tileBorder: "#2a1a4a",
@@ -148,6 +164,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#7B1FA2",
     textColor: "#e1bee7",
     fontClass: "font-pixel",
+    ambientEmoji: ["☁️", "⭐", "🌙"],
+    bgPattern: "radial-gradient(circle at 20% 50%, rgba(123,31,162,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(123,31,162,0.04) 0%, transparent 30%)",
     roomColors: {
       locked: "#1a1222",
       available: "#6a1b9a",
@@ -165,6 +183,8 @@ export const DUNGEON_THEMES: Record<DungeonTheme, ThemeConfig> = {
     accentColor: "#00e676",
     textColor: "#b9f6ca",
     fontClass: "font-pixel",
+    ambientEmoji: ["💻", "🔮", "📡"],
+    bgPattern: "linear-gradient(rgba(0,230,118,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,230,118,0.02) 1px, transparent 1px)",
     roomColors: {
       locked: "#121a12",
       available: "#1b5e20",
