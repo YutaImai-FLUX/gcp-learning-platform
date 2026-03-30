@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { getServiceDescription } from "@/lib/data/gcp-service-descriptions"
 
+// ─── Lucide fallback icons ───
 const ICON_MAP: Record<string, LucideIcon> = {
   Globe, Server, Database, HardDrive, Shield, Key, Play, Box,
   Lock, Radio, Zap, Search, Code2, Brain, Sparkles, Cpu,
@@ -22,6 +23,66 @@ const ICON_MAP: Record<string, LucideIcon> = {
   SplitSquareHorizontal: Network,
   List: Layers,
   CheckCircle: Activity,
+}
+
+// ─── Service name → GCP official icon SVG file ───
+// Files are in /public/icons/gcp/{name}-512-color.svg
+const GCP_ICON_MAP: Record<string, string> = {
+  // Compute
+  "Compute": "compute",
+  "Compute Engine": "compute",
+  "Cloud Run": "serverlesscomputing",
+  "GKE": "gke",
+  "Functions": "serverlesscomputing",
+  "Cloud Functions": "serverlesscomputing",
+  // Storage & Database
+  "Storage": "cloud-storage",
+  "Cloud Storage": "cloud-storage",
+  "Database": "cloudsql",
+  "Cloud SQL": "cloudsql",
+  "Firestore": "databases",
+  "Bigtable": "databases",
+  "Cloud Spanner": "cloudspanner",
+  "AlloyDB": "alloydb",
+  // Data & Analytics
+  "BigQuery": "bigquery",
+  "Dataflow": "dataanalytics",
+  "Dataproc": "dataanalytics",
+  "Looker": "looker",
+  "Dataplex": "dataanalytics",
+  "dbt": "dataanalytics",
+  // AI/ML
+  "Vertex AI": "vertexai",
+  "ADK": "agents",
+  // Networking
+  "Network": "networking-512-color-rgb",
+  "VPC": "networking-512-color-rgb",
+  "Load Balancer": "networking-512-color-rgb",
+  "LB": "networking-512-color-rgb",
+  "CDN": "networking-512-color-rgb",
+  // Security
+  "Security": "securityidentity",
+  "Firebase": "webmobile",
+  // DevOps & Operations
+  "Cloud Build": "devops",
+  "Cloud Deploy": "devops",
+  "Artifact Registry": "containers",
+  "Cloud Ops": "operations",
+  "Eventarc": "integrationservices",
+  // Other
+  "Pub/Sub": "integrationservices",
+  "Marketplace": "marketplace",
+  "Anthos": "anthos",
+  "Cache": "databases",
+  "Memorystore": "databases",
+}
+
+function getGcpIconPath(service: string): string | null {
+  const iconName = GCP_ICON_MAP[service]
+  if (!iconName) return null
+  // Handle the special case where the filename already contains the full pattern
+  if (iconName.includes("-color-rgb")) return `/icons/gcp/${iconName}.svg`
+  return `/icons/gcp/${iconName}-512-color.svg`
 }
 
 export type GcpNodeData = {
@@ -34,8 +95,9 @@ export type GcpNodeData = {
 
 function GcpNodeComponent({ data }: NodeProps) {
   const nodeData = data as unknown as GcpNodeData
-  const { label, color, icon, role } = nodeData
+  const { label, service, color, icon, role } = nodeData
   const IconComp = ICON_MAP[icon] || Box
+  const gcpIconPath = getGcpIconPath(service)
   const lines = label.split("\n")
 
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null)
@@ -46,7 +108,6 @@ function GcpNodeComponent({ data }: NodeProps) {
   const description = getServiceDescription(label)
   const hasTooltip = description || role
 
-  // W4 fix: clear timer on unmount to avoid memory leak
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
@@ -69,6 +130,23 @@ function GcpNodeComponent({ data }: NodeProps) {
     if (timerRef.current) clearTimeout(timerRef.current)
     setTooltipPos(null)
   }, [])
+
+  // Render icon: GCP official logo or Lucide fallback
+  const renderIcon = (size: number) => {
+    if (gcpIconPath) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={gcpIconPath}
+          alt={service}
+          width={size}
+          height={size}
+          className="object-contain"
+        />
+      )
+    }
+    return <IconComp size={size} style={{ color }} />
+  }
 
   return (
     <>
@@ -95,9 +173,9 @@ function GcpNodeComponent({ data }: NodeProps) {
         {/* Icon */}
         <div
           className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0 ml-1"
-          style={{ backgroundColor: `${color}15` }}
+          style={{ backgroundColor: gcpIconPath ? "transparent" : `${color}15` }}
         >
-          <IconComp size={16} style={{ color }} />
+          {renderIcon(gcpIconPath ? 24 : 16)}
         </div>
 
         {/* Text */}
@@ -125,7 +203,7 @@ function GcpNodeComponent({ data }: NodeProps) {
         )}
       </div>
 
-      {/* Portal tooltip rendered outside ReactFlow canvas */}
+      {/* Portal tooltip */}
       {tooltipPos && hasTooltip && typeof document !== "undefined" &&
         createPortal(
           <div
@@ -147,9 +225,9 @@ function GcpNodeComponent({ data }: NodeProps) {
               <div className="flex items-center gap-2 mb-2">
                 <div
                   className="flex items-center justify-center w-7 h-7 rounded-lg shrink-0"
-                  style={{ backgroundColor: `${color}18` }}
+                  style={{ backgroundColor: gcpIconPath ? "transparent" : `${color}18` }}
                 >
-                  <IconComp size={14} style={{ color }} />
+                  {renderIcon(gcpIconPath ? 20 : 14)}
                 </div>
                 <span className="text-xs font-bold text-foreground leading-tight">
                   {productName}
