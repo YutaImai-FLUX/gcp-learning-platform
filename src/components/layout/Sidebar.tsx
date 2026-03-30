@@ -31,10 +31,11 @@ import {
   Target,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { XPProgressBar } from "@/components/game/XPProgressBar"
 import { StreakDisplay } from "@/components/game/StreakDisplay"
 import { useSidebarStore } from "@/lib/stores/useSidebarStore"
+import { useUpdatesBadge } from "@/lib/hooks/useUpdatesBadge"
 
 interface NavChild {
   label: string
@@ -99,6 +100,7 @@ const NAV_SECTIONS: NavSection[] = [
         ],
       },
       { label: "アーキテクチャ図", href: "/architecture", icon: Network },
+      { label: "Google法人サービス", href: "/google-enterprise", icon: Building2 },
     ],
   },
   {
