@@ -12,6 +12,14 @@ export type ProductCategory =
   | "Integration"
   | "IoT"
 
+export interface ProductInsight {
+  purpose: string
+  useCasesDetail: string
+  comparison: string
+  bestPractices: string
+  examTips: string
+}
+
 export interface GCPProduct {
   id: string
   name: string
@@ -29,4 +37,5 @@ export interface GCPProduct {
   demoPath?: string
   gcpIcon?: string
   docUrl?: string
+  insight?: ProductInsight
 }

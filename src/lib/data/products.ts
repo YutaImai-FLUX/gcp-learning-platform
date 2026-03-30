@@ -1,4 +1,5 @@
 import type { GCPProduct } from "@/lib/types/product"
+import { PRODUCT_INSIGHTS } from "./product-insights"
 
 export const GCP_PRODUCTS: GCPProduct[] = [
   // ─── Compute ──────────────────────────────────────────────
@@ -679,6 +680,12 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     docUrl: "https://cloud.google.com/logging",
   },
 ]
+
+// Merge insights into products
+for (const product of GCP_PRODUCTS) {
+  const insight = PRODUCT_INSIGHTS[product.id]
+  if (insight) product.insight = insight
+}
 
 export const PRODUCT_CATEGORIES = [
   "All",

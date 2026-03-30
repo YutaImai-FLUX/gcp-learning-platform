@@ -2,7 +2,10 @@
 
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, PlayCircle, CheckCircle, Tag, Link2, ExternalLink } from "lucide-react"
+import {
+  ArrowLeft, PlayCircle, CheckCircle, Tag, Link2, ExternalLink,
+  Target, Lightbulb, ArrowLeftRight, ShieldCheck, GraduationCap,
+} from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -94,6 +97,31 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
+
+      {/* 5 Insights */}
+      {product.insight && (
+        <div className="space-y-4">
+          {[
+            { icon: Target, label: "製品の目的", text: product.insight.purpose, color: "#4285F4" },
+            { icon: Lightbulb, label: "利用シーンとアーキテクチャ例", text: product.insight.useCasesDetail, color: "#34A853" },
+            { icon: ArrowLeftRight, label: "類似・競合サービスとの使い分け", text: product.insight.comparison, color: "#FBBC05" },
+            { icon: ShieldCheck, label: "設計・運用のベストプラクティスと注意点", text: product.insight.bestPractices, color: "#EA4335" },
+            { icon: GraduationCap, label: "資格試験での頻出ポイント", text: product.insight.examTips, color: "#7B1FA2" },
+          ].map(({ icon: Icon, label, text, color }) => (
+            <Card key={label} className="border-border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Icon size={16} style={{ color }} />
+                  {label}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-foreground/85 leading-relaxed">{text}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Key Features */}
