@@ -38,10 +38,17 @@ export const GCP_SERVICE_DESCRIPTIONS: Record<string, string> = {
   "Feature Store": "ML用の特徴量を一元管理・配信するストア。トレーニングとサービングで一貫したデータを提供。",
   "Model Registry": "学習済みモデルのバージョン管理・メタデータ管理を行うレジストリ。",
   "Vector Search": "ベクトル類似検索のためのインデックスサービス。RAGパイプラインの検索基盤。",
+  "ADK": "AIエージェントの構築・評価・デプロイを行うオープンソースフレームワーク。マルチエージェントシステム対応。",
+  "Agent Development Kit": "AIエージェントの構築・評価・デプロイを行うオープンソースフレームワーク。マルチエージェントシステム対応。",
+  "Agent Builder": "Vertex AI上でAIエージェントを構築・テスト・デプロイするマネージドプラットフォーム。",
+  "Agent Engine": "AIエージェントのフルマネージドランタイム。セッション管理・メモリ・ツールガバナンスを提供。",
+  "Agentspace": "Geminiとエージェント機能を企業全体に展開するAIプラットフォーム。社内ナレッジ検索・業務自動化。",
+  "Imagen": "テキストプロンプトから高品質な画像を生成・編集するAIモデル。SynthIDデジタル透かし付き。",
 
   // Security
   "Secret Manager": "APIキーやパスワードなどの機密情報を安全に管理・配布するサービス。",
   "Cloud IAM": "リソースへのきめ細かいアクセス制御を提供するID・アクセス管理サービス。",
+  "Google Unified Security": "脅威インテリジェンス・SecOps・クラウドセキュリティ・ブラウザセキュリティをAIで統合した包括的セキュリティプラットフォーム。",
 
   // DevOps
   "Cloud Build": "CI/CDパイプラインのビルド・テスト・デプロイを自動化するサーバーレスサービス。",
@@ -55,6 +62,13 @@ export const GCP_SERVICE_DESCRIPTIONS: Record<string, string> = {
   // Monitoring
   "Model Monitoring": "デプロイ済みモデルの予測品質・ドリフトを監視するサービス。",
   "Monitoring": "アプリとインフラのメトリクス・ログ・アラートを統合管理する Cloud Operations サービス。",
+
+  // Networking
+  "Cloud WAN": "Googleのグローバルネットワークを企業バックボーンとして利用できるフルマネージドWANサービス。",
+
+  // Integration
+  "Cloud Composer": "Apache Airflowベースのフルマネージドワークフローオーケストレーションサービス。",
+  "Colab Enterprise": "VPC-SC・IAM統合対応のエンタープライズ向けデータサイエンスノートブック環境。",
 
   // Other
   "dbt": "SQLベースのデータ変換ツール。ELTパイプラインのTransformレイヤーを担当。",

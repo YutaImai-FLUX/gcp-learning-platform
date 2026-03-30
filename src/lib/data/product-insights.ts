@@ -436,4 +436,150 @@ export const PRODUCT_INSIGHTS: Record<string, ProductInsight> = {
     examTips:
       "ACE・PCSE で出題。監査ログの種類（管理アクティビティ / データアクセス / システムイベント / ポリシー拒否）、ログシンクの設定、ログの保持期間（デフォルト30日、最大10年）、除外フィルタの仕組みを理解しましょう。",
   },
+
+  // ─── 2025-2026 新製品 ───
+  gemini: {
+    purpose:
+      "GeminiはGoogleが開発した最先端のマルチモーダル大規模言語モデルファミリーです。テキスト・画像・動画・音声・コードを統合的に理解・生成でき、Vertex AI経由でエンタープライズ利用が可能です。",
+    useCasesDetail:
+      "チャットボット・カスタマーサポート（Gemini API + Cloud Run）、ドキュメント要約・翻訳（Gemini + Cloud Storage連携）、コード生成・レビュー支援、マルチモーダル分析（画像+テキスト入力で商品説明生成）、RAGパイプライン（Gemini + Vector Search + BigQuery）が典型的な構成です。",
+    comparison:
+      "OpenAI GPT-4o、Anthropic Claude と競合。Gemini 2.5 Proは推論（Thinking）能力に特化、Flashは低コスト・高速応答に最適化。GCP上で使う場合はVertex AIのIAM・VPC-SC等のセキュリティ統合が強み。Azure OpenAI Service、Amazon Bedrockに対する Google Cloud のLLMサービスに該当します。",
+    bestPractices:
+      "用途に応じてモデルサイズを選択（Flash: 低コスト定型処理、Pro: 高品質推論）。Grounding（Google Search / データストア連携）でハルシネーションを低減。System Instructionで出力品質を制御。Context Cachingで長文コンテキストのコスト最適化。安全性フィルターの設定も忘れずに。",
+    examTips:
+      "PCA・PMLE で出題が増加傾向。モデルファミリーの使い分け（Pro vs Flash vs Nano）、Vertex AI Studio でのプロンプト設計、Grounding の仕組み、マルチモーダル入力の対応形式を押さえましょう。",
+  },
+  adk: {
+    purpose:
+      "Agent Development Kit（ADK）は、AIエージェントの構築・評価・デプロイを効率化するオープンソースフレームワークです。2025年4月のCloud Next '25で発表され、マルチエージェントシステムの構築を簡素化します。",
+    useCasesDetail:
+      "社内業務自動化エージェント（ADK + Gemini + 社内APIツール）、カスタマーサポートエージェント（ADK + Agent Engine + Firestore）、データ分析エージェント（ADK + BigQuery + Colab Enterprise）、マルチエージェントワークフロー（SequentialAgent / ParallelAgent で複雑なタスクを分担）が典型です。",
+    comparison:
+      "LangChain / LlamaIndex / CrewAI と競合するエージェントフレームワーク。ADKの強みはGemini・Vertex AIとのネイティブ統合、Agent2Agentプロトコルによるクロスベンダー相互運用性、Agent Engineによるマネージドデプロイ。モデル非依存（Gemini以外も利用可能）だがGCP統合が最も充実しています。",
+    bestPractices:
+      "エージェントの責務を明確に分離し、SequentialAgent / ParallelAgent で構成。ツール定義にはdocstringを詳細に記述（LLMがツール選択に使用）。Session / Memory Bank でステートフルな会話管理。本番デプロイにはAgent Engineを使用し、ローカル開発にはadk webコマンドを活用しましょう。",
+    examTips:
+      "最新の試験範囲では出題されにくいが、PMLE・PCA の生成AI関連セクションで概念的に問われる可能性あり。Agent2Agentプロトコルの目的、マルチエージェントアーキテクチャの利点を理解しておきましょう。",
+  },
+  "agent-builder": {
+    purpose:
+      "Vertex AI Agent Builderは、生成AIを活用したエージェントの構築・テスト・デプロイを行うマネージドプラットフォームです。Agent Engineでスケーラブルなランタイムを提供し、企業向けのAIエージェントを安全に運用できます。",
+    useCasesDetail:
+      "RAGベースの社内ナレッジ検索エージェント（Agent Builder + データストア + Cloud Storage）、カスタマーサポートBot（Agent Builder + Dialogflow CX統合）、データ分析エージェント（Agent Builder + BigQuery連携）、Agent Designerでローコード開発 → Agent Engineでデプロイの構成が典型です。",
+    comparison:
+      "AWS Bedrock Agents、Azure AI Agent Service と競合。Agent Builderの強みはAgent Engine（フルマネージドランタイム）、Agent Designer（ローコード設計ツール）、Cloud API Registryによるツールガバナンス。ADKはコードファーストの開発フレームワーク、Agent Builderはマネージドプラットフォームという位置づけです。",
+    bestPractices:
+      "データストアのグラウンディングを活用してハルシネーションを低減。Agent Engineのセッション管理で会話コンテキストを維持。ツールガバナンスでエージェントがアクセスできるAPIを制御。評価フレームワークでエージェントの品質を継続的に測定しましょう。",
+    examTips:
+      "PCA・PMLE で出題増加が予想されます。Agent Builder と ADK の使い分け、グラウンディングの仕組み、Agent Engineの特徴を理解しましょう。",
+  },
+  agentspace: {
+    purpose:
+      "Google Agentspaceは、Geminiとエージェント機能を企業全体に展開するプラットフォームです。社内データソースを横断したナレッジ検索、業務自動化、データ分析支援を提供し、従業員の生産性を向上させます。",
+    useCasesDetail:
+      "全社ナレッジポータル（Agentspace + Google Drive / Confluence / SharePoint連携）、社内データ分析支援（Agentspace + AlloyDB / BigQuery連携）、NotebookLM Plusによるドキュメント要約・ポッドキャスト生成、部署別カスタムエージェント展開が典型的な利用シーンです。",
+    comparison:
+      "Microsoft 365 Copilot、Amazon Q Business と競合。Agentspaceの強みは100+データソースコネクタ、NotebookLM Plus統合、GCPセキュリティとの深い統合。Agent Builder/ADK は開発者向けツール、Agentspaceはエンドユーザー向けプラットフォームという位置づけです。",
+    bestPractices:
+      "データソースのアクセス権限を既存のIAMポリシーと連携させ、ユーザーが権限のないデータにアクセスしないようにする。段階的にデータソースを接続し、検索品質を確認しながら拡大。カスタムエージェントで部署固有のワークフローを自動化しましょう。",
+    examTips:
+      "CDL試験で概念的に問われる可能性あり。Agentspaceの位置づけ（エンドユーザー向けAI）と他のAI製品（Vertex AI, Agent Builder, ADK）との使い分けを理解しましょう。",
+  },
+  imagen: {
+    purpose:
+      "Imagen on Vertex AIは、テキストプロンプトから高品質な画像を生成・編集するAIサービスです。Imagen 3ではフォトリアリスティックな画像生成、テキストレンダリング、インペインティング/アウトペインティングをサポートします。",
+    useCasesDetail:
+      "マーケティング素材の大量生成（Imagen API + Cloud Functions でバッチ処理）、eコマース商品画像のバリエーション生成、デザインプロトタイピング、コンテンツモデレーション用の合成データ生成が典型です。",
+    comparison:
+      "OpenAI DALL-E 3、Midjourney、Stability AI Stable Diffusion と競合。Imagenの強みはエンタープライズ向けSynthIDデジタル透かし、Vertex AIのセキュリティ・ガバナンス統合、安全性フィルターの充実。GCP上で安全に画像生成AIを運用したい場合に最適です。",
+    bestPractices:
+      "プロンプトは具体的かつ詳細に記述して品質を向上。ネガティブプロンプトで不要な要素を除外。SynthIDによる透かしは自動付与されるため、生成画像の追跡性を確保。安全性フィルター設定でブランドリスクを軽減しましょう。",
+    examTips:
+      "PMLE で出題される可能性あり。Imagen と Gemini のマルチモーダル機能の違い（Imagen: 画像生成特化、Gemini: 汎用マルチモーダル）を理解しましょう。",
+  },
+  "vector-search": {
+    purpose:
+      "Vector Searchは、Vertex AI上で大規模なベクトルデータに対する高速な近似最近傍（ANN）検索を提供するマネージドサービスです。RAGパイプライン、レコメンデーション、セマンティック検索の基盤として機能します。",
+    useCasesDetail:
+      "RAGパイプライン（Embedding API → Vector Search → Gemini で回答生成）、商品レコメンデーション（商品ベクトル化 → 類似商品検索）、セマンティック検索（社内ドキュメントのベクトル化 → 自然言語検索）、異常検知（通常パターンのベクトルと比較）が典型です。",
+    comparison:
+      "Pinecone、Weaviate、Milvus と競合するベクトルDB/検索エンジン。Vector Searchの強みはGoogleのScaNN技術ベースの高速検索（数十億ベクトル対応）、Vertex AI統合、ストリーミング更新対応。AlloyDB / Cloud SQL でもpgvector拡張で小規模なベクトル検索が可能です。",
+    bestPractices:
+      "Embedding モデルの選択が検索品質の鍵（Vertex AI Embedding API推奨）。インデックスのディメンション数とシャード数を適切に設定。ストリーミング更新でリアルタイム性を確保。フィルタリング検索で検索精度を向上させましょう。",
+    examTips:
+      "PMLE・PCA で出題増加。ベクトル検索の基本概念（Embedding、ANN）、RAGアーキテクチャにおけるVector Searchの位置づけ、他のデータストア（AlloyDB pgvector等）との使い分けを押さえましょう。",
+  },
+  eventarc: {
+    purpose:
+      "Eventarcは、Google Cloudサービスやカスタムソースからのイベントを統一的にルーティングするイベント管理サービスです。CloudEvents標準に準拠し、イベント駆動アーキテクチャの構築を簡素化します。",
+    useCasesDetail:
+      "Cloud Storageへのファイルアップロードをトリガーに画像処理（Eventarc → Cloud Run）、監査ログイベントに基づくセキュリティアラート（Eventarc → Cloud Functions）、サードパーティSaaSからのWebhookイベント処理が典型です。",
+    comparison:
+      "Pub/Sub は汎用メッセージング、Eventarc はイベントルーティングに特化。Eventarc は内部的にPub/Subを利用しつつ、監査ログイベントやCloudEvents形式の統一的なイベント管理を提供。AWS EventBridge に相当します。",
+    bestPractices:
+      "イベントフィルタリングを活用して不要なイベントの処理を回避。監査ログイベントのトリガーはデータアクセスログの有効化が必要な場合がある点に注意。べき等な処理を設計し、少なくとも1回の配信保証に対応しましょう。",
+    examTips:
+      "ACE・PCA で出題。Eventarc と Pub/Sub の使い分け、CloudEvents標準、サポートされるイベントソースの種類（GCPサービス直接 / 監査ログ / サードパーティ）を理解しましょう。",
+  },
+  "cloud-composer": {
+    purpose:
+      "Cloud Composerは、Apache Airflowベースのフルマネージドワークフローオーケストレーションサービスです。複雑なデータパイプラインやML ワークフローの構築・スケジュール・監視を行います。",
+    useCasesDetail:
+      "日次ETLパイプライン（Cloud Composer → Dataflow → BigQuery）、MLトレーニングワークフロー（Composer → Vertex AI Training → Model Registry）、マルチクラウドデータ統合（Composer → AWS S3 / Azure Blob → BigQuery）が典型です。",
+    comparison:
+      "Cloud Workflows はシンプルなAPIオーケストレーション向き、Cloud Composer は複雑なDAGベースのワークフロー向き。AWS Step Functions + MWAA、Azure Data Factory と競合。Airflow経験者はそのまま移行可能な点が強みです。",
+    bestPractices:
+      "Composer 2を使用（パフォーマンス・コスト最適化）。DAGのサイズを適切に保ち、タスク間の依存関係を明確化。GCPオペレーター（BigQueryOperator等）を活用してサービス連携。環境のオートスケール設定でコスト最適化しましょう。",
+    examTips:
+      "PDE・PCA で頻出。Composer vs Workflows の使い分け、Airflow の基本概念（DAG, タスク, スケジューラー）、Composer 2 の特徴を理解しましょう。",
+  },
+  dataplex: {
+    purpose:
+      "Dataplexは、データレイクとデータウェアハウスを横断して統合管理するデータガバナンスサービスです。データ品質管理、メタデータ管理、セキュリティポリシーの一元化を実現します。",
+    useCasesDetail:
+      "データメッシュアーキテクチャ（Dataplex でドメイン別データ管理 + BigQuery / GCS横断カタログ）、データ品質自動チェック（Dataplex DQ → 品質ルール定義 → 自動スキャン → アラート）、データリネージ追跡（データの流れを可視化）が典型です。",
+    comparison:
+      "AWS Glue Data Catalog、Azure Purview に相当。Dataplex はGCS + BigQuery を統一的に管理できる点が強み。BigQuery Universal Catalog との統合で、より包括的なデータガバナンスを実現します。",
+    bestPractices:
+      "データゾーンとアセットを論理的に構造化。データ品質ルールを定義して自動スキャンを設定。メタデータタグを活用してデータの発見性を向上。IAMポリシーと連携してデータアクセス制御を一元化しましょう。",
+    examTips:
+      "PDE・PCA で出題増加。データガバナンスの概念、Dataplex のデータゾーン / レイク / アセットの階層構造、データ品質チェック機能を理解しましょう。",
+  },
+  "colab-enterprise": {
+    purpose:
+      "Colab Enterpriseは、Google Colabのエンタープライズ版で、VPC-SC・IAM統合による安全なノートブック環境を提供します。Vertex AI連携やData Science Agentにより、データサイエンスの生産性を大幅に向上させます。",
+    useCasesDetail:
+      "データ探索・可視化（Colab Enterprise + BigQuery SQL セル）、MLモデル開発（Colab Enterprise + Vertex AI Training）、Data Science Agentによる自動ML開発（自然言語でモデル構築を指示）、チーム共有ノートブックでのコラボレーションが典型です。",
+    comparison:
+      "SageMaker Studio Notebooks、Azure ML Studio Notebooks と競合。Colab Enterprise の強みはGoogle Colab のUXをそのまま活かしつつエンタープライズセキュリティを追加、Data Science Agent による自動化。BigQuery との深い統合も強みです。",
+    bestPractices:
+      "VPC-SC境界内で機密データを安全に分析。BigQuery SQLセルとPythonセルを組み合わせて効率的な分析。ランタイムテンプレートでチーム共通の環境を標準化。Data Science Agent を活用して EDA・特徴量エンジニアリングを効率化しましょう。",
+    examTips:
+      "PMLE・PDE で出題される可能性あり。Colab Enterprise と Vertex AI Workbench の使い分け、Data Science Agent の概要を理解しましょう。",
+  },
+  "cloud-wan": {
+    purpose:
+      "Cloud WANは、Googleのグローバルネットワーク（200+国、33リージョン対応）を企業のWANバックボーンとして利用できるフルマネージドサービスです。従来のMPLSネットワークの代替として、高速・低コストなグローバル接続を提供します。",
+    useCasesDetail:
+      "グローバル拠点間の高速接続（Cloud WAN + SD-WAN統合）、リモートワーカーのセキュアアクセス（Cloud WAN + ゼロトラストセキュリティ）、マルチクラウド環境のバックボーン（Cloud WAN + Cloud Interconnect）が典型です。",
+    comparison:
+      "従来のMPLS/SD-WANソリューション、AWS Cloud WAN と競合。Google Cloud WANの強みはGoogleのグローバルネットワーク（200+国対応、既にGoogle検索/YouTube等を支えるインフラ）を直接利用できる点。MPLS比40%高速とされています。",
+    bestPractices:
+      "既存SD-WANソリューションとの統合を検討。ゼロトラストセキュリティポリシーを設定。SLAベースのパフォーマンスモニタリングを設定。段階的に拠点を接続し、パフォーマンスを検証しながら展開しましょう。",
+    examTips:
+      "PCNE で出題される可能性あり。Cloud WAN と Cloud Interconnect / Cloud VPN の違い、ユースケースの使い分けを理解しましょう。",
+  },
+  "unified-security": {
+    purpose:
+      "Google Unified Securityは、脅威インテリジェンス（Mandiant）、セキュリティ運用（SecOps/Chronicle）、クラウドセキュリティ（SCC）、ブラウザセキュリティ（Chrome Enterprise）を単一のAI駆動プラットフォームに統合した包括的セキュリティソリューションです。",
+    useCasesDetail:
+      "SOCの効率化（AIアラートトリアージエージェント → 自動調査・判定）、マルウェア分析の自動化（AIマルウェア分析エージェント）、クラウドセキュリティ態勢管理（SCC + セキュリティグラフ分析）、エンドポイント保護（Chrome Enterprise統合）が典型です。",
+    comparison:
+      "Microsoft Sentinel + Defender、AWS Security Hub + GuardDuty、CrowdStrike Falcon、Palo Alto Cortex XSIAM と競合。Google Unified Security の強みはMandiantの脅威インテリジェンス、GeminiによるAIエージェント、Google規模のデータ分析能力の統合です。",
+    bestPractices:
+      "AIエージェント（アラートトリアージ、マルウェア分析）を段階的に有効化して効果を検証。既存のSIEM/SOARとの統合を検討。Security Command Centerの検出結果をUnified Securityに集約。Chrome Enterpriseとの統合でエンドポイント可視性を確保しましょう。",
+    examTips:
+      "PCSE で出題増加が予想されます。Unified Securityの構成要素（Mandiant / SecOps / SCC / Chrome Enterprise）、AIエージェントの役割、Security Command Centerとの関係を理解しましょう。",
+  },
 }
