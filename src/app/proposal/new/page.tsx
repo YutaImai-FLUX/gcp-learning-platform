@@ -128,7 +128,7 @@ export default function ProposalNewPage() {
 
   /* ── Wizard ── */
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       <Link
         href="/proposal"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

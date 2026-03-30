@@ -22,7 +22,7 @@ const EXAMPLES = [
 
 export default function ProposalPage() {
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8">
       {/* Hero */}
       <motion.div
         className="text-center py-8"
