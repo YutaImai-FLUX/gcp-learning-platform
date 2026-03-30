@@ -7,7 +7,7 @@ import { Search, PlayCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { GCP_PRODUCTS, PRODUCT_CATEGORIES, CATEGORY_COLORS } from "@/lib/data/products"
+import { GCP_PRODUCTS, PRODUCT_CATEGORIES, CATEGORY_COLORS, getGcpProductIconPath } from "@/lib/data/products"
 
 export default function ProductsPage() {
   const [search, setSearch] = useState("")
@@ -80,10 +80,17 @@ export default function ProductsPage() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-base shrink-0"
-                      style={{ backgroundColor: product.color }}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: `${product.color}12` }}
                     >
-                      {product.name.charAt(0)}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={getGcpProductIconPath(product)}
+                        alt={product.name}
+                        width={28}
+                        height={28}
+                        className="object-contain"
+                      />
                     </div>
                     <div className="flex gap-1 flex-wrap justify-end">
                       <Badge

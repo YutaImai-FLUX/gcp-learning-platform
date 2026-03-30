@@ -24,6 +24,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["gke", "cloud-run", "cloud-functions"],
     hasDemo: true,
     demoPath: "/demos/gce",
+    gcpIcon: "compute-512-color.svg",
+    docUrl: "https://cloud.google.com/compute",
   },
   {
     id: "gke",
@@ -47,6 +49,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["gce", "cloud-run", "artifact-registry"],
     hasDemo: true,
     demoPath: "/demos/gke",
+    gcpIcon: "gke-512-color.svg",
+    docUrl: "https://cloud.google.com/kubernetes-engine",
   },
   {
     id: "cloud-run",
@@ -70,6 +74,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["cloud-functions", "gke", "artifact-registry"],
     hasDemo: true,
     demoPath: "/demos/cloud-run",
+    gcpIcon: "serverlesscomputing-512-color.svg",
+    docUrl: "https://cloud.google.com/run",
   },
   {
     id: "cloud-functions",
@@ -93,6 +99,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["cloud-run", "pubsub", "eventarc"],
     hasDemo: true,
     demoPath: "/demos/cloud-functions",
+    gcpIcon: "serverlesscomputing-512-color.svg",
+    docUrl: "https://cloud.google.com/functions",
   },
   {
     id: "app-engine",
@@ -109,6 +117,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "F1インスタンス: $0.05/時間",
     relatedProducts: ["cloud-run", "cloud-functions"],
     hasDemo: false,
+    gcpIcon: "serverlesscomputing-512-color.svg",
+    docUrl: "https://cloud.google.com/appengine",
   },
 
   // ─── Storage ──────────────────────────────────────────────
@@ -134,6 +144,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["bigquery", "dataflow", "cloud-cdn"],
     hasDemo: true,
     demoPath: "/demos/gcs",
+    gcpIcon: "cloud-storage-512-color.svg",
+    docUrl: "https://cloud.google.com/storage",
   },
   {
     id: "persistent-disk",
@@ -149,6 +161,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "pd-standard: $0.040/GB/月、pd-ssd: $0.170/GB/月",
     relatedProducts: ["gce", "filestore"],
     hasDemo: false,
+    gcpIcon: "hyperdisk-512-color.svg",
+    docUrl: "https://cloud.google.com/persistent-disk",
   },
   {
     id: "filestore",
@@ -164,6 +178,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "Basic HDD: $0.20/GB/月",
     relatedProducts: ["gke", "persistent-disk"],
     hasDemo: false,
+    gcpIcon: "storage-512-color.svg",
+    docUrl: "https://cloud.google.com/filestore",
   },
 
   // ─── Database ──────────────────────────────────────────────
@@ -182,6 +198,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "db-f1-micro: $7.67/月、ストレージ $0.170/GB/月",
     relatedProducts: ["cloud-run", "gce", "spanner"],
     hasDemo: false,
+    gcpIcon: "cloudsql-512-color.svg",
+    docUrl: "https://cloud.google.com/sql",
   },
   {
     id: "spanner",
@@ -204,6 +222,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "Processing Unit: $0.9/PU/月",
     relatedProducts: ["cloud-sql", "bigquery"],
     hasDemo: false,
+    gcpIcon: "cloudspanner-512-color.svg",
+    docUrl: "https://cloud.google.com/spanner",
   },
   {
     id: "firestore",
@@ -220,6 +240,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "読み取り $0.06/100万件、書き込み $0.18/100万件",
     relatedProducts: ["cloud-functions", "firebase", "bigtable"],
     hasDemo: false,
+    gcpIcon: "databases-512-color.svg",
+    docUrl: "https://cloud.google.com/firestore",
   },
   {
     id: "bigtable",
@@ -235,6 +257,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "SSD: $0.17/GB/月、ノード: $0.65/時間",
     relatedProducts: ["bigquery", "dataflow", "pubsub"],
     hasDemo: false,
+    gcpIcon: "databases-512-color.svg",
+    docUrl: "https://cloud.google.com/bigtable",
   },
   {
     id: "memorystore",
@@ -250,6 +274,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "Basic M1: $0.016/GB/時間",
     relatedProducts: ["cloud-sql", "gke"],
     hasDemo: false,
+    gcpIcon: "databases-512-color.svg",
+    docUrl: "https://cloud.google.com/memorystore",
   },
   {
     id: "alloydb",
@@ -266,6 +292,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "2vCPU/16GB RAM: $0.30/時間",
     relatedProducts: ["cloud-sql", "spanner"],
     hasDemo: false,
+    gcpIcon: "alloydb-512-color.svg",
+    docUrl: "https://cloud.google.com/alloydb",
   },
 
   // ─── Analytics ────────────────────────────────────────────
@@ -291,6 +319,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["dataflow", "pubsub", "looker"],
     hasDemo: true,
     demoPath: "/demos/bigquery",
+    gcpIcon: "bigquery-512-color.svg",
+    docUrl: "https://cloud.google.com/bigquery",
   },
   {
     id: "dataflow",
@@ -307,6 +337,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "n1-standard-1ワーカー: $0.056/時間",
     relatedProducts: ["pubsub", "bigquery", "bigtable"],
     hasDemo: false,
+    gcpIcon: "dataanalytics-512-color.svg",
+    docUrl: "https://cloud.google.com/dataflow",
   },
   {
     id: "pubsub",
@@ -330,6 +362,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["dataflow", "cloud-functions", "eventarc"],
     hasDemo: true,
     demoPath: "/demos/pubsub",
+    gcpIcon: "integrationservices-512-color.svg",
+    docUrl: "https://cloud.google.com/pubsub",
   },
   {
     id: "looker",
@@ -345,6 +379,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "Looker Studio: 無料、Looker: エンタープライズ価格",
     relatedProducts: ["bigquery", "dataform"],
     hasDemo: false,
+    gcpIcon: "looker-512-color.svg",
+    docUrl: "https://cloud.google.com/looker",
   },
   {
     id: "dataproc",
@@ -360,6 +396,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "n1-standard-4クラスター: $0.24/時間",
     relatedProducts: ["bigquery", "gcs", "dataflow"],
     hasDemo: false,
+    gcpIcon: "dataanalytics-512-color.svg",
+    docUrl: "https://cloud.google.com/dataproc",
   },
 
   // ─── AI/ML ────────────────────────────────────────────────
@@ -386,6 +424,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     relatedProducts: ["bigquery", "gcs", "cloud-functions"],
     hasDemo: true,
     demoPath: "/demos/vertex-ai",
+    gcpIcon: "vertexai-512-color.svg",
+    docUrl: "https://cloud.google.com/vertex-ai",
   },
   {
     id: "document-ai",
@@ -401,6 +441,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "一般OCR: $1.50/1000ページ",
     relatedProducts: ["vertex-ai", "cloud-functions"],
     hasDemo: false,
+    gcpIcon: "aimachinelearning-512-color.svg",
+    docUrl: "https://cloud.google.com/document-ai",
   },
   {
     id: "speech-to-text",
@@ -416,6 +458,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "Standard: $0.024/分、Medical: $0.078/分",
     relatedProducts: ["natural-language", "translate"],
     hasDemo: false,
+    gcpIcon: "aimachinelearning-512-color.svg",
+    docUrl: "https://cloud.google.com/speech-to-text",
   },
   {
     id: "vision-ai",
@@ -431,6 +475,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "ラベル検出: $1.50/1000ユニット",
     relatedProducts: ["document-ai", "vertex-ai"],
     hasDemo: false,
+    gcpIcon: "aimachinelearning-512-color.svg",
+    docUrl: "https://cloud.google.com/vision",
   },
 
   // ─── Networking ───────────────────────────────────────────
@@ -449,6 +495,7 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "Ingressトラフィック: 無料、Egress: $0.12/GB",
     relatedProducts: ["cloud-nat", "cloud-vpn", "interconnect"],
     hasDemo: false,
+    docUrl: "https://cloud.google.com/vpc",
   },
   {
     id: "cloud-cdn",
@@ -464,6 +511,7 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "キャッシュルックアップ: $0.0075/10000リクエスト",
     relatedProducts: ["cloud-load-balancing", "gcs"],
     hasDemo: false,
+    docUrl: "https://cloud.google.com/cdn",
   },
   {
     id: "cloud-load-balancing",
@@ -479,6 +527,7 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "ルール: $0.008/時間、データ処理: $0.008/GB",
     relatedProducts: ["cloud-cdn", "cloud-armor", "gke"],
     hasDemo: false,
+    docUrl: "https://cloud.google.com/load-balancing",
   },
   {
     id: "cloud-armor",
@@ -494,6 +543,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "セキュリティポリシー: $5/ポリシー/月",
     relatedProducts: ["cloud-load-balancing", "cloud-cdn"],
     hasDemo: false,
+    gcpIcon: "securityidentity-512-color.svg",
+    docUrl: "https://cloud.google.com/armor",
   },
 
   // ─── Security ─────────────────────────────────────────────
@@ -517,6 +568,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "無料",
     relatedProducts: ["cloud-armor", "secret-manager"],
     hasDemo: false,
+    gcpIcon: "securityidentity-512-color.svg",
+    docUrl: "https://cloud.google.com/iam",
   },
   {
     id: "secret-manager",
@@ -532,6 +585,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "6バージョンまで無料、以降 $0.06/バージョン/月",
     relatedProducts: ["iam", "cloud-functions"],
     hasDemo: false,
+    gcpIcon: "securityidentity-512-color.svg",
+    docUrl: "https://cloud.google.com/secret-manager",
   },
 
   // ─── DevOps ───────────────────────────────────────────────
@@ -550,6 +605,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "最初の120分/日無料、以降 $0.003/ビルド分",
     relatedProducts: ["artifact-registry", "cloud-run", "gke"],
     hasDemo: false,
+    gcpIcon: "devops-512-color.svg",
+    docUrl: "https://cloud.google.com/build",
   },
   {
     id: "artifact-registry",
@@ -565,6 +622,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "ストレージ $0.10/GB/月",
     relatedProducts: ["cloud-build", "gke", "cloud-run"],
     hasDemo: false,
+    gcpIcon: "containers-512-color.svg",
+    docUrl: "https://cloud.google.com/artifact-registry",
   },
   {
     id: "cloud-deploy",
@@ -580,6 +639,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "$0.02/アクティブデリバリーパイプライン/時間",
     relatedProducts: ["cloud-build", "gke", "cloud-run"],
     hasDemo: false,
+    gcpIcon: "devops-512-color.svg",
+    docUrl: "https://cloud.google.com/deploy",
   },
 
   // ─── Management ───────────────────────────────────────────
@@ -597,6 +658,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "最初の150MB/月無料",
     relatedProducts: ["cloud-logging", "cloud-trace"],
     hasDemo: false,
+    gcpIcon: "observability-512-color.svg",
+    docUrl: "https://cloud.google.com/monitoring",
   },
   {
     id: "cloud-logging",
@@ -612,6 +675,8 @@ export const GCP_PRODUCTS: GCPProduct[] = [
     pricingExample: "最初の50GB/月無料",
     relatedProducts: ["cloud-monitoring", "bigquery"],
     hasDemo: false,
+    gcpIcon: "observability-512-color.svg",
+    docUrl: "https://cloud.google.com/logging",
   },
 ]
 
@@ -643,6 +708,27 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Management: "#5f6368",
   Integration: "#FBBC05",
   IoT: "#00897b",
+}
+
+/** Category fallback icons for products without a specific gcpIcon */
+const CATEGORY_ICON_MAP: Record<string, string> = {
+  Compute: "compute-512-color.svg",
+  Serverless: "serverlesscomputing-512-color.svg",
+  Storage: "cloud-storage-512-color.svg",
+  Database: "databases-512-color.svg",
+  Analytics: "dataanalytics-512-color.svg",
+  "AI/ML": "aimachinelearning-512-color.svg",
+  Networking: "compute-512-color.svg",
+  Security: "securityidentity-512-color.svg",
+  DevOps: "devops-512-color.svg",
+  Management: "managementtools-512-color.svg",
+  Integration: "integrationservices-512-color.svg",
+}
+
+export function getGcpProductIconPath(product: GCPProduct): string {
+  const icon = product.gcpIcon ?? CATEGORY_ICON_MAP[product.category]
+  if (icon) return `/icons/gcp/${icon}`
+  return ""
 }
 
 export function getProductById(id: string): GCPProduct | undefined {

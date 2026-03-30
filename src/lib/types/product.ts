@@ -27,4 +27,6 @@ export interface GCPProduct {
   relatedProducts: string[]
   hasDemo: boolean
   demoPath?: string
+  gcpIcon?: string
+  docUrl?: string
 }

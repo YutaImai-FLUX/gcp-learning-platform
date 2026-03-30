@@ -2,11 +2,11 @@
 
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, PlayCircle, CheckCircle, Tag, Link2 } from "lucide-react"
+import { ArrowLeft, PlayCircle, CheckCircle, Tag, Link2, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { getProductById, GCP_PRODUCTS, CATEGORY_COLORS } from "@/lib/data/products"
+import { getProductById, GCP_PRODUCTS, CATEGORY_COLORS, getGcpProductIconPath } from "@/lib/data/products"
 import { getCertsForProduct, getArchsForProduct, getDemosForProduct } from "@/lib/data/cross-references"
 import { RelatedCerts, RelatedArchitectures, RelatedDemos } from "@/components/shared/RelatedContent"
 
@@ -43,10 +43,17 @@ export default function ProductDetailPage() {
       {/* Header */}
       <div className="flex items-start gap-5 p-6 bg-white dark:bg-card rounded-2xl border border-border">
         <div
-          className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0"
-          style={{ backgroundColor: product.color }}
+          className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
+          style={{ backgroundColor: `${product.color}12` }}
         >
-          {product.name.charAt(0)}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={getGcpProductIconPath(product)}
+            alt={product.name}
+            width={40}
+            height={40}
+            className="object-contain"
+          />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -68,14 +75,24 @@ export default function ProductDetailPage() {
           <h1 className="text-2xl font-bold text-foreground">{product.name}</h1>
           <p className="text-muted-foreground mt-2 leading-relaxed">{product.description}</p>
         </div>
-        {product.hasDemo && product.demoPath && (
-          <Link href={product.demoPath}>
-            <Button className="bg-gcp-blue hover:bg-gcp-blue-dark text-white shrink-0">
-              <PlayCircle size={16} className="mr-2" />
-              デモを試す
-            </Button>
-          </Link>
-        )}
+        <div className="flex flex-col gap-2 shrink-0">
+          {product.hasDemo && product.demoPath && (
+            <Link href={product.demoPath}>
+              <Button className="bg-gcp-blue hover:bg-gcp-blue-dark text-white w-full">
+                <PlayCircle size={16} className="mr-2" />
+                デモを試す
+              </Button>
+            </Link>
+          )}
+          {product.docUrl && (
+            <a href={product.docUrl} target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" className="w-full">
+                <ExternalLink size={14} className="mr-2" />
+                公式ドキュメント
+              </Button>
+            </a>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -171,10 +188,17 @@ export default function ProductDetailPage() {
                   className="flex items-center gap-2.5 p-3 rounded-lg border border-border hover:border-gcp-blue/40 hover:bg-gcp-blue-light/20 transition-all"
                 >
                   <div
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style={{ backgroundColor: rel.color }}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: `${rel.color}12` }}
                   >
-                    {rel.name.charAt(0)}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getGcpProductIconPath(rel)}
+                      alt={rel.name}
+                      width={18}
+                      height={18}
+                      className="object-contain"
+                    />
                   </div>
                   <span className="text-xs font-medium text-foreground leading-tight">{rel.name}</span>
                 </Link>
