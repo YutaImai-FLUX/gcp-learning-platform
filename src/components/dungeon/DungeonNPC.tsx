@@ -4,17 +4,12 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import type { DungeonNPC as DungeonNPCType } from "@/lib/types/dungeon"
 import type { ThemeConfig } from "@/lib/game/dungeon-themes"
+import { ChevronRight } from "lucide-react"
 
 interface DungeonNPCProps {
   npc: DungeonNPCType
   theme: ThemeConfig
   onClose: () => void
-}
-
-const TS = "1px 1px 0 rgba(0,0,0,0.7)"
-
-function mcBevel(light: string, dark: string, size = 3): string {
-  return `inset ${size}px ${size}px 0 0 ${light}, inset -${size}px -${size}px 0 0 ${dark}`
 }
 
 export function DungeonNPCDialog({ npc, theme, onClose }: DungeonNPCProps) {
@@ -29,80 +24,53 @@ export function DungeonNPCDialog({ npc, theme, onClose }: DungeonNPCProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
-        {/* Backdrop (dark like MC pause screen) */}
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
-          onClick={onClose}
-        />
+        <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
-        {/* MC-style dialog box */}
         <motion.div
-          className="relative w-full max-w-lg p-5 mb-4"
-          style={{
-            backgroundColor: theme.tileColor,
-            border: `2px solid ${theme.tileBorder}`,
-            boxShadow: mcBevel(theme.bevelLight, theme.bevelDark, 4),
-            imageRendering: "pixelated",
-          }}
+          className="relative w-full max-w-lg rounded-lg border border-border bg-card p-5 mb-4"
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 40, opacity: 0 }}
         >
-          {/* NPC name (MC yellow title) */}
+          {/* NPC name */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-base">🧙</span>
-            <span
-              className="font-bold text-sm"
-              style={{ color: "#FFFF55", textShadow: "1px 1px 0 #555500" }}
-            >
+            <span className="text-base">{theme.icon}</span>
+            <span className="font-semibold text-sm" style={{ color: theme.accentColor }}>
               {npc.name}
             </span>
           </div>
 
-          {/* Dialogue text (MC white with shadow) */}
-          <p
-            className="text-sm leading-relaxed mb-4 min-h-[3rem]"
-            style={{ color: "#FFFFFF", textShadow: TS }}
-          >
+          {/* Dialogue */}
+          <p className="text-sm leading-relaxed text-foreground mb-4 min-h-[3rem]">
             {npc.dialogues[dialogIndex]}
           </p>
 
-          {/* MC-style button */}
-          <div className="flex justify-end">
+          {/* Controls */}
+          <div className="flex items-center justify-between">
+            {/* Page indicator */}
+            <div className="flex gap-1">
+              {npc.dialogues.map((_, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full transition-all"
+                  style={{
+                    backgroundColor: i === dialogIndex ? theme.accentColor : "var(--border)",
+                  }}
+                />
+              ))}
+            </div>
+
             <button
               onClick={() => {
-                if (isLast) {
-                  onClose()
-                } else {
-                  setDialogIndex(dialogIndex + 1)
-                }
+                if (isLast) onClose()
+                else setDialogIndex(dialogIndex + 1)
               }}
-              className="px-4 py-1.5 text-xs font-bold transition-all hover:brightness-110 active:brightness-90"
-              style={{
-                backgroundColor: "#8B8B8B",
-                color: "#FFFFFF",
-                textShadow: TS,
-                boxShadow: mcBevel("#C6C6C6", "#555555", 2),
-                border: "1px solid #555",
-              }}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium text-white transition-colors hover:opacity-90"
+              style={{ backgroundColor: theme.accentColor }}
             >
-              {isLast ? "閉じる" : "次へ  >>"}
+              {isLast ? "始める" : "次へ"}
+              {!isLast && <ChevronRight size={12} />}
             </button>
-          </div>
-
-          {/* Page dots */}
-          <div className="flex gap-1.5 mt-3 justify-center">
-            {npc.dialogues.map((_, i) => (
-              <div
-                key={i}
-                className="w-2 h-2"
-                style={{
-                  backgroundColor: i === dialogIndex ? "#80FF20" : theme.tileBorder,
-                  boxShadow: i === dialogIndex ? "0 0 4px #80FF20" : undefined,
-                }}
-              />
-            ))}
           </div>
         </motion.div>
       </motion.div>

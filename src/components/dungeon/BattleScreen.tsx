@@ -71,7 +71,6 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
     setTimeout(() => setShowDamage(null), 800)
     setAnswers(newAnswers)
 
-    // Delay before next question or end
     setTimeout(() => {
       const nextIndex = currentIndex + 1
       const isVictory = isCorrect && enemyHP - DAMAGE_PER_CORRECT <= 0
@@ -107,14 +106,11 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
   const enemyHPPct = (enemyHP / maxEnemyHP) * 100
 
   return (
-    <div
-      className="rounded-xl overflow-hidden relative"
-      style={{ border: `2px solid ${theme.accentColor}` }}
-    >
+    <div className="rounded-lg border border-border overflow-hidden relative bg-card">
       {/* Battle header */}
       <div
-        className="flex items-center justify-between px-4 sm:px-6 py-3"
-        style={{ backgroundColor: theme.accentColor + "20" }}
+        className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border"
+        style={{ backgroundColor: theme.accentMuted }}
       >
         <div className="flex items-center gap-2">
           {isBoss ? (
@@ -122,24 +118,21 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
           ) : (
             <Swords size={18} style={{ color: theme.accentColor }} />
           )}
-          <span className="text-sm font-bold" style={{ color: theme.textColor }}>
+          <span className="text-sm font-bold">
             {isBoss ? "ボス戦" : "バトル"}: {roomLabel}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: theme.accentColor + "30", color: theme.textColor }}>
-            {currentIndex + 1} / {questions.length}
-          </span>
-        </div>
+        <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted">
+          {currentIndex + 1} / {questions.length}
+        </span>
       </div>
 
-      <div className="p-4 sm:p-6 space-y-5" style={{ backgroundColor: theme.tileColor }}>
-        {/* HP Bars - Pokemon style */}
+      <div className="p-4 sm:p-6 space-y-5">
+        {/* HP Bars */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Player */}
           <motion.div
-            className="rounded-lg p-3"
-            style={{ backgroundColor: theme.tileBorder + "40" }}
+            className="rounded-lg p-3 bg-muted"
             animate={shakePlayer ? { x: [-6, 6, -4, 4, 0] } : {}}
             transition={{ duration: 0.3 }}
           >
@@ -148,28 +141,26 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
                 <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
                   <Shield size={12} className="text-blue-400" />
                 </div>
-                <span className="text-xs font-bold" style={{ color: theme.textColor }}>あなた</span>
+                <span className="text-xs font-bold">あなた</span>
               </div>
-              <span className="text-xs font-mono" style={{ color: theme.textColor + "80" }}>
+              <span className="text-xs font-mono text-muted-foreground">
                 {playerHP}/{MAX_PLAYER_HP}
               </span>
             </div>
-            <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: theme.tileBorder }}>
+            <div className="h-2.5 rounded-full overflow-hidden bg-border">
               <motion.div
                 className="h-full rounded-full"
                 style={{
                   background: playerHPPct > 50
-                    ? "linear-gradient(90deg, #4caf50, #66bb6a)"
+                    ? "#4caf50"
                     : playerHPPct > 25
-                      ? "linear-gradient(90deg, #ff9800, #ffc107)"
-                      : "linear-gradient(90deg, #ef5350, #f44336)",
+                      ? "#ff9800"
+                      : "#ef5350",
                 }}
                 animate={{ width: `${playerHPPct}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
-
-            {/* Damage popup */}
             <AnimatePresence>
               {showDamage?.type === "wrong" && (
                 <motion.span
@@ -186,34 +177,31 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
 
           {/* Enemy */}
           <motion.div
-            className="rounded-lg p-3"
-            style={{ backgroundColor: theme.tileBorder + "40" }}
+            className="rounded-lg p-3 bg-muted"
             animate={shakeEnemy ? { x: [-6, 6, -4, 4, 0] } : {}}
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.accentColor + "30" }}>
+                <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.accentMuted }}>
                   {isBoss ? <Crown size={12} style={{ color: theme.accentColor }} /> : <Zap size={12} style={{ color: theme.accentColor }} />}
                 </div>
-                <span className="text-xs font-bold" style={{ color: theme.textColor }}>
+                <span className="text-xs font-bold">
                   {isBoss ? "ボス" : "モンスター"}
                 </span>
               </div>
-              <span className="text-xs font-mono" style={{ color: theme.textColor + "80" }}>
+              <span className="text-xs font-mono text-muted-foreground">
                 {enemyHP}/{maxEnemyHP}
               </span>
             </div>
-            <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: theme.tileBorder }}>
+            <div className="h-2.5 rounded-full overflow-hidden bg-border">
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: `linear-gradient(90deg, ${theme.accentColor}, ${theme.accentColor}cc)` }}
+                style={{ backgroundColor: theme.accentColor }}
                 animate={{ width: `${enemyHPPct}%` }}
                 transition={{ duration: 0.5 }}
               />
             </div>
-
-            {/* Damage popup */}
             <AnimatePresence>
               {showDamage?.type === "correct" && (
                 <motion.span
@@ -238,48 +226,35 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
-            {/* Domain tag */}
             <div className="mb-2">
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                style={{ backgroundColor: theme.accentColor + "20", color: theme.accentColor }}
+                style={{ backgroundColor: theme.accentMuted, color: theme.accentColor }}
               >
                 {currentQuestion.domain}
               </span>
             </div>
 
-            <p className="text-sm font-medium mb-4 leading-relaxed" style={{ color: theme.textColor }}>
+            <p className="text-sm font-medium mb-4 leading-relaxed">
               {currentQuestion.question}
             </p>
 
-            {/* Options */}
             <div className="grid gap-2">
               {currentQuestion.options.map((option, i) => {
                 const isSelected = selectedOption === i
                 const isCorrect = i === currentQuestion.correctIndex
                 const showFeedback = selectedOption !== null
 
-                let optionBg = theme.tileBorder
-                let optionBorder = "transparent"
-                if (showFeedback) {
-                  if (isCorrect) {
-                    optionBg = "#2e7d3240"
-                    optionBorder = "#4caf50"
-                  } else if (isSelected && !isCorrect) {
-                    optionBg = "#c6282840"
-                    optionBorder = "#ef5350"
-                  }
-                }
-
                 return (
                   <motion.button
                     key={i}
-                    className="text-left p-3 rounded-lg text-xs font-medium transition-all"
-                    style={{
-                      backgroundColor: optionBg,
-                      color: theme.textColor,
-                      border: `1.5px solid ${optionBorder}`,
-                    }}
+                    className={`text-left p-3 rounded-lg text-xs font-medium transition-all border ${
+                      showFeedback && isCorrect
+                        ? "bg-green-500/10 border-green-500"
+                        : showFeedback && isSelected && !isCorrect
+                          ? "bg-red-500/10 border-red-500"
+                          : "bg-muted border-transparent hover:border-border"
+                    }`}
                     onClick={() => handleAnswer(i)}
                     disabled={selectedOption !== null}
                     whileHover={selectedOption === null ? { scale: 1.01, x: 4 } : {}}
@@ -287,11 +262,18 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
                   >
                     <div className="flex items-start gap-2">
                       <span
-                        className="w-5 h-5 rounded shrink-0 flex items-center justify-center text-[10px] font-bold"
-                        style={{
-                          backgroundColor: showFeedback && isCorrect ? "#4caf50" : showFeedback && isSelected ? "#ef5350" : theme.accentColor + "30",
-                          color: showFeedback && (isCorrect || isSelected) ? "#fff" : theme.accentColor,
-                        }}
+                        className={`w-5 h-5 rounded shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                          showFeedback && isCorrect
+                            ? "bg-green-500 text-white"
+                            : showFeedback && isSelected
+                              ? "bg-red-500 text-white"
+                              : "text-muted-foreground"
+                        }`}
+                        style={
+                          !showFeedback || (!isCorrect && !isSelected)
+                            ? { backgroundColor: theme.accentMuted, color: theme.accentColor }
+                            : undefined
+                        }
                       >
                         {String.fromCharCode(65 + i)}
                       </span>
@@ -302,13 +284,11 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
               })}
             </div>
 
-            {/* Explanation after answering */}
             {selectedOption !== null && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-3 p-3 rounded-lg text-xs flex items-start gap-2"
-                style={{ backgroundColor: theme.tileBorder + "60", color: theme.textColor + "cc" }}
+                className="mt-3 p-3 rounded-lg text-xs flex items-start gap-2 bg-muted text-muted-foreground"
               >
                 <Sparkles size={14} className="shrink-0 mt-0.5" style={{ color: theme.accentColor }} />
                 <span className="leading-relaxed">{currentQuestion.explanation}</span>
@@ -322,7 +302,7 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
       <AnimatePresence>
         {showResult && (
           <motion.div
-            className="absolute inset-0 flex items-center justify-center rounded-xl z-10"
+            className="absolute inset-0 flex items-center justify-center rounded-lg z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             style={{
