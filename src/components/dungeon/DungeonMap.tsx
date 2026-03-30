@@ -4,8 +4,7 @@ import { useMemo, useState } from "react"
 import type { DungeonMap as DungeonMapType, RoomStatus } from "@/lib/types/dungeon"
 import type { ThemeConfig } from "@/lib/game/dungeon-themes"
 import { useGameStore } from "@/lib/stores/useGameStore"
-import { DungeonRoomNode } from "./DungeonRoom"
-import { DungeonPath } from "./DungeonPath"
+import { DungeonRoomCard } from "./DungeonRoom"
 import { DungeonNPCDialog } from "./DungeonNPC"
 import type { CertificationId } from "@/lib/types/quiz"
 
@@ -14,8 +13,6 @@ interface DungeonMapProps {
   theme: ThemeConfig
   onRoomSelect: (roomId: string) => void
 }
-
-const CELL_SIZE = 130
 
 export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps) {
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
@@ -50,12 +47,6 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     return available?.id ?? dungeon.rooms[0]?.id
   }, [dungeon.rooms, roomStatuses])
 
-  const maxX = Math.max(...dungeon.rooms.map((r) => r.gridX)) + 1
-  const maxY = Math.max(...dungeon.rooms.map((r) => r.gridY)) + 1
-  const svgWidth = maxX * CELL_SIZE + 40
-  const svgHeight = maxY * CELL_SIZE + 40
-  const PAD = 20
-
   const npcRoom = showNPC
     ? dungeon.rooms.find((r) => r.id === showNPC)
     : null
@@ -64,7 +55,6 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     const room = dungeon.rooms.find((r) => r.id === roomId)
     if (!room) return
 
-    // Show NPC dialog for start rooms
     if (room.type === "start" && room.npc && !dungeonProgress[roomId]?.cleared) {
       setShowNPC(roomId)
       return
@@ -73,81 +63,79 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     onRoomSelect(roomId)
   }
 
-  // Grid pattern ID
-  const gridPatternId = `grid-${dungeon.certId}`
-  const bgPatternId = `bg-${dungeon.certId}`
+  // Group rooms by row (gridY)
+  const maxY = Math.max(...dungeon.rooms.map((r) => r.gridY))
+  const maxX = Math.max(...dungeon.rooms.map((r) => r.gridX))
+  const cols = maxX + 1
+
+  // Build rows
+  const rows: { y: number; rooms: typeof dungeon.rooms }[] = []
+  for (let y = 0; y <= maxY; y++) {
+    const rowRooms = dungeon.rooms.filter((r) => r.gridY === y)
+    if (rowRooms.length > 0) {
+      rows.push({ y, rooms: rowRooms })
+    }
+  }
 
   return (
     <div className="relative">
-      <div className="overflow-auto rounded-xl">
-        <svg
-          width={svgWidth}
-          height={svgHeight}
-          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-          className="mx-auto"
-        >
-          <defs>
-            {/* Subtle grid pattern */}
-            <pattern id={gridPatternId} width={CELL_SIZE} height={CELL_SIZE} patternUnits="userSpaceOnUse">
-              <rect width={CELL_SIZE} height={CELL_SIZE} fill="none" stroke={theme.tileBorder} strokeWidth={0.5} opacity={0.2} />
-            </pattern>
-            {/* Radial gradient background */}
-            <radialGradient id={bgPatternId} cx="50%" cy="40%" r="70%">
-              <stop offset="0%" stopColor={theme.accentColor} stopOpacity={0.08} />
-              <stop offset="100%" stopColor="transparent" stopOpacity={0} />
-            </radialGradient>
-          </defs>
+      <div
+        className="rounded-xl p-4 sm:p-6"
+        style={{ backgroundColor: theme.tileColor, border: `1px solid ${theme.tileBorder}` }}
+      >
+        {/* Map grid */}
+        <div className="space-y-3">
+          {rows.map(({ y, rooms: rowRooms }) => {
+            // Check if this row has a connector from previous row
+            const hasConnectorAbove = y > 0
 
-          {/* Background */}
-          <rect width={svgWidth} height={svgHeight} fill={theme.tileColor} rx={12} />
-          <rect width={svgWidth} height={svgHeight} fill={`url(#${bgPatternId})`} rx={12} />
-          <rect width={svgWidth} height={svgHeight} fill={`url(#${gridPatternId})`} />
+            return (
+              <div key={y}>
+                {/* Vertical connector */}
+                {hasConnectorAbove && (
+                  <div className="flex justify-center mb-3">
+                    <div
+                      className="w-0.5 h-6"
+                      style={{ backgroundColor: theme.pathColor, opacity: 0.5 }}
+                    />
+                  </div>
+                )}
 
-          {/* Decorative border */}
-          <rect
-            x={2}
-            y={2}
-            width={svgWidth - 4}
-            height={svgHeight - 4}
-            fill="none"
-            stroke={theme.accentColor}
-            strokeWidth={1.5}
-            rx={12}
-            opacity={0.3}
-          />
+                {/* Room row */}
+                <div
+                  className="grid gap-3"
+                  style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+                >
+                  {Array.from({ length: cols }, (_, x) => {
+                    const room = rowRooms.find((r) => r.gridX === x)
+                    if (!room) {
+                      return <div key={x} />
+                    }
+                    return (
+                      <DungeonRoomCard
+                        key={room.id}
+                        room={room}
+                        status={roomStatuses[room.id] ?? "locked"}
+                        theme={theme}
+                        isPlayerHere={room.id === currentRoomId}
+                        onClick={() => handleRoomClick(room.id)}
+                      />
+                    )
+                  })}
+                </div>
 
-          <g transform={`translate(${PAD}, ${PAD})`}>
-            {/* Paths */}
-            {dungeon.connections.map((conn) => {
-              const fromCleared = dungeonProgress[conn.from]?.cleared ?? false
-              const toAvailable = roomStatuses[conn.to] === "available" || roomStatuses[conn.to] === "cleared"
-              return (
-                <DungeonPath
-                  key={`${conn.from}-${conn.to}`}
-                  connection={conn}
-                  rooms={dungeon.rooms}
-                  theme={theme}
-                  isCleared={fromCleared}
-                  isActive={toAvailable && !fromCleared}
-                  cellSize={CELL_SIZE}
-                />
-              )
-            })}
-
-            {/* Rooms */}
-            {dungeon.rooms.map((room) => (
-              <DungeonRoomNode
-                key={room.id}
-                room={room}
-                status={roomStatuses[room.id] ?? "locked"}
-                theme={theme}
-                isPlayerHere={room.id === currentRoomId}
-                onClick={() => handleRoomClick(room.id)}
-                cellSize={CELL_SIZE}
-              />
-            ))}
-          </g>
-        </svg>
+                {/* Horizontal connector between study and quiz in same row */}
+                {rowRooms.length > 1 && (
+                  <div className="flex items-center justify-center mt-1">
+                    <div className="flex items-center gap-1 text-[10px] font-medium" style={{ color: theme.pathColor, opacity: 0.6 }}>
+                      学習 → バトル
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       {/* NPC Dialog overlay */}
@@ -157,7 +145,6 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
           theme={theme}
           onClose={() => {
             setShowNPC(null)
-            // Auto-clear start room
             useGameStore.getState().clearDungeonRoom(
               dungeon.certId as CertificationId,
               npcRoom.id

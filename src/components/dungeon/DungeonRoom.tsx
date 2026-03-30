@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import type { DungeonRoom as DungeonRoomType, RoomStatus } from "@/lib/types/dungeon"
 import type { ThemeConfig } from "@/lib/game/dungeon-themes"
-import { BookOpen, Swords, FlaskConical, PlayCircle, Gift, Crown, LogIn, Lock, CheckCircle } from "lucide-react"
+import { BookOpen, Swords, FlaskConical, PlayCircle, Gift, Crown, LogIn, Lock, CheckCircle2 } from "lucide-react"
 
 const ROOM_ICONS: Record<string, React.ElementType> = {
   start: LogIn,
@@ -17,207 +17,121 @@ const ROOM_ICONS: Record<string, React.ElementType> = {
 
 const ROOM_TYPE_LABELS: Record<string, string> = {
   start: "入口",
-  study: "学習",
-  quiz: "バトル",
-  lab: "ラボ",
-  demo: "デモ",
-  treasure: "宝箱",
-  boss: "ボス",
+  study: "📖 学習",
+  quiz: "⚔ バトル",
+  lab: "🧪 ラボ",
+  demo: "▶ デモ",
+  treasure: "🎁 宝箱",
+  boss: "👑 ボス戦",
 }
 
-interface DungeonRoomProps {
+interface DungeonRoomCardProps {
   room: DungeonRoomType
   status: RoomStatus
   theme: ThemeConfig
   isPlayerHere: boolean
   onClick: () => void
-  cellSize: number
 }
 
-export function DungeonRoomNode({ room, status, theme, isPlayerHere, onClick, cellSize }: DungeonRoomProps) {
+export function DungeonRoomCard({ room, status, theme, isPlayerHere, onClick }: DungeonRoomCardProps) {
   const Icon = ROOM_ICONS[room.type] ?? BookOpen
   const isLocked = status === "locked"
   const isCleared = status === "cleared"
-  const isAvailable = status === "available"
   const isBoss = room.type === "boss"
 
-  const nodeW = cellSize * 0.82
-  const nodeH = cellSize * 0.62
-  const cx = room.gridX * cellSize + cellSize / 2
-  const cy = room.gridY * cellSize + cellSize / 2
-  const rx = cx - nodeW / 2
-  const ry = cy - nodeH / 2
-
-  // Colors per status
-  const bgColor = isLocked
-    ? theme.roomColors.locked
-    : isCleared
-      ? theme.roomColors.cleared
-      : theme.roomColors.available
-
-  const borderColor = isPlayerHere
-    ? "#fff"
-    : isAvailable
-      ? theme.accentColor
-      : isCleared
-        ? theme.accentColor + "80"
-        : "transparent"
-
-  const iconColor = isLocked ? "#888" : isCleared ? "#333" : "#fff"
-  const textColor = isLocked ? "#666" : isCleared ? "#333" : "#fff"
-  const typeBadgeColor = isLocked ? "#555" : isCleared ? "#44444480" : theme.accentColor + "50"
-
-  // Glow filter ID unique to this room
-  const glowId = `glow-${room.id}`
-
   return (
-    <motion.g
+    <motion.button
       onClick={isLocked ? undefined : onClick}
-      style={{ cursor: isLocked ? "not-allowed" : "pointer" }}
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: isLocked ? 0.6 : 1 }}
-      transition={{ delay: 0.05 * room.gridY + 0.02 * room.gridX, type: "spring", stiffness: 180 }}
+      disabled={isLocked}
+      className={`
+        relative w-full rounded-xl p-3 text-left transition-all
+        ${isLocked ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
+        ${isPlayerHere ? "ring-2 ring-white ring-offset-2 ring-offset-transparent" : ""}
+      `}
+      style={{
+        backgroundColor: isLocked
+          ? theme.roomColors.locked
+          : isCleared
+            ? theme.roomColors.cleared
+            : theme.roomColors.available,
+        border: `2px solid ${
+          isPlayerHere
+            ? "#fff"
+            : isCleared
+              ? theme.accentColor + "60"
+              : isLocked
+                ? "transparent"
+                : theme.accentColor
+        }`,
+        boxShadow: isPlayerHere
+          ? `0 0 16px ${theme.accentColor}60`
+          : isBoss && !isLocked
+            ? `0 0 12px ${theme.accentColor}40`
+            : undefined,
+      }}
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      whileHover={isLocked ? {} : { scale: 1.03, y: -2 }}
+      whileTap={isLocked ? {} : { scale: 0.98 }}
     >
-      {/* Glow filter for player / boss */}
-      {(isPlayerHere || (isBoss && !isLocked)) && (
-        <defs>
-          <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation={isBoss ? 6 : 4} result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-      )}
-
-      {/* Outer glow ring for player position */}
+      {/* Player indicator */}
       {isPlayerHere && (
-        <motion.rect
-          x={rx - 4}
-          y={ry - 4}
-          width={nodeW + 8}
-          height={nodeH + 8}
-          rx={isBoss ? nodeH / 2 + 4 : 12}
-          fill="none"
-          stroke="#fff"
-          strokeWidth={2}
-          opacity={0.5}
-          animate={{ opacity: [0.3, 0.7, 0.3] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        />
-      )}
-
-      {/* Room body */}
-      <motion.rect
-        x={rx}
-        y={ry}
-        width={nodeW}
-        height={nodeH}
-        rx={isBoss ? nodeH / 2 : 10}
-        fill={bgColor}
-        stroke={borderColor}
-        strokeWidth={isPlayerHere ? 2.5 : isAvailable ? 1.5 : 0}
-        filter={isPlayerHere || (isBoss && !isLocked) ? `url(#${glowId})` : undefined}
-        whileHover={isLocked ? {} : { scale: 1.06, y: ry - 2 }}
-        whileTap={isLocked ? {} : { scale: 0.97 }}
-      />
-
-      {/* Type badge (top-left) */}
-      <rect
-        x={rx + 4}
-        y={ry + 4}
-        width={28}
-        height={14}
-        rx={7}
-        fill={typeBadgeColor}
-      />
-      <text
-        x={rx + 18}
-        y={ry + 13}
-        textAnchor="middle"
-        fontSize={7}
-        fill={textColor}
-        fontWeight={600}
-        opacity={0.9}
-      >
-        {ROOM_TYPE_LABELS[room.type] ?? ""}
-      </text>
-
-      {/* Icon */}
-      <foreignObject
-        x={cx - 11}
-        y={ry + 14}
-        width={22}
-        height={22}
-      >
-        {isLocked ? (
-          <Lock size={18} color="#888" />
-        ) : (
-          <Icon size={18} color={iconColor} />
-        )}
-      </foreignObject>
-
-      {/* Label - full text, multi-line if needed */}
-      <text
-        x={cx}
-        y={ry + nodeH - 8}
-        textAnchor="middle"
-        fontSize={room.label.length > 12 ? 8 : 9}
-        fill={textColor}
-        fontWeight={600}
-      >
-        {room.label.length > 16 ? room.label.slice(0, 15) + "…" : room.label}
-      </text>
-
-      {/* XP reward badge (bottom-right) */}
-      {!isLocked && room.xpReward > 0 && !isCleared && (
-        <>
-          <rect
-            x={rx + nodeW - 30}
-            y={ry + nodeH - 14}
-            width={26}
-            height={12}
-            rx={6}
-            fill={theme.accentColor + "40"}
-          />
-          <text
-            x={rx + nodeW - 17}
-            y={ry + nodeH - 5}
-            textAnchor="middle"
-            fontSize={7}
-            fill={theme.accentColor}
-            fontWeight={700}
-          >
-            +{room.xpReward}
-          </text>
-        </>
-      )}
-
-      {/* Cleared check */}
-      {isCleared && (
-        <foreignObject
-          x={rx + nodeW - 18}
-          y={ry + 2}
-          width={16}
-          height={16}
-        >
-          <CheckCircle size={14} color="#2e7d32" />
-        </foreignObject>
-      )}
-
-      {/* Player indicator - bouncing arrow */}
-      {isPlayerHere && (
-        <motion.g
-          animate={{ y: [0, -5, 0] }}
+        <motion.div
+          className="absolute -top-3 left-1/2 -translate-x-1/2"
+          animate={{ y: [0, -4, 0] }}
           transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
         >
-          <polygon
-            points={`${cx - 5},${ry - 10} ${cx + 5},${ry - 10} ${cx},${ry - 4}`}
-            fill="#fff"
-          />
-        </motion.g>
+          <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-white" />
+        </motion.div>
       )}
-    </motion.g>
+
+      {/* Cleared badge */}
+      {isCleared && (
+        <div className="absolute -top-1.5 -right-1.5">
+          <CheckCircle2 size={18} className="text-white" style={{ filter: `drop-shadow(0 0 2px ${theme.accentColor})` }} fill={theme.accentColor} />
+        </div>
+      )}
+
+      {/* Top row: type + XP */}
+      <div className="flex items-center justify-between mb-1.5">
+        <span
+          className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+          style={{
+            backgroundColor: isLocked ? "#ffffff10" : isCleared ? theme.accentColor + "30" : "#ffffff20",
+            color: isLocked ? "#888" : isCleared ? theme.accentColor : "#fff",
+          }}
+        >
+          {ROOM_TYPE_LABELS[room.type] ?? room.type}
+        </span>
+        {!isLocked && room.xpReward > 0 && !isCleared && (
+          <span
+            className="text-[10px] font-bold"
+            style={{ color: theme.accentColor }}
+          >
+            +{room.xpReward} XP
+          </span>
+        )}
+      </div>
+
+      {/* Icon */}
+      <div className="flex justify-center my-2">
+        {isLocked ? (
+          <Lock size={24} color="#666" />
+        ) : (
+          <Icon
+            size={isBoss ? 28 : 22}
+            color={isCleared ? theme.accentColor : "#fff"}
+          />
+        )}
+      </div>
+
+      {/* Label */}
+      <p
+        className={`text-center font-bold leading-tight ${isBoss ? "text-xs" : "text-[11px]"}`}
+        style={{ color: isLocked ? "#666" : isCleared ? theme.textColor : "#fff" }}
+      >
+        {room.label}
+      </p>
+    </motion.button>
   )
 }

@@ -67,18 +67,28 @@ const NPC_DIALOGUES: Record<CertificationId, string[]> = {
   ],
 }
 
+/** Shorten long domain names for display in dungeon rooms */
+function shortenDomainName(name: string): string {
+  return name
+    .replace(/Google Cloud\s*(による|の)\s*/g, "")
+    .replace(/インフラストラクチャの/g, "インフラ")
+    .replace(/アプリケーションの近代化/g, "アプリ近代化")
+    .replace(/データ価値の最大化/g, "データ活用")
+    .replace(/モダナイズ/g, "近代化")
+}
+
 function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
   const cert = CERTIFICATIONS.find((c) => c.id === certId)
   if (!cert) return []
 
   const rooms: DungeonRoom[] = []
 
-  // Start room
+  // Start room — always row 0
   rooms.push({
     id: `${certId}-start`,
     label: "入口",
     type: "start",
-    gridX: 2,
+    gridX: 1,
     gridY: 0,
     xpReward: 0,
     npc: {
@@ -87,18 +97,18 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
     },
   })
 
-  // Generate rooms per domain
+  // Generate rooms per domain — compact: 2 rows per domain (study + quiz side by side)
   cert.domains.forEach((domain, domainIdx) => {
-    const baseY = 1 + domainIdx * 3
-    const xOffset = domainIdx % 2 === 0 ? 0 : 1
+    const baseY = 1 + domainIdx * 2
+    const shortName = shortenDomainName(domain.name)
 
-    // Study room
+    // Study room — left side
     rooms.push({
       id: `${certId}-study-${domainIdx}`,
-      label: `${domain.name}`,
+      label: shortName,
       domainName: domain.name,
       type: "study",
-      gridX: 1 + xOffset,
+      gridX: 0,
       gridY: baseY,
       moduleIds: [`${certId}-module-${domainIdx}`],
       unlockRequires: domainIdx === 0
@@ -107,27 +117,27 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
       xpReward: 15,
     })
 
-    // Quiz room
+    // Quiz room — right side
     rooms.push({
       id: `${certId}-quiz-${domainIdx}`,
-      label: `${domain.name} バトル`,
+      label: `${shortName}`,
       domainName: domain.name,
       type: "quiz",
-      gridX: 3 - xOffset,
-      gridY: baseY + 1,
+      gridX: 2,
+      gridY: baseY,
       quizDomain: domain.name,
       quizCount: 5,
       unlockRequires: [`${certId}-study-${domainIdx}`],
       xpReward: 50,
     })
 
-    // Treasure room (every other domain)
+    // Treasure room — center, between domain pairs
     if (domainIdx % 2 === 0 && domainIdx < cert.domains.length - 1) {
       rooms.push({
         id: `${certId}-treasure-${domainIdx}`,
-        label: "宝箱部屋",
+        label: "宝箱",
         type: "treasure",
-        gridX: domainIdx % 4 === 0 ? 4 : 0,
+        gridX: 1,
         gridY: baseY + 1,
         unlockRequires: [`${certId}-quiz-${domainIdx}`],
         xpReward: 30,
@@ -135,13 +145,13 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
     }
   })
 
-  // Boss room
-  const bossY = 1 + cert.domains.length * 3
+  // Boss room — final row
+  const bossY = 1 + cert.domains.length * 2
   rooms.push({
     id: `${certId}-boss`,
-    label: "ボス戦 〜模擬試験〜",
+    label: "ボス戦",
     type: "boss",
-    gridX: 2,
+    gridX: 1,
     gridY: bossY,
     quizDomain: "all",
     quizCount: 20,
