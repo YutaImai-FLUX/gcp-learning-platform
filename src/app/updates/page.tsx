@@ -46,6 +46,75 @@ const CATEGORY_CONFIG: Record<NewsCategory, { label: string; color: string; icon
 
 const NEWS_ITEMS: NewsItem[] = [
   {
+    id: "gke-kubecon-eu-2026",
+    date: "2026-03",
+    category: "devops",
+    title: "GKE が KubeCon EU 2026 で TPU DRA オープンソース化＆AI適合性認定を発表",
+    description:
+      "アムステルダムで開催された KubeCon + CloudNativeCon Europe 2026（3月23〜26日）で、Google が GKE の重要な発表を行いました。TPU 向け DRA（Dynamic Resource Allocation）ドライバーをオープンソース化し、GKE が AI適合プラットフォームとして認定。NVIDIA とも連携して GPU DRA ドライバーの CNCF への寄贈を共同推進し、AI ワークロードのポータビリティ向上に貢献しました。",
+    highlights: [
+      "TPU 向け DRA（動的リソース割り当て）ドライバーをオープンソース化し、AI ワークロードのポータビリティを促進",
+      "GKE が AI 適合プラットフォーム（AI-Conformant Platform）として認定、モデルやAIツールの環境横断移植が容易に",
+      "Kubernetes Agent Sandbox と GKE Pod Snapshots でエージェント型 AI ワークロードの安全性・起動速度を大幅改善",
+    ],
+    sourceUrl: "https://cloud.google.com/blog/products/containers-kubernetes/gke-and-oss-innovation-at-kubecon-eu-2026",
+    sourceLabel: "Google Cloud Blog",
+    icon: Network,
+    color: "#5f6368",
+  },
+  {
+    id: "gemini-code-assist-march2026",
+    date: "2026-03",
+    category: "ai",
+    title: "Gemini Code Assist に /deploy コマンドと Gemini 3.1 Pro サポートが追加",
+    description:
+      "Gemini Code Assist が大幅アップデート。VS Code と IntelliJ にて Gemini 3.1 Pro と Gemini 3.0 Flash がプレビュー利用可能に。エージェントモードに新しい /deploy コマンドが追加され、Cloud Run へのデプロイをコンテナビルドから構成まで全自動化。GitHub での永続メモリ機能により、過去のインタラクションを活用した継続的な支援が可能になりました。",
+    highlights: [
+      "VS Code・IntelliJ で Gemini 3.1 Pro / 3.0 Flash をエージェントモード・チャット・コード生成に利用可能 (Preview)",
+      "/deploy コマンドでビルド・コンテナ化・プッシュ・構成を全自動化して Cloud Run に直接デプロイ",
+      "GitHub での永続メモリ機能が追加され、以前のインタラクション情報を将来のコンテキストに活用",
+    ],
+    sourceUrl: "https://developers.google.com/gemini-code-assist/resources/release-notes",
+    sourceLabel: "Gemini Code Assist Release Notes",
+    icon: Bot,
+    color: "#4285F4",
+    isHighlight: true,
+  },
+  {
+    id: "scc-ai-protection-ga-march2026",
+    date: "2026-03",
+    category: "security",
+    title: "Security Command Center「AI Protection」が GA 昇格＆Model Armor の MCP サーバー対応",
+    description:
+      "Security Command Center の AI Protection 機能が Enterprise ティアで一般提供（GA）開始。AI ワークロードに対する包括的なセキュリティ保護を提供します。また、Google管理の MCP（Model Context Protocol）サーバーと Vertex AI モデルへのトラフィックにセーフティフィルターを適用する Model Armor のフロア設定がプレビュー公開されました。",
+    highlights: [
+      "AI Protection が Security Command Center Enterprise ティアで GA、Premium ティアでもプレビュー提供",
+      "Model Armor のフロア設定で Google 管理 MCP サーバーへのトラフィックにベースラインセキュリティフィルターを適用 (Preview)",
+      "Risk Engine が強化されたヒューリスティクスでデフォルト高価値リソースの識別精度を向上",
+    ],
+    sourceUrl: "https://cloud.google.com/security-command-center/docs/release-notes",
+    sourceLabel: "Security Command Center Release Notes",
+    icon: Shield,
+    color: "#EA4335",
+  },
+  {
+    id: "bigquery-global-query-advanced-runtime-march2026",
+    date: "2026-03",
+    category: "data",
+    title: "BigQuery グローバルクエリ (Preview) と高度なランタイム GA が追加",
+    description:
+      "BigQuery に複数リージョンのデータを単一クエリで横断参照できる「グローバルクエリ」がプレビューリリース。また、クエリ実行時間とスロット使用量を改善する「BigQuery 高度なランタイム」が一般提供（GA）に昇格。誤って削除したデータセットをタイムトラベルウィンドウ内で復元できる「データセット復元（Undelete）」も GA になりました。",
+    highlights: [
+      "グローバルクエリで複数リージョンにまたがるデータを単一クエリで参照可能 (Preview)",
+      "BigQuery 高度なランタイムでクエリ実行速度とスロット効率が向上 (GA)",
+      "削除データセットのタイムトラベル復元（Undelete Dataset）が GA に",
+    ],
+    sourceUrl: "https://cloud.google.com/bigquery/docs/release-notes",
+    sourceLabel: "BigQuery Release Notes",
+    icon: Database,
+    color: "#FBBC05",
+  },
+  {
     id: "gemini-3-1-flash-lite-preview",
     date: "2026-03",
     category: "ai",
@@ -237,76 +306,6 @@ const NEWS_ITEMS: NewsItem[] = [
     icon: Sparkles,
     color: "#4285F4",
     isHighlight: true,
-  },
-  {
-    id: "gemini-2-5-flash",
-    date: "2025-04",
-    category: "ai",
-    title: "Gemini 2.5 Flash -- 高速・低コスト思考モデル",
-    description:
-      "Gemini 2.5 Flash がプレビュー公開。高速かつコスト効率に優れた思考型モデルで、大量処理タスクに最適化。開発者が品質とレイテンシ/コストのバランスを調整できる「Thinking Budget」機能を搭載しています。",
-    highlights: [
-      "設定可能な Thinking Budget で品質/速度を調整",
-      "本番ワークロード向けのコスト最適化",
-      "Gemini 2.5 Pro と同等の推論品質を高速で実現",
-    ],
-    sourceUrl: "https://developers.googleblog.com/en/gemini-25-flash-is-now-in-preview/",
-    sourceLabel: "Google Developers Blog",
-    icon: Sparkles,
-    color: "#4285F4",
-  },
-  {
-    id: "cloud-next-25",
-    date: "2025-04",
-    category: "cloud",
-    title: "Google Cloud Next '25 -- 300以上の新発表",
-    description:
-      "ラスベガスで開催された Google Cloud Next '25 では、AI インフラ、Gemini のクラウド全体への統合、エージェント構築ツール、エンタープライズ AI 機能など 300 以上の発表がありました。Thomas Kurian CEO は「エージェント時代」をテーマに掲げました。",
-    highlights: [
-      "「エージェント時代」をテーマにした基調講演",
-      "AIインフラ・エージェントツール・セキュリティの大型発表",
-      "Google Cloud 全スタックへの Gemini 統合強化",
-    ],
-    sourceUrl: "https://cloud.google.com/blog/topics/google-cloud-next/google-cloud-next-2025-wrap-up",
-    sourceLabel: "Google Cloud Blog",
-    icon: Network,
-    color: "#34A853",
-    isHighlight: true,
-  },
-  {
-    id: "adk-launch",
-    date: "2025-04",
-    category: "ai",
-    title: "Agent Development Kit (ADK) オープンソース公開",
-    description:
-      "Google が Agent Development Kit (ADK) をオープンソースとして公開。マルチエージェント AI システムの構築・オーケストレーション・デプロイを行う Python フレームワークで、Agent2Agent (A2A) プロトコルにも対応しています。",
-    highlights: [
-      "マルチエージェントアーキテクチャの構築をサポート",
-      "エージェント間通信・ツール利用・Vertex AI 連携",
-      "A2A プロトコルによる異種フレームワーク間の相互運用",
-    ],
-    sourceUrl: "https://google.github.io/adk-docs/",
-    sourceLabel: "ADK Documentation",
-    icon: Bot,
-    color: "#4285F4",
-    isHighlight: true,
-  },
-  {
-    id: "a2a-protocol",
-    date: "2025-04",
-    category: "ai",
-    title: "Agent2Agent (A2A) プロトコルの発表",
-    description:
-      "異なるフレームワーク・ベンダーで構築された AI エージェント同士が通信・協力するためのオープンプロトコル。ローンチ時点で50社以上のパートナーが参加。Anthropic の MCP (Model Context Protocol) を補完する形でエージェント間相互運用に特化しています。",
-    highlights: [
-      "50社以上のテクノロジーパートナーが参加",
-      "MCP との補完関係（ツール統合 vs エージェント間通信）",
-      "フレームワークに依存しないオープン標準",
-    ],
-    sourceUrl: "https://blog.google/technology/google-labs/agent-to-agent-a2a-protocol/",
-    sourceLabel: "Google Blog",
-    icon: Network,
-    color: "#4285F4",
   },
 ]
 
