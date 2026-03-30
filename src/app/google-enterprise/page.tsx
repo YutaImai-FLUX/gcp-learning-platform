@@ -25,6 +25,7 @@ import {
   WORKSPACE_PLANS,
   GEMINI_PLANS,
   GEMINI_FEATURE_LABELS,
+  USAGE_LIMITS,
   CONFUSION_POINTS,
   SERVICE_LAYERS,
   CERT_RELEVANCE,
@@ -55,7 +56,7 @@ export default function GoogleEnterprisePage() {
         </div>
         <h1 className="text-2xl font-bold">Google法人向けサービスの全体像</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Google Workspace / Gemini for Workspace / GCP の関係性を正しく理解する
+          Google Workspace（Gemini AI標準搭載）/ GCP の関係性を正しく理解する
         </p>
       </motion.div>
 
@@ -71,8 +72,8 @@ export default function GoogleEnterprisePage() {
             <div className="text-sm">
               <span className="font-semibold text-gcp-blue">GCP資格学習者向けポイント：</span>
               <span className="text-muted-foreground ml-1">
-                「Gemini Enterprise」と「Workspace Enterprise」は別物。GCPのGemini APIも別の課金体系。
-                この3つの関係を正しく理解することがCDL・PCA・PCSE試験対策の基礎になります。
+                2025年1月〜 Gemini AIがWorkspace全プランに標準搭載。旧Gemini Business/Enterpriseアドオンは販売終了。
+                Workspace内蔵AIとGCPのGemini API（Vertex AI）は別の課金体系。この関係を正しく理解することが試験対策の基礎になります。
               </span>
             </div>
           </CardContent>
@@ -228,13 +229,13 @@ function OverviewTab() {
                   ))}
                 </div>
 
-                {/* Gemini Add-on nested */}
+                {/* Gemini AI built-in */}
                 <div className="rounded-lg border-2 p-3 ml-4" style={{ borderColor: "#886FBF", backgroundColor: "rgba(136,111,191,0.05)" }}>
                   <div className="text-xs font-semibold mb-2" style={{ color: "#886FBF" }}>
-                    + Gemini for Workspace（アドオン・別契約）
+                    Gemini AI（Standard以上に標準搭載 / 2025年1月〜）
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {["文書生成AI", "メール要約", "表計算分析", "プレゼン自動生成", "会議要約", "NotebookLM Plus"].map((s) => (
+                    {["Geminiサイドパネル", "Help me write", "Geminiアプリ(Gems)", "会議ノート自動生成", "NotebookLM Plus", "Deep Research"].map((s) => (
                       <span key={s} className="px-2 py-1 rounded text-xs bg-white dark:bg-card border border-purple-200 dark:border-purple-800">
                         {s}
                       </span>
@@ -256,7 +257,7 @@ function OverviewTab() {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#886FBF" }} />
-                <span>Geminiアドオン（月額固定・別契約）</span>
+                <span>Gemini AI（Workspace標準搭載）</span>
               </div>
             </div>
           </div>
@@ -339,6 +340,9 @@ function WorkspaceTab() {
                       <div className="text-xs text-muted-foreground font-normal mt-0.5">
                         {plan.price}
                       </div>
+                      <div className="text-[10px] text-muted-foreground font-normal">
+                        年間: {plan.priceAnnual}
+                      </div>
                     </th>
                   ))}
                 </tr>
@@ -374,6 +378,11 @@ function WorkspaceTab() {
                   values={WORKSPACE_PLANS.map((p) => p.securityLevel)}
                   highlights={WORKSPACE_PLANS.map((p) => !!p.highlight)}
                 />
+                <PlanRow
+                  label="Gemini AI"
+                  values={WORKSPACE_PLANS.map((p) => p.geminiLevel)}
+                  highlights={WORKSPACE_PLANS.map((p) => !!p.highlight)}
+                />
               </tbody>
             </table>
           </div>
@@ -381,13 +390,14 @@ function WorkspaceTab() {
       </Card>
 
       {/* Important Note */}
-      <Card className="border-amber-300/50 bg-amber-50/50 dark:bg-amber-950/10">
+      <Card className="border-green-300/50 bg-green-50/50 dark:bg-green-950/10">
         <CardContent className="p-4 flex items-start gap-3">
-          <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+          <Sparkles size={16} className="text-green-600 shrink-0 mt-0.5" />
           <div className="text-sm text-muted-foreground">
-            <span className="font-semibold text-amber-600 dark:text-amber-400">注意：</span>
-            どのWorkspaceプランを選んでもGemini AI機能は含まれません。
-            Gemini機能を利用するには別途 Gemini Business または Gemini Enterprise アドオンの契約が必要です。
+            <span className="font-semibold text-green-600 dark:text-green-400">2025年1月〜：</span>
+            Gemini AI機能がBusiness/Enterpriseプランに標準搭載されました（旧Gemini Business/Enterpriseアドオンは販売終了）。
+            Business Starterは制限付き（1日5プロンプト）、Standard以上はフル機能が利用可能です。
+            使用量上限を超える場合はAI Expanded / AI Ultra Accessアドオンを追加できます。
           </div>
         </CardContent>
       </Card>
@@ -419,7 +429,7 @@ function WorkspaceTab() {
               </div>
               <div className="flex items-start gap-2">
                 <ChevronRight size={12} className="shrink-0 mt-0.5 text-gcp-green" />
-                <span>AI活用推進部門には <strong>Gemini Enterprise</strong> アドオンを選択的に付与</span>
+                <span>AI活用ヘビーユーザーには <strong>AI Expanded Access</strong> アドオンで使用量上限を拡張</span>
               </div>
             </div>
           </CardContent>
@@ -436,10 +446,10 @@ function GeminiTab() {
       <div>
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Sparkles size={20} style={{ color: "#886FBF" }} />
-          Gemini Business vs Enterprise 比較
+          Workspace内蔵 Gemini AI 比較
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Google Workspace向けAIアドオンの2プランを徹底比較
+          Standard/Plus vs Enterprise：Workspaceプラン別に含まれるAI機能を比較
         </p>
       </div>
 
@@ -462,12 +472,12 @@ function GeminiTab() {
                 <tr className="border-b border-border bg-muted/30">
                   <th className="text-left p-3 font-medium text-muted-foreground">機能</th>
                   <th className="text-center p-3 font-medium" style={{ color: "#886FBF" }}>
-                    Business
-                    <div className="text-xs font-normal text-muted-foreground">$14/user/月</div>
+                    Standard / Plus
+                    <div className="text-xs font-normal text-muted-foreground">Workspace料金に含む</div>
                   </th>
                   <th className="text-center p-3 font-medium bg-purple-50/50 dark:bg-purple-950/10" style={{ color: "#886FBF" }}>
                     Enterprise
-                    <div className="text-xs font-normal text-muted-foreground">$30/user/月</div>
+                    <div className="text-xs font-normal text-muted-foreground">Workspace料金に含む</div>
                   </th>
                 </tr>
               </thead>
@@ -501,6 +511,59 @@ function GeminiTab() {
         </CardContent>
       </Card>
 
+      {/* Usage Limits Table */}
+      <Card className="border-border overflow-hidden">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <AlertTriangle size={14} className="text-gcp-yellow" />
+            使用量制限（2026年4月〜適用開始）
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/30">
+                  <th className="text-left p-3 font-medium text-muted-foreground">機能</th>
+                  {USAGE_LIMITS.tiers.map((t) => (
+                    <th key={t.tier} className="text-center p-3 font-medium text-xs">{t.tier}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border">
+                  <td className="p-3 text-muted-foreground">画像生成</td>
+                  {USAGE_LIMITS.tiers.map((t) => (
+                    <td key={t.tier} className="text-center p-3 text-xs">{t.imageGeneration}</td>
+                  ))}
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="p-3 text-muted-foreground">Vids動画生成</td>
+                  {USAGE_LIMITS.tiers.map((t) => (
+                    <td key={t.tier} className="text-center p-3 text-xs">{t.vidsGeneration}</td>
+                  ))}
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="p-3 text-muted-foreground">Workspace Studio</td>
+                  {USAGE_LIMITS.tiers.map((t) => (
+                    <td key={t.tier} className="text-center p-3 text-xs">{t.workspaceStudio}</td>
+                  ))}
+                </tr>
+                <tr className="border-b border-border last:border-0">
+                  <td className="p-3 text-muted-foreground">PDF音声概要</td>
+                  {USAGE_LIMITS.tiers.map((t) => (
+                    <td key={t.tier} className="text-center p-3 text-xs">{t.pdfAudioSummary}</td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="p-3 text-xs text-muted-foreground border-t border-border bg-muted/20">
+            上限を超える場合は <strong>AI Expanded Access</strong> / <strong>AI Ultra Access</strong> アドオンで拡張可能
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Three Gemini Comparison */}
       <Card className="border-border">
         <CardHeader className="pb-2">
@@ -513,8 +576,8 @@ function GeminiTab() {
           <div className="space-y-3">
             {[
               {
-                name: "Gemini for Workspace",
-                desc: "Workspace上で動くAIアシスタント（月額固定・アドオン）",
+                name: "Workspace内蔵 Gemini AI",
+                desc: "Workspaceプランに標準搭載のAIアシスタント（月額固定・Workspace料金に含む）",
                 color: "#886FBF",
                 target: "一般ユーザー",
               },

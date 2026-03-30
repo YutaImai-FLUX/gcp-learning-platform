@@ -1,14 +1,18 @@
 // Google法人向けサービス理解ページ用データ
+// 2025年1月〜 Gemini AI機能がWorkspace Business/Enterpriseプランに標準搭載
+// 旧Gemini Business/Enterpriseアドオンは販売終了
 
 export interface WorkspacePlan {
   name: string
   price: string
+  priceAnnual: string
   storage: string
   meetCapacity: string
   vault: boolean
   dlp: boolean
   appSheet: boolean
   securityLevel: string
+  geminiLevel: string
   highlight?: boolean
 }
 
@@ -16,14 +20,14 @@ export interface GeminiPlan {
   name: string
   price: string
   features: {
-    docsSheetSlides: boolean
-    gmailMeet: boolean
+    geminiSidePanel: boolean
+    helpMeWrite: boolean
+    geminiApp: boolean
+    meetNotes: boolean
     notebookLmPlus: boolean
     deepResearch: boolean
-    aiMeetingsFull: boolean
-    aiSecurityDlp: boolean
-    vertexAiGrounding: boolean
-    aiStudioExpanded: boolean
+    appSheetGemini: boolean
+    workspaceStudioExpanded: boolean
   }
 }
 
@@ -54,125 +58,184 @@ export interface ServiceLayer {
 export const WORKSPACE_PLANS: WorkspacePlan[] = [
   {
     name: "Business Starter",
-    price: "$7.20/user/月",
+    price: "$8.40/user/月",
+    priceAnnual: "$7/user/月",
     storage: "30GB/user",
     meetCapacity: "100人",
     vault: false,
     dlp: false,
-    appSheet: false,
+    appSheet: true,
     securityLevel: "基本",
+    geminiLevel: "制限付き（1日5プロンプト）",
   },
   {
     name: "Business Standard",
-    price: "$14.40/user/月",
+    price: "$16.80/user/月",
+    priceAnnual: "$14/user/月",
     storage: "2TB/user",
     meetCapacity: "150人",
     vault: false,
     dlp: false,
-    appSheet: false,
+    appSheet: true,
     securityLevel: "基本",
+    geminiLevel: "標準AI内蔵",
+    highlight: true,
   },
   {
     name: "Business Plus",
-    price: "$21.60/user/月",
+    price: "$26.40/user/月",
+    priceAnnual: "$22/user/月",
     storage: "5TB/user",
     meetCapacity: "500人",
     vault: true,
     dlp: true,
     appSheet: true,
     securityLevel: "強化",
-    highlight: true,
+    geminiLevel: "標準AI内蔵",
   },
   {
     name: "Enterprise",
     price: "要問合せ",
-    storage: "無制限",
+    priceAnnual: "要問合せ",
+    storage: "5TB/user〜",
     meetCapacity: "1,000人",
     vault: true,
     dlp: true,
     appSheet: true,
     securityLevel: "最上位（S/MIME, DLP, CAA等）",
+    geminiLevel: "拡張AI内蔵（高上限）",
   },
 ]
 
 export const GEMINI_PLANS: GeminiPlan[] = [
   {
-    name: "Gemini Business",
-    price: "$14/user/月",
+    name: "Standard / Plus 内蔵AI",
+    price: "Workspace料金に含む",
     features: {
-      docsSheetSlides: true,
-      gmailMeet: true,
-      notebookLmPlus: false,
-      deepResearch: false,
-      aiMeetingsFull: false,
-      aiSecurityDlp: false,
-      vertexAiGrounding: false,
-      aiStudioExpanded: false,
+      geminiSidePanel: true,
+      helpMeWrite: true,
+      geminiApp: true,
+      meetNotes: true,
+      notebookLmPlus: true,
+      deepResearch: true,
+      appSheetGemini: false,
+      workspaceStudioExpanded: false,
     },
   },
   {
-    name: "Gemini Enterprise",
-    price: "$30/user/月",
+    name: "Enterprise 内蔵AI",
+    price: "Workspace料金に含む",
     features: {
-      docsSheetSlides: true,
-      gmailMeet: true,
+      geminiSidePanel: true,
+      helpMeWrite: true,
+      geminiApp: true,
+      meetNotes: true,
       notebookLmPlus: true,
       deepResearch: true,
-      aiMeetingsFull: true,
-      aiSecurityDlp: true,
-      vertexAiGrounding: true,
-      aiStudioExpanded: true,
+      appSheetGemini: true,
+      workspaceStudioExpanded: true,
     },
   },
 ]
 
 export const GEMINI_FEATURE_LABELS: Record<keyof GeminiPlan["features"], string> = {
-  docsSheetSlides: "Gemini in Docs / Sheets / Slides",
-  gmailMeet: "Gemini in Gmail / Meet",
+  geminiSidePanel: "Gemini サイドパネル（Gmail / Docs / Sheets / Slides / Drive / Chat）",
+  helpMeWrite: "Help me write（文書・メール作成支援）",
+  geminiApp: "Gemini アプリ（Gems でAIエキスパート構築）",
+  meetNotes: "Meet ノート自動生成・会議要約",
   notebookLmPlus: "NotebookLM Plus",
-  deepResearch: "Gemini Deep Research",
-  aiMeetingsFull: "AI Meetings（翻訳字幕・要約等フル機能）",
-  aiSecurityDlp: "AI Security（DLP for AI）",
-  vertexAiGrounding: "Vertex AI データグラウンディング連携",
-  aiStudioExpanded: "Google AI Studio 拡張上限",
+  deepResearch: "Deep Research",
+  appSheetGemini: "AppSheet Gemini連携（自然言語アプリ生成）",
+  workspaceStudioExpanded: "Workspace Studio（拡張上限）",
 }
+
+export const USAGE_LIMITS = {
+  description: "2026年4月1日より使用量制限が適用開始。それ以前はプロモーション期間。",
+  tiers: [
+    {
+      tier: "Business Starter",
+      imageGeneration: "3回/月",
+      vidsGeneration: "50本/月",
+      workspaceStudio: "100回/月",
+      pdfAudioSummary: "なし",
+    },
+    {
+      tier: "Business Standard / Plus",
+      imageGeneration: "30回/月",
+      vidsGeneration: "50本/月",
+      workspaceStudio: "400回/月",
+      pdfAudioSummary: "20回/日",
+    },
+    {
+      tier: "Enterprise",
+      imageGeneration: "300回/月",
+      vidsGeneration: "200本/月",
+      workspaceStudio: "2,000回/月",
+      pdfAudioSummary: "40回/日",
+    },
+  ],
+  addons: [
+    {
+      name: "AI Expanded Access",
+      description: "使用量上限を大幅に引き上げるオプションアドオン",
+      imageGeneration: "1,000回/月",
+      vidsGeneration: "500本/月",
+      workspaceStudio: "10,000回/月",
+      pdfAudioSummary: "200回/日",
+    },
+    {
+      name: "AI Ultra Access",
+      description: "最も高度なAI機能へのアクセス権（創造的・研究プロジェクト向け）",
+      imageGeneration: "1,000回/月",
+      vidsGeneration: "500本/月",
+      workspaceStudio: "—",
+      pdfAudioSummary: "—",
+    },
+  ],
+} as const
 
 export const CONFUSION_POINTS: ConfusionPoint[] = [
   {
     question: "Gemini Enterprise = GCPのサービス？",
     answer:
-      "いいえ。Gemini EnterpriseはGoogle Workspace向けのAIアドオンです。GCPで利用するGemini API（Vertex AI経由）とは課金体系も利用方法も完全に別物です。",
+      "いいえ。旧「Gemini Enterprise」はGoogle Workspace向けのAIアドオンでしたが、2025年1月に販売終了しました。現在はWorkspace各プランにGemini AI機能が標準搭載されています。GCPで利用するGemini API（Vertex AI経由）とは課金体系も利用方法も完全に別物です。",
     category: "gemini",
   },
   {
-    question: "Workspace EnterpriseプランにGeminiは含まれる？",
+    question: "WorkspaceプランにGemini AI機能は含まれる？",
     answer:
-      "含まれません。Workspace Enterpriseプランは基盤サービス（Gmail, Drive等）の最上位プランであり、Gemini機能を利用するには別途Gemini Business/Enterpriseアドオンの契約が必要です。",
+      "はい、2025年1月以降、Business Standard以上のプランにGemini AI機能が標準搭載されました。Business Starterにも制限付き（1日5プロンプト）で含まれます。旧Gemini Business/Enterpriseアドオンの別途契約は不要になりました。",
     category: "workspace",
   },
   {
-    question: "Gemini APIとGemini for Workspaceの違いは？",
+    question: "Gemini APIとWorkspace内蔵Geminiの違いは？",
     answer:
-      "Gemini API（Vertex AI）は開発者向けで従量課金（トークン単位）。Gemini for Workspaceはエンドユーザー向けで月額固定のサブスクリプション。同じGeminiモデルを基盤としていますが、提供形態が異なります。",
+      "Gemini API（Vertex AI）は開発者向けで従量課金（トークン単位）。Workspace内蔵Geminiはエンドユーザー向けでWorkspaceサブスクリプションに含まれます。同じGeminiモデルを基盤としていますが、提供形態・課金方式・利用上限が異なります。",
     category: "gcp",
   },
   {
-    question: "Google One AI PremiumとGemini Enterpriseの違いは？",
+    question: "Google One AI PremiumとWorkspace内蔵Geminiの違いは？",
     answer:
-      "Google One AI Premiumは個人向け（$19.99/月）で、個人のGmailやDriveでGeminiを利用できます。Gemini Enterpriseは法人向けで、組織全体のセキュリティ・管理機能（DLP, Vault連携等）が含まれます。",
+      "Google One AI Premiumは個人向けで、個人のGmailやDriveでGemini Advancedを利用できます。Workspace内蔵Geminiは法人向けで、組織全体のセキュリティ・管理機能（DLP、データ保護ポリシー等）が含まれます。",
     category: "gemini",
   },
   {
-    question: "AppSheetとGeminiの関係は？",
+    question: "AI Expanded Access / AI Ultra Access とは？",
     answer:
-      "AppSheetはWorkspaceに統合されたノーコード開発プラットフォームです。Business Plus以上で利用可能。Geminiと連携して自然言語からアプリを自動生成する機能も提供されています。",
+      "Gemini AI機能がWorkspaceに標準搭載された後の新しいオプションアドオンです。画像生成・動画生成・Workspace Studioなどの使用量上限を大幅に引き上げます。旧Gemini Business/Enterpriseアドオンの後継に相当しますが、基本AI機能は別途契約不要です。",
     category: "workspace",
   },
   {
     question: "Duet AIとGemini for Workspaceは別物？",
     answer:
-      "同じものです。2024年2月にDuet AI for Google Workspaceは「Gemini for Google Workspace」にリブランドされました。機能はそのまま引き継がれています。",
+      "同じものの名称変更です。2024年2月にDuet AI for Google Workspaceは「Gemini for Google Workspace」にリブランドされ、さらに2025年1月からはWorkspace各プランに統合されました。現在は「Workspace内蔵AI」として提供されています。",
     category: "gemini",
+  },
+  {
+    question: "使用量制限（Usage Limits）はいつから適用される？",
+    answer:
+      "2026年4月1日から正式に使用量制限が適用されます。それ以前はプロモーション期間として、Business/Enterpriseエディションのユーザーは新しいAI機能に優先アクセスできます。制限は日次または月次でリセットされ、ユーザー間で共有できません。",
+    category: "workspace",
   },
 ]
 
@@ -181,18 +244,18 @@ export const SERVICE_LAYERS: ServiceLayer[] = [
     id: "workspace",
     label: "Google Workspace",
     color: "#4285F4",
-    description: "全社員の業務基盤となるコラボレーションSaaS",
-    services: ["Gmail", "Google Drive", "Docs / Sheets / Slides", "Google Meet", "Google Chat", "Google Calendar", "AppSheet"],
+    description: "全社員の業務基盤となるコラボレーションSaaS（Gemini AI機能を標準搭載）",
+    services: ["Gmail", "Google Drive", "Docs / Sheets / Slides", "Google Meet", "Google Chat", "Google Calendar", "AppSheet", "Gemini AI"],
     target: "全社員（非エンジニア含む）",
     billing: "ユーザー単位の月額サブスクリプション",
   },
   {
     id: "gemini-workspace",
-    label: "Gemini for Workspace",
+    label: "AI拡張オプション",
     color: "#886FBF",
-    description: "Workspace上で動作するAIアシスタント（アドオン）",
-    services: ["文書・メール生成支援", "スプレッドシート分析", "プレゼン自動生成", "会議要約・翻訳字幕", "NotebookLM Plus", "Deep Research"],
-    target: "Workspaceユーザー（アドオン契約者）",
+    description: "Workspace内蔵AIの使用量上限を引き上げるオプションアドオン",
+    services: ["AI Expanded Access", "AI Ultra Access", "画像生成上限拡張", "動画生成上限拡張", "Workspace Studio拡張", "PDF音声概要拡張"],
+    target: "AI活用ヘビーユーザー",
     billing: "Workspace契約 + アドオン月額",
   },
   {
@@ -236,55 +299,55 @@ export const CERT_RELEVANCE = [
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: "ge-q1",
-    question: "Gemini for Google Workspaceを利用するために必要なものは？",
+    question: "2025年以降、Google WorkspaceでGemini AI機能を利用するために必要なものは？",
     options: [
       "GCPプロジェクトとVertex AIの有効化",
-      "Google Workspaceの契約 + Geminiアドオンの契約",
-      "Google One AI Premiumの契約",
+      "Business Standard以上のWorkspaceプランの契約（AI機能は標準搭載）",
+      "旧Gemini Enterpriseアドオンの契約",
       "Gemini APIキーの発行",
     ],
     correctIndex: 1,
     explanation:
-      "Gemini for WorkspaceはWorkspaceのアドオンとして提供されます。GCPのVertex AI（Gemini API）とは別の契約・課金体系です。",
+      "2025年1月以降、Gemini AI機能はWorkspace Business/Enterpriseプランに標準搭載されました。旧Gemini Business/Enterpriseアドオンは販売終了しています。GCPのVertex AI（Gemini API）とは別の契約・課金体系です。",
   },
   {
     id: "ge-q2",
     question: "Google Workspace Enterprise プランに標準で含まれるものはどれか？",
     options: [
-      "Gemini Enterprise機能",
       "Vertex AI APIの無料枠",
-      "Google Vault（データ保持・電子情報開示）",
+      "Gemini AI機能 + Google Vault + DLP + AppSheet Gemini連携",
       "BigQueryへの直接エクスポート",
+      "AI Ultra Accessアドオン",
     ],
-    correctIndex: 2,
+    correctIndex: 1,
     explanation:
-      "VaultはWorkspace Enterprise（およびBusiness Plus）に含まれます。Gemini機能は別途アドオン契約が必要です。",
+      "EnterpriseプランにはGemini AI機能が標準搭載されており、Vault、DLP、AppSheet Gemini連携も含まれます。AI Ultra Accessは使用量上限を引き上げる別途オプションアドオンです。",
   },
   {
     id: "ge-q3",
     question: "GCPのGemini API（Vertex AI経由）の課金方式は？",
     options: [
-      "ユーザー単位の月額固定",
+      "ユーザー単位の月額固定（Workspaceに含む）",
       "入出力トークン単位の従量課金",
       "リクエスト数に応じた段階制",
       "年間契約の一括払い",
     ],
     correctIndex: 1,
     explanation:
-      "Vertex AI経由のGemini APIは入出力トークン数に基づく従量課金です。Gemini for Workspaceのユーザー月額固定とは異なります。",
+      "Vertex AI経由のGemini APIは入出力トークン数に基づく従量課金です。Workspace内蔵のGemini AIとは提供形態・課金体系が完全に異なります。",
   },
   {
     id: "ge-q4",
-    question: "Gemini Enterprise（Workspace用アドオン）でのみ利用可能な機能はどれか？",
+    question: "Workspace Enterprise内蔵AIでのみ利用可能（または拡張上限が適用される）機能はどれか？",
     options: [
-      "Gemini in Gmail での文面生成",
-      "Gemini in Sheets での数式提案",
-      "NotebookLM Plus と Deep Research",
-      "Gemini in Slides での画像生成",
+      "Gemini in Gmail でのメール文面生成",
+      "Help me write による文書作成支援",
+      "AppSheet Gemini連携 と Workspace Studio拡張上限",
+      "NotebookLM Plus",
     ],
     correctIndex: 2,
     explanation:
-      "NotebookLM PlusとDeep ResearchはGemini Enterpriseのみの機能です。Docs/Sheets/Slides/Gmail/Meetの基本AI機能はGemini Businessでも利用可能です。",
+      "AppSheet Gemini連携とWorkspace Studioの拡張上限はEnterprise内蔵AIの特徴です。Gemini サイドパネル、Help me write、NotebookLM PlusはBusiness Standard/Plus内蔵AIでも利用可能です。",
   },
   {
     id: "ge-q5",
