@@ -4,7 +4,7 @@ import { useMemo, useState, useCallback } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Sword, BookOpen, FlaskConical, PlayCircle, Gift, Map } from "lucide-react"
+import { ArrowLeft, BookOpen, FlaskConical, PlayCircle, Gift, Map } from "lucide-react"
 import type { CertificationId } from "@/lib/types/quiz"
 import type { BattleState } from "@/lib/types/dungeon"
 import { getDungeonMap } from "@/lib/game/dungeon-config"
@@ -112,22 +112,28 @@ export default function DungeonCertPage() {
       >
         <Link
           href="/dungeon"
-          className="p-2 rounded-lg hover:bg-muted transition-colors"
+          className="p-2 hover:bg-muted transition-colors"
+          style={{ imageRendering: "pixelated" }}
         >
           <ArrowLeft size={18} />
         </Link>
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-            style={{ backgroundColor: theme.accentColor + "20" }}
-          >
-            <Sword size={16} style={{ color: theme.accentColor }} />
-          </div>
+          <span className="text-xl shrink-0" style={{ imageRendering: "pixelated" }}>
+            {theme.ambientEmoji[0]}
+          </span>
           <div className="min-w-0">
-            <h1 className="text-base sm:text-lg font-bold truncate" style={{ color: theme.accentColor }}>
+            <h1
+              className="text-base sm:text-lg font-bold truncate"
+              style={{ color: theme.accentColor, textShadow: "1px 1px 0 rgba(0,0,0,0.5)" }}
+            >
               {dungeon.name}
             </h1>
-            <p className="text-xs text-muted-foreground truncate">{theme.nameJa}</p>
+            <p
+              className="text-[10px] text-muted-foreground truncate"
+              style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.3)" }}
+            >
+              {theme.biome} - {theme.nameJa}
+            </p>
           </div>
         </div>
 
@@ -135,7 +141,8 @@ export default function DungeonCertPage() {
         {phase !== "map" && (
           <button
             onClick={handleBackToMap}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:bg-muted"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+            style={{ boxShadow: "inset 2px 2px 0 0 #C6C6C6, inset -2px -2px 0 0 #555555", backgroundColor: "#8B8B8B", color: "#fff", textShadow: "1px 1px 0 rgba(0,0,0,0.7)" }}
           >
             <Map size={14} />
             マップ
@@ -154,7 +161,8 @@ export default function DungeonCertPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+            className={`bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+              style={{ border: `2px solid ${theme.tileBorder}`, boxShadow: `inset 3px 3px 0 0 ${theme.bevelLight}, inset -3px -3px 0 0 ${theme.bevelDark}` }}
           >
             <DungeonMapView
               dungeon={dungeon}
@@ -170,7 +178,8 @@ export default function DungeonCertPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+            className={`bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+              style={{ border: `2px solid ${theme.tileBorder}`, boxShadow: `inset 3px 3px 0 0 ${theme.bevelLight}, inset -3px -3px 0 0 ${theme.bevelDark}` }}
           >
             <BattleScreen
               certId={certId}
@@ -189,7 +198,8 @@ export default function DungeonCertPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`rounded-xl bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+            className={`bg-gradient-to-b ${theme.bgGradient} p-3 sm:p-4`}
+              style={{ border: `2px solid ${theme.tileBorder}`, boxShadow: `inset 3px 3px 0 0 ${theme.bevelLight}, inset -3px -3px 0 0 ${theme.bevelDark}` }}
           >
             <BattleResult
               battle={battleResult}
@@ -206,8 +216,11 @@ export default function DungeonCertPage() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl overflow-hidden"
-          style={{ border: `1px solid ${theme.tileBorder}` }}
+          className="overflow-hidden"
+          style={{
+            border: `2px solid ${theme.tileBorder}`,
+            boxShadow: `inset 3px 3px 0 0 ${theme.bevelLight}, inset -3px -3px 0 0 ${theme.bevelDark}`,
+          }}
         >
           <div
             className="px-4 py-3 flex items-center gap-3"
@@ -219,19 +232,22 @@ export default function DungeonCertPage() {
               return (
                 <>
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: theme.accentColor + "20" }}
+                    className="w-8 h-8 flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: "#8B8B8B",
+                      boxShadow: "inset 2px 2px 0 0 #C6C6C6, inset -2px -2px 0 0 #555555",
+                    }}
                   >
                     <RoomIcon size={16} style={{ color: theme.accentColor }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm">{activeRoom.label}</p>
-                    <p className="text-xs opacity-70">{info?.description}</p>
+                    <p className="font-bold text-sm" style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.5)" }}>{activeRoom.label}</p>
+                    <p className="text-xs opacity-70" style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.3)" }}>{info?.description}</p>
                   </div>
                   {activeRoom.xpReward > 0 && (
                     <span
-                      className="text-xs font-bold px-2 py-1 rounded-lg shrink-0"
-                      style={{ backgroundColor: theme.accentColor + "20", color: theme.accentColor }}
+                      className="text-xs font-bold px-2 py-1 shrink-0"
+                      style={{ color: "#80FF20", textShadow: "1px 1px 0 #1A3A00" }}
                     >
                       +{activeRoom.xpReward} XP
                     </span>

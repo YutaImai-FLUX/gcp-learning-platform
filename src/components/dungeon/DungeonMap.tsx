@@ -20,7 +20,6 @@ const MAP_W = 400
 
 /** Convert pathSide to pixel X center coordinate */
 function sideToX(side: PathSide, roomType: string): number {
-  // Study rooms are wider (164px), so offset center differently
   if (roomType === "study") {
     return side === "left" ? 100 : side === "right" ? 300 : 200
   }
@@ -30,6 +29,11 @@ function sideToX(side: PathSide, roomType: string): number {
 /** Convert pathIndex to pixel Y center coordinate */
 function indexToY(pathIndex: number): number {
   return 48 + pathIndex * ROW_H
+}
+
+/** MC 3D bevel box-shadow helper */
+function mcBevel(light: string, dark: string, size = 4): string {
+  return `inset ${size}px ${size}px 0 0 ${light}, inset -${size}px -${size}px 0 0 ${dark}`
 }
 
 export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps) {
@@ -81,34 +85,38 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
 
   return (
     <div className="relative">
+      {/* MC Inventory-style outer frame */}
       <div
-        className="relative mx-auto overflow-visible rounded-2xl"
+        className="relative mx-auto overflow-visible"
         style={{
           maxWidth: MAP_W,
           minHeight: totalH,
           backgroundColor: theme.tileColor,
-          border: `1px solid ${theme.tileBorder}`,
+          boxShadow: mcBevel(theme.bevelLight, theme.bevelDark),
+          border: `2px solid ${theme.tileBorder}`,
           backgroundImage: theme.bgPattern,
-          backgroundSize: "40px 40px",
+          backgroundSize: "8px 8px",
+          imageRendering: "pixelated",
         }}
       >
-        {/* Ambient emoji decoration */}
+        {/* Ambient emoji decoration (block particles) */}
         {theme.ambientEmoji.map((emoji, i) => (
           <div
             key={i}
             className="absolute select-none pointer-events-none"
             style={{
-              fontSize: 16,
-              opacity: 0.12,
+              fontSize: 14,
+              opacity: 0.1,
               left: `${15 + i * 30}%`,
               top: `${20 + i * 25}%`,
+              imageRendering: "pixelated",
             }}
           >
             {emoji}
           </div>
         ))}
 
-        {/* SVG paths layer */}
+        {/* SVG paths layer (redstone trails) */}
         <svg
           className="absolute inset-0 w-full pointer-events-none"
           style={{ height: totalH }}
@@ -138,16 +146,15 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
           })}
         </svg>
 
-        {/* Room nodes layer */}
+        {/* Room nodes layer (block items) */}
         <div className="relative" style={{ height: totalH }}>
           {dungeon.rooms.map((room) => {
             const cx = sideToX(room.pathSide, room.type)
             const cy = indexToY(room.pathIndex)
             const isActive = room.id === currentRoomId
 
-            // Determine offset from center based on room type dimensions
             const halfW = room.type === "study" ? 82 : room.type === "boss" ? 44 : room.type === "quiz" ? 36 : 32
-            const halfH = room.type === "study" ? 26 : room.type === "boss" ? 44 : room.type === "quiz" ? 36 : 32
+            const halfH = room.type === "study" ? 26 : room.type === "boss" ? 44 : room.type === "quiz" ? 36 : room.type === "treasure" ? 28 : 32
 
             return (
               <div
