@@ -341,7 +341,7 @@ export default function UpdatesPage() {
             <Sparkles size={20} className="text-white/80" />
             <span className="text-white/70 text-xs font-medium uppercase tracking-wider">Google Cloud &amp; AI Updates</span>
           </div>
-          <h1 className="text-3xl font-bold mb-2">最新アップデート情報</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">最新アップデート情報</h1>
           <p className="text-white/80 text-lg">
             Google Cloud・Gemini・AI エコシステムの最新ニュースとリリース情報
           </p>

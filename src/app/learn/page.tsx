@@ -61,7 +61,7 @@ export default function LearnPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "総問題数", value: "100+問", icon: FileText, color: "text-gcp-blue", bg: "bg-gcp-blue-light" },
           { label: "資格コース", value: `${CERTIFICATIONS.length}種`, icon: GraduationCap, color: "text-gcp-yellow", bg: "bg-[#fef7e0]" },

@@ -44,7 +44,7 @@ export default function ProductDetailPage() {
       </Link>
 
       {/* Header */}
-      <div className="flex items-start gap-5 p-6 bg-white dark:bg-card rounded-2xl border border-border">
+      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5 p-4 sm:p-6 bg-white dark:bg-card rounded-2xl border border-border">
         <div
           className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
           style={{ backgroundColor: `${product.color}12` }}

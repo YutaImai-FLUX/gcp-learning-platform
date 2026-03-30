@@ -248,7 +248,7 @@ export default function GCSDemo() {
               {/* Storage class info */}
               <Card className="border-border">
                 <CardContent className="p-3">
-                  <div className="grid grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {GCS_STORAGE_CLASSES.map((cls) => (
                       <div
                         key={cls.id}

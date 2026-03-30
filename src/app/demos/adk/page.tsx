@@ -505,7 +505,7 @@ export default function ADKDemo() {
                     </pre>
                   </div>
                   {metrics && (
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       {[
                         { label: "実行時間", value: `${metrics.time}s` },
                         { label: "トークン", value: metrics.tokens.toLocaleString() },

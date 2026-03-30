@@ -50,7 +50,7 @@ export function BattleResult({ battle, theme, onContinue, onRetry }: BattleResul
       </p>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 py-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-3">
         <div>
           <div className="text-lg font-bold">{correctCount}/{totalCount}</div>
           <div className="text-[10px] opacity-60">正答数</div>
