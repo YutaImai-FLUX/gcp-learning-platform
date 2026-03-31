@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Moon, Sun, Command } from "lucide-react"
+import { Search, Moon, Sun, Command, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSidebarStore } from "@/lib/stores/useSidebarStore"
 import { CommandPalette } from "@/components/search/CommandPalette"
@@ -9,7 +9,15 @@ import { CommandPalette } from "@/components/search/CommandPalette"
 export function Header() {
   const [dark, setDark] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [email, setEmail] = useState<string | null>(null)
   const collapsed = useSidebarStore((s) => s.collapsed)
+
+  useEffect(() => {
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then((d) => setEmail(d.email))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     const saved = localStorage.getItem("theme")
@@ -66,6 +74,14 @@ export function Header() {
           >
             {dark ? <Sun size={18} /> : <Moon size={18} />}
           </Button>
+          {email && (
+            <div className="flex items-center gap-2 ml-2">
+              <User size={16} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground hidden sm:inline">
+                {email}
+              </span>
+            </div>
+          )}
         </div>
       </header>
 
