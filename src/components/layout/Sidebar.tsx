@@ -125,6 +125,18 @@ export function Sidebar() {
     }
   }, [pathname, markUpdatesSeen])
 
+  // Ctrl+B でサイドバー開閉
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "b") {
+        e.preventDefault()
+        toggle()
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [toggle])
+
   return (
     <aside
       className={cn(
@@ -132,19 +144,35 @@ export function Sidebar() {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-3 border-b border-border min-h-[57px]">
-        <div className="flex items-center gap-1 shrink-0">
-          <span className="w-3 h-3 rounded-full bg-gcp-blue" />
-          <span className="w-3 h-3 rounded-full bg-gcp-red" />
-          <span className="w-3 h-3 rounded-full bg-gcp-yellow" />
-          <span className="w-3 h-3 rounded-full bg-gcp-green" />
-        </div>
-        {!collapsed && (
-          <div className="flex flex-col leading-tight">
-            <span className="font-extrabold text-lg text-foreground tracking-tight">GLP <span className="text-xs font-normal text-foreground">by FLUX</span></span>
-            <span className="text-[10px] text-muted-foreground">Google Learning Platform</span>
-          </div>
+      {/* Logo + Toggle */}
+      <div className={cn("flex items-center border-b border-border min-h-[57px]", collapsed ? "justify-center px-2 py-3" : "px-5 py-3")}>
+        {collapsed ? (
+          <span className="font-extrabold text-base text-foreground tracking-tight">GLP</span>
+        ) : (
+          <>
+            <div className="flex items-center gap-1 shrink-0">
+              <span className="w-3 h-3 rounded-full bg-gcp-blue" />
+              <span className="w-3 h-3 rounded-full bg-gcp-red" />
+              <span className="w-3 h-3 rounded-full bg-gcp-yellow" />
+              <span className="w-3 h-3 rounded-full bg-gcp-green" />
+            </div>
+            <div className="flex flex-col leading-tight ml-3">
+              <span className="font-extrabold text-lg text-foreground tracking-tight">GLP <span className="text-xs font-normal text-foreground">by FLUX</span></span>
+              <span className="text-[10px] text-muted-foreground">Google Learning Platform</span>
+            </div>
+            <div className="relative ml-auto group/toggle">
+              <button
+                onClick={toggle}
+                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <PanelLeftClose size={18} />
+              </button>
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-2.5 py-1.5 bg-foreground text-background text-xs rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover/toggle:opacity-100 transition-opacity shadow-lg z-50">
+                サイドバーを閉じる
+                <kbd className="ml-2 px-1.5 py-0.5 bg-background/20 rounded text-[10px] font-mono">Ctrl+B</kbd>
+              </div>
+            </div>
+          </>
         )}
       </div>
 
@@ -276,13 +304,20 @@ export function Sidebar() {
             </div>
           </div>
         )}
-        <button
-          onClick={toggle}
-          className="w-full flex items-center justify-center py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-          title={collapsed ? "サイドバーを開く" : "サイドバーを閉じる"}
-        >
-          {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-        </button>
+        {collapsed && (
+          <div className="relative group/toggle">
+            <button
+              onClick={toggle}
+              className="w-full flex items-center justify-center py-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            >
+              <PanelLeftOpen size={18} />
+            </button>
+            <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 bg-foreground text-background text-xs rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover/toggle:opacity-100 transition-opacity shadow-lg z-50">
+              サイドバーを開く
+              <kbd className="ml-2 px-1.5 py-0.5 bg-background/20 rounded text-[10px] font-mono">Ctrl+B</kbd>
+            </div>
+          </div>
+        )}
       </div>
     </aside>
   )
