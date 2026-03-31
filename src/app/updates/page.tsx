@@ -524,14 +524,14 @@ export default function UpdatesPage() {
                   <span className="font-display text-sm font-bold text-foreground">注目のアップデート</span>
                   <span className="text-[10px] text-muted-foreground">({highlightItems.length})</span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 select-none">
                   {/* Dot indicators */}
                   <div className="flex items-center gap-1 mr-2">
                     {Array.from({ length: Math.ceil(highlightItems.length / SLIDER_VISIBLE_COUNT) }).map((_, i) => (
                       <button
                         key={i}
                         onClick={() => scrollToPage(i)}
-                        className={`w-1.5 h-1.5 rounded-full transition-all ${
+                        className={`w-1.5 h-1.5 rounded-full transition-all outline-none ${
                           sliderPage === i ? "bg-primary w-4" : "bg-border hover:bg-muted-foreground/40"
                         }`}
                       />
