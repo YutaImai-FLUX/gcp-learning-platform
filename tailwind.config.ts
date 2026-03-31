@@ -72,7 +72,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Google Sans", "Roboto", "system-ui", "sans-serif"],
+        sans: ["'Noto Sans JP'", "system-ui", "sans-serif"],
+        display: ["'Inter Tight'", "'Noto Sans JP'", "system-ui", "sans-serif"],
         mono: ["Roboto Mono", "monospace"],
         pixel: ["'Press Start 2P'", "monospace"],
       },

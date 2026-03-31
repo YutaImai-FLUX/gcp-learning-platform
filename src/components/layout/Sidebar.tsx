@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -128,21 +129,20 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-full bg-white dark:bg-[#292a2d] border-r border-border flex flex-col z-40 transition-[width] duration-200",
+        "fixed left-0 top-0 h-full bg-white/80 dark:bg-[#1c1f26]/80 backdrop-blur-xl border-r border-border flex flex-col z-40 transition-[width] duration-200",
         collapsed ? "w-16" : "w-64"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2 px-5 py-4 border-b border-border min-h-[57px]">
-        <div className="flex items-center gap-1 shrink-0">
-          <span className="w-3 h-3 rounded-full bg-gcp-blue" />
-          <span className="w-3 h-3 rounded-full bg-gcp-red" />
-          <span className="w-3 h-3 rounded-full bg-gcp-yellow" />
-          <span className="w-3 h-3 rounded-full bg-gcp-green" />
-        </div>
-        {!collapsed && (
-          <span className="font-bold text-[15px] text-foreground whitespace-nowrap">GCP Learning</span>
-        )}
+      <div className="flex items-center justify-center px-3 py-3 border-b border-border min-h-[57px]">
+        <Image
+          src="/logo.png"
+          alt="Google Learning Platform"
+          width={collapsed ? 36 : 200}
+          height={collapsed ? 36 : 48}
+          className="object-contain"
+          priority
+        />
       </div>
 
       {/* Navigation */}

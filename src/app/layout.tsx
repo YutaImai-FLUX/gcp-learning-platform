@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className="bg-background text-foreground antialiased">
+      <body className="font-sans bg-background text-foreground antialiased">
         <Sidebar />
         <Header />
         <MainContent>{children}</MainContent>
