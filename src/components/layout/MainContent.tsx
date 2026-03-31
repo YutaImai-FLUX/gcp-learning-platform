@@ -17,7 +17,7 @@ export function MainContent({ children }: { children: React.ReactNode }) {
         `,
       }}
     >
-      <div className="p-3 sm:p-6 max-w-[1400px]">
+      <div className="p-3 sm:p-6">
         <Breadcrumb />
         {children}
       </div>
