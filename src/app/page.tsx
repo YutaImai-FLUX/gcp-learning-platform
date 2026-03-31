@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
-  PlayCircle, GraduationCap,
+  GraduationCap,
   ArrowRight, Trophy,
   Sword, Target, Layers,
   Sparkles, ChevronRight,
@@ -27,7 +27,6 @@ const GETTING_STARTED = [
     title: "デモを体験する",
     desc: "GCPサービスを実際に操作して理解を深めよう",
     href: "/demos",
-    icon: PlayCircle,
     color: "#4285F4",
   },
   {
@@ -35,7 +34,6 @@ const GETTING_STARTED = [
     title: "資格学習を始める",
     desc: "CDLから始めて、段階的にスキルアップ",
     href: "/learn",
-    icon: GraduationCap,
     color: "#34A853",
   },
   {
@@ -43,7 +41,6 @@ const GETTING_STARTED = [
     title: "ダンジョンに挑戦",
     desc: "RPGバトル形式でクイズに挑戦しよう",
     href: "/dungeon",
-    icon: Sword,
     color: "#EA4335",
   },
 ]
@@ -93,7 +90,6 @@ function NewUserDashboard() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {GETTING_STARTED.map((item, idx) => {
-            const Icon = item.icon
             const isFirst = idx === 0
             return (
               <Link
