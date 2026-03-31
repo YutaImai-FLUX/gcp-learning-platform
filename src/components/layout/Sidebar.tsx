@@ -100,7 +100,14 @@ const NAV_SECTIONS: NavSection[] = [
         ],
       },
       { label: "アーキテクチャ図", href: "/architecture", icon: Network },
-      { label: "Google法人サービス", href: "/google-enterprise", icon: Building2 },
+      {
+        label: "Google法人サービス",
+        href: "/google-enterprise",
+        icon: Building2,
+        children: [
+          { label: "AWT プリセールス", href: "/google-enterprise/awt", icon: Bot },
+        ],
+      },
     ],
   },
   {
@@ -114,7 +121,12 @@ const NAV_SECTIONS: NavSection[] = [
 
 export function Sidebar() {
   const pathname = usePathname()
-  const [expandedDemos, setExpandedDemos] = useState(pathname.startsWith("/demos"))
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(() => {
+    const initial = new Set<string>()
+    if (pathname.startsWith("/demos")) initial.add("/demos")
+    if (pathname.startsWith("/google-enterprise/")) initial.add("/google-enterprise")
+    return initial
+  })
   const { collapsed, toggle } = useSidebarStore()
   const { hasNew: hasNewUpdate, markAsSeen: markUpdatesSeen } = useUpdatesBadge()
 
@@ -196,15 +208,21 @@ export function Sidebar() {
                 const Icon = item.icon
 
                 if (item.children) {
+                  const isExpanded = expandedMenus.has(item.href)
                   return (
                     <div key={item.href}>
                       <button
                         onClick={() => {
                           if (collapsed) {
                             toggle()
-                            setExpandedDemos(true)
+                            setExpandedMenus((prev) => new Set(prev).add(item.href))
                           } else {
-                            setExpandedDemos(!expandedDemos)
+                            setExpandedMenus((prev) => {
+                              const next = new Set(prev)
+                              if (next.has(item.href)) next.delete(item.href)
+                              else next.add(item.href)
+                              return next
+                            })
                           }
                         }}
                         className={cn(
@@ -221,11 +239,11 @@ export function Sidebar() {
                         {!collapsed && (
                           <ChevronDown
                             size={16}
-                            className={cn("transition-transform", expandedDemos && "rotate-180")}
+                            className={cn("transition-transform", isExpanded && "rotate-180")}
                           />
                         )}
                       </button>
-                      {expandedDemos && !collapsed && (
+                      {isExpanded && !collapsed && (
                         <div className="ml-4 mt-1 space-y-0.5 border-l border-border pl-3">
                           {item.children.map((child) => {
                             if (child.separator) {

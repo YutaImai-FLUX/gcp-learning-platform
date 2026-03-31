@@ -16,6 +16,8 @@ const ROUTE_LABELS: Record<string, string> = {
   "updates": "最新アップデート",
   "quiz": "クイズ",
   "new": "新規作成",
+  "google-enterprise": "Google法人向けサービス",
+  "awt": "AWT プリセールス",
 }
 
 export function Breadcrumb() {
