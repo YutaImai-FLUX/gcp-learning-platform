@@ -38,6 +38,20 @@ const SIDE_X: Record<PathSide, number> = {
   right: X_RIGHT,
 }
 
+/** Card-width baseline for centering compact nodes */
+const CARD_W = 180
+const COMPACT_WIDTHS: Record<string, number> = {
+  start: 64, quiz: 72, treasure: 56, boss: 88,
+}
+
+/** Get X position centered on the card column axis */
+function getNodeX(pathSide: PathSide, roomType: string): number {
+  const baseX = SIDE_X[pathSide]
+  const nodeW = COMPACT_WIDTHS[roomType]
+  if (!nodeW) return baseX // study/lab/demo — full card width
+  return baseX + (CARD_W - nodeW) / 2
+}
+
 export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps) {
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
   const [showNPC, setShowNPC] = useState<string | null>(null)
@@ -85,7 +99,7 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
       id: room.id,
       type: "dungeon",
       position: {
-        x: SIDE_X[room.pathSide],
+        x: getNodeX(room.pathSide, room.type),
         y: room.pathIndex * ROW_H + 20,
       },
       data: {

@@ -94,7 +94,16 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
     const side: PathSide = domainIdx % 2 === 0 ? "left" : "right"
     const shortName = shortenDomain(domain.name)
 
-    // Study room
+    // Study room — unlocks from previous quiz, or from treasure if one was inserted
+    const prevTreasureId = domainIdx > 0 && (domainIdx - 1) % 2 === 0 && (domainIdx - 1) < cert.domains.length - 1
+      ? `${certId}-treasure-${domainIdx - 1}`
+      : null
+    const studyUnlockReq = domainIdx === 0
+      ? [`${certId}-start`]
+      : prevTreasureId
+        ? [prevTreasureId]
+        : [`${certId}-quiz-${domainIdx - 1}`]
+
     rooms.push({
       id: `${certId}-study-${domainIdx}`,
       label: shortName,
@@ -104,9 +113,7 @@ function generateDungeonRooms(certId: CertificationId): DungeonRoom[] {
       pathIndex: idx++,
       pathSide: side,
       moduleIds: [`${certId}-module-${domainIdx}`],
-      unlockRequires: domainIdx === 0
-        ? [`${certId}-start`]
-        : [`${certId}-quiz-${domainIdx - 1}`],
+      unlockRequires: studyUnlockReq,
       xpReward: 15,
     })
 
