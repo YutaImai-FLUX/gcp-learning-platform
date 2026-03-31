@@ -1,12 +1,11 @@
 "use client"
 
-import { useMemo, useState, useCallback } from "react"
+import { useMemo, useState, useCallback, useEffect, useRef } from "react"
 import {
   ReactFlow,
-  Background,
-  BackgroundVariant,
   type Node,
   type Edge,
+  Position,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import type { DungeonMap as DungeonMapType, RoomStatus, PathSide } from "@/lib/types/dungeon"
@@ -26,12 +25,23 @@ interface DungeonMapProps {
 const NODE_TYPES = { dungeon: DungeonFlowNode }
 const EDGE_TYPES = { dungeon: DungeonFlowEdge }
 
-const COL_W = 210
-const ROW_Y: Record<PathSide, number> = { left: 0, center: 100, right: 200 }
+/** Vertical winding path layout constants */
+const ROW_H = 120
+const MAP_W = 420
+const X_LEFT = 40
+const X_CENTER = MAP_W / 2 - 90
+const X_RIGHT = MAP_W - 220
+
+const SIDE_X: Record<PathSide, number> = {
+  left: X_LEFT,
+  center: X_CENTER,
+  right: X_RIGHT,
+}
 
 export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps) {
   const dungeonProgress = useGameStore((s) => s.dungeonProgress)
   const [showNPC, setShowNPC] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const roomStatuses = useMemo(() => {
     const statuses: Record<string, RoomStatus> = {}
@@ -64,13 +74,19 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     onRoomSelect(roomId)
   }, [dungeon.rooms, dungeonProgress, onRoomSelect])
 
+  /** Calculate total map height based on room count */
+  const mapHeight = useMemo(() => {
+    const maxIdx = Math.max(...dungeon.rooms.map((r) => r.pathIndex))
+    return (maxIdx + 1) * ROW_H + 80
+  }, [dungeon.rooms])
+
   const nodes: Node[] = useMemo(() => {
     return dungeon.rooms.map((room) => ({
       id: room.id,
       type: "dungeon",
       position: {
-        x: room.pathIndex * COL_W,
-        y: ROW_Y[room.pathSide],
+        x: SIDE_X[room.pathSide],
+        y: room.pathIndex * ROW_H + 20,
       },
       data: {
         label: room.label,
@@ -84,6 +100,8 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
       draggable: false,
       selectable: false,
       connectable: false,
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
     }))
   }, [dungeon.rooms, roomStatuses, currentRoomId, theme.accentColor, handleRoomClick])
 
@@ -105,40 +123,50 @@ export function DungeonMapView({ dungeon, theme, onRoomSelect }: DungeonMapProps
     })
   }, [dungeon.connections, dungeonProgress, roomStatuses, theme.accentColor])
 
+  /** Auto-scroll to current active room */
+  useEffect(() => {
+    if (!containerRef.current || !currentRoomId) return
+    const currentRoom = dungeon.rooms.find((r) => r.id === currentRoomId)
+    if (!currentRoom) return
+    const scrollY = currentRoom.pathIndex * ROW_H - 120
+    containerRef.current.scrollTo({ top: Math.max(0, scrollY), behavior: "smooth" })
+  }, [currentRoomId, dungeon.rooms])
+
   const npcRoom = showNPC ? dungeon.rooms.find((r) => r.id === showNPC) : null
 
   return (
     <div className="relative">
       <div
-        className="rounded-xl border border-border overflow-hidden bg-card/50"
-        style={{ height: 420 }}
+        ref={containerRef}
+        className="rounded-xl border border-border overflow-hidden bg-card/30 overflow-y-auto scrollbar-thin"
+        style={{
+          height: Math.min(mapHeight, 560),
+          background: `
+            radial-gradient(circle at 20% 30%, ${theme.accentColor}06 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, ${theme.accentColor}04 0%, transparent 50%),
+            var(--card)
+          `,
+        }}
       >
         <ReactFlow
           nodes={nodes}
           edges={edges}
           nodeTypes={NODE_TYPES}
           edgeTypes={EDGE_TYPES}
-          fitView
-          fitViewOptions={{ padding: 0.08 }}
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
           panOnDrag
           panOnScroll
-          zoomOnScroll
-          zoomOnPinch
+          zoomOnScroll={false}
+          zoomOnPinch={false}
           zoomOnDoubleClick={false}
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
           proOptions={{ hideAttribution: true }}
-          minZoom={0.3}
-          maxZoom={2}
-        >
-          <Background
-            variant={BackgroundVariant.Dots}
-            gap={24}
-            size={1}
-            color="var(--border)"
-          />
-        </ReactFlow>
+          minZoom={1}
+          maxZoom={1}
+          style={{ width: MAP_W, height: mapHeight }}
+        />
       </div>
 
       {npcRoom?.npc && showNPC && (
