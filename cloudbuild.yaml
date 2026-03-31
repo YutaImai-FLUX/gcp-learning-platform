@@ -38,7 +38,7 @@ steps:
       - '--min-instances'
       - '0'
       - '--max-instances'
-      - '10'
+      - '3'
       - '--concurrency'
       - '80'
       - '--cpu-boost'
