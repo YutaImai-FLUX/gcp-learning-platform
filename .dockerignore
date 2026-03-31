@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+.env*
+.gcloudignore
+Dockerfile
+docker-compose*.yml
+.vscode
+__pycache__
+*.pyc
+.pytest_cache
+.venv
+venv
