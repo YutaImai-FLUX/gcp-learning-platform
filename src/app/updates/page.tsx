@@ -46,6 +46,76 @@ const CATEGORY_CONFIG: Record<NewsCategory, { label: string; color: string; icon
 
 const NEWS_ITEMS: NewsItem[] = [
   {
+    id: "gemini-3-1-flash-image-preview",
+    date: "2026-03",
+    category: "ai",
+    title: "Gemini 3.1 Flash Image がパブリックプレビュー -- テキストから高品質画像を低レイテンシで生成",
+    description:
+      "Google が Vertex AI で Gemini 3.1 Flash Image（gemini-3.1-flash-image）をパブリックプレビューリリース。改善された価格と低レイテンシで高品質な画像生成を実現し、Google はテキストから画像を生成する際の推奨モデルとして位置づけています。従来の Imagen シリーズより高いコスト効率でエンタープライズ向け画像生成ワークフローを刷新します。",
+    highlights: [
+      "gemini-3.1-flash-image が Vertex AI でパブリックプレビュー公開、Google 推奨の画像生成モデルに",
+      "従来モデルより改善された価格と低レイテンシで高品質な画像生成を提供",
+      "テキストプロンプトから直接高品質画像を生成できる Gemini 3.1 シリーズ初の専用画像モデル",
+    ],
+    sourceUrl: "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/release-notes",
+    sourceLabel: "Vertex AI Release Notes",
+    icon: Sparkles,
+    color: "#4285F4",
+    isHighlight: true,
+  },
+  {
+    id: "gemini-cli-march25-2026",
+    date: "2026-03",
+    category: "devops",
+    title: "Gemini CLI 大型アップデート -- キーボードショートカット、Vim サポート、A2A エージェント連携強化",
+    description:
+      "3月25日のナイトリービルドで Gemini CLI が大幅アップデートを実施。カスタマイズ可能なキーボードショートカット、リッチな Vim・キーバインドサポート、安全なリトライ機構、改善されたテレメトリーを搭載。リモートエージェント・ブラウザ操作・Agent-to-Agent（A2A）連携の強化により、エージェント型ワークフローが大幅に向上しました。",
+    highlights: [
+      "カスタマイズ可能なキーボードショートカットとリッチな Vim・キーバインドサポートを追加",
+      "リモートエージェント・ブラウザ操作・A2A（Agent-to-Agent）連携機能を強化",
+      "ポリシーハンドリング改善、テレメトリー強化、コア/CLI パフォーマンス全般を向上",
+    ],
+    sourceUrl: "https://releasebot.io/updates/google/gemini-cli",
+    sourceLabel: "Gemini CLI Release Notes",
+    icon: Bot,
+    color: "#5f6368",
+  },
+  {
+    id: "bigquery-data-insights-agent-ga",
+    date: "2026-03",
+    category: "data",
+    title: "BigQuery Data Insights Agent が GA（許可リスト制）＆カスタム用語集が Preview に",
+    description:
+      "BigQuery の Data Insights Agent が許可リスト制で一般提供（GA）開始。BigQuery データから自動的にインサイトを提供する Made by Google エージェントです。また、会話型アナリティクスエージェント向けのカスタム用語集（Custom Glossary Terms）がプレビュー公開され、ビジネス固有の用語解釈精度が向上しました。",
+    highlights: [
+      "Data Insights Agent が GA（許可リスト制）、BigQuery データからインサイトを自動生成",
+      "カスタム用語集（Custom Glossary Terms）でエージェントのビジネス用語解釈精度が向上 (Preview)",
+      "Gemini 搭載 BigQuery Studio アシスタントがリソース検出・クエリスケジューリング・障害分析に対応",
+    ],
+    sourceUrl: "https://docs.cloud.google.com/bigquery/docs/release-notes",
+    sourceLabel: "BigQuery Release Notes",
+    icon: Database,
+    color: "#FBBC05",
+  },
+  {
+    id: "gemini-drop-personal-intelligence-march2026",
+    date: "2026-03",
+    category: "ai",
+    title: "Gemini アプリ「March Drop」-- Personal Intelligence が米国全ユーザー無料に＆他社 AI からの記憶移行",
+    description:
+      "Gemini アプリの March Drop 更新で、Gmail・写真・YouTube を横断する Personal Intelligence 機能が米国の全 Gemini ユーザーに無料開放。他社 AI プロバイダーからの会話履歴・AIメモリ転送機能も追加され、ユーザーはワンクリックで Gemini に過去のコンテキストを引き継ぐことが可能になりました。",
+    highlights: [
+      "Personal Intelligence が米国の全 Gemini ユーザーに無料提供、Gmail・Photos・YouTube を横断参照",
+      "他社 AI プロバイダーの会話履歴・メモリを数クリックで Gemini に転送可能",
+      "Lyria 3 Pro で最長3分の楽曲生成と写真・アイデアからの高品質アンセム作成が可能に",
+    ],
+    sourceUrl: "https://blog.google/innovation-and-ai/products/gemini-app/gemini-drop-updates-march-2026/",
+    sourceLabel: "Google Blog",
+    icon: Sparkles,
+    color: "#4285F4",
+    isHighlight: true,
+  },
+  {
     id: "gke-kubecon-eu-2026",
     date: "2026-03",
     category: "devops",
@@ -235,76 +305,6 @@ const NEWS_ITEMS: NewsItem[] = [
     sourceLabel: "Google Cloud Documentation",
     icon: Database,
     color: "#FBBC05",
-    isHighlight: true,
-  },
-  {
-    id: "cloud-run-gpu-networking-march26",
-    date: "2026-03",
-    category: "devops",
-    title: "Cloud Run に NVIDIA RTX PRO 6000 Blackwell GPU とIPv6デュアルスタック対応",
-    description:
-      "Cloud Run が NVIDIA RTX PRO 6000 Blackwell GPU のプレビューサポートを追加し、GPU on Cloud Run Jobs が一般提供へ昇格。ネットワーク面では IPv6 デュアルスタックサブネット対応が GA に、Direct VPC Egress で VPC Flow Logs とプライベート NAT もサポートされました。",
-    highlights: [
-      "NVIDIA RTX PRO 6000 Blackwell GPU がサービス・ジョブ・ワーカープールで利用可能 (Preview)",
-      "IPv6デュアルスタックサブネット対応 GA で外部IPv6トラフィックを直接処理",
-      "Python ADK (Agent Development Kit) フレームワーク対応がソースデプロイで GA に",
-    ],
-    sourceUrl: "https://docs.cloud.google.com/run/docs/release-notes",
-    sourceLabel: "Cloud Run Release Notes",
-    icon: Box,
-    color: "#5f6368",
-  },
-  {
-    id: "gke-openssl-security-bulletin",
-    date: "2026-03",
-    category: "security",
-    title: "GKE OpenSSL脆弱性パッチ (GCP-2026-006) とMCP IAM制御の変更",
-    description:
-      "GKE が OpenSSL の重大な脆弱性 CVE-2025-15467 (リモートコード実行の可能性) に対処するセキュリティアップデートをリリース。また、2026年3月17日以降 GKE の MCP サーバー制御が組織ポリシーから IAM 拒否ポリシーに移行しました。",
-    highlights: [
-      "CVE-2025-15467 (OpenSSL RCE) を含む複数のカーネル脆弱性を修正",
-      "GKE Regularチャンネルのデフォルトバージョンが 1.35.1-gke.1396002 に更新",
-      "MCP サーバーの利用制御が組織ポリシーから IAM 拒否ポリシーに移行",
-    ],
-    sourceUrl: "https://cloud.google.com/support/bulletins",
-    sourceLabel: "Google Cloud Security Bulletins",
-    icon: Shield,
-    color: "#EA4335",
-  },
-  {
-    id: "bigquery-conversational-analytics-march26",
-    date: "2026-03",
-    category: "data",
-    title: "BigQuery に会話型アナリティクスとMigration Service MCPサーバーが追加",
-    description:
-      "BigQuery Studio に自然言語でデータを分析できる「会話型アナリティクス」エージェントが導入。さらに BigQuery Migration Service MCP サーバー (Preview) が公開され、AIエージェントが SQL 翻訳・DDL生成・クエリ説明を直接実行できるようになりました。",
-    highlights: [
-      "会話型アナリティクスエージェントがクエリ生成・実行・可視化をワンストップで対応",
-      "BigQuery Migration Service MCPサーバーでレガシーSQL→GoogleSQL の AI 翻訳が可能",
-      "BigQuery→Spanner へのリバース ETL が EXPORT DATA 文経由で GA に",
-    ],
-    sourceUrl: "https://mwpro.co.uk/blog/2026/03/27/gcp-release-notes-march-26-2026/",
-    sourceLabel: "GCP Release Notes (March 26, 2026)",
-    icon: Database,
-    color: "#FBBC05",
-    isHighlight: true,
-  },
-  {
-    id: "gemini-2-5-pro",
-    date: "2025-03",
-    category: "ai",
-    title: "Gemini 2.5 Pro -- 思考型AIモデルのリリース",
-    description:
-      "Google DeepMind が Gemini 2.5 Pro をリリース。内部で Chain-of-Thought 推論を行う「思考型」モデルで、コーディング・数学・科学ベンチマークで最先端の性能を達成。SWE-bench や GPQA で競合を上回るスコアを記録しました。",
-    highlights: [
-      "内部思考プロセスによる高精度な推論",
-      "100万トークンのコンテキストウィンドウ",
-      "コーディング・数学・科学で最高水準のベンチマークスコア",
-    ],
-    sourceUrl: "https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/",
-    sourceLabel: "Google Blog",
-    icon: Sparkles,
-    color: "#4285F4",
     isHighlight: true,
   },
 ]
