@@ -64,6 +64,24 @@ const NEWS_ITEMS: NewsItem[] = [
     isHighlight: true,
   },
   {
+    id: "nvidia-vera-rubin-nvl72-google-cloud",
+    date: "2026-03",
+    category: "cloud",
+    title: "Google Cloud が NVIDIA Vera Rubin NVL72 を H2 2026 に提供予定 -- AI Hypercomputer 基盤を刷新",
+    description:
+      "NVIDIA GTC 2026（3月30日）で、Google Cloud CEO Thomas Kurian が NVIDIA Vera Rubin NVL72 ラックスケールシステムを H2 2026 に提供すると発表。新 A4 Ultra インスタンスファミリーとして Q2 2026 プレビューで us-central1・europe-west4 に登場予定です。NVL72 は 72 基の Rubin GPU・HBM4 メモリを搭載し、Blackwell 比で推論性能が最大5倍向上します。",
+    highlights: [
+      "NVIDIA Vera Rubin NVL72（72 GPU・HBM4 搭載）を H2 2026 に提供、Blackwell 比5倍の推論性能",
+      "A4 Ultra インスタンスファミリーが Q2 2026 プレビューで us-central1・europe-west4 に登場",
+      "AI Hypercomputer が TPU と CUDA ベース GPU のヘテロジニアスプラットフォームに進化",
+    ],
+    sourceUrl: "https://cloud.google.com/blog/products/compute/google-cloud-ai-infrastructure-at-nvidia-gtc-2026",
+    sourceLabel: "Google Cloud Blog",
+    icon: Cpu,
+    color: "#34A853",
+    isHighlight: true,
+  },
+  {
     id: "gemini-cli-march25-2026",
     date: "2026-03",
     category: "devops",
@@ -287,24 +305,6 @@ const NEWS_ITEMS: NewsItem[] = [
     sourceLabel: "Vertex AI Documentation",
     icon: Sparkles,
     color: "#4285F4",
-    isHighlight: true,
-  },
-  {
-    id: "vector-search-2-ga",
-    date: "2026-03",
-    category: "data",
-    title: "Vector Search 2.0 が一般提供 (GA) 開始 -- ハイブリッド検索統合",
-    description:
-      "Vertex AI Vector Search 2.0 が正式に一般提供開始。ベクトル検索・全文検索・セマンティック再ランキングを単一の並列クエリで実行するハイブリッド検索機能を搭載。AI アプリケーションの知識コアとして機能する高度な検索エンジンです。",
-    highlights: [
-      "ベクトル検索・全文検索・セマンティック再ランキングの単一クエリ統合",
-      "コレクション単位でデータとベクトルを一元管理するシンプルなデータモデル",
-      "自動埋め込み生成 (Auto-Embeddings) でベクトルフィールドの自動設定が可能",
-    ],
-    sourceUrl: "https://cloud.google.com/vertex-ai/docs/vector-search/overview",
-    sourceLabel: "Google Cloud Documentation",
-    icon: Database,
-    color: "#FBBC05",
     isHighlight: true,
   },
 ]
