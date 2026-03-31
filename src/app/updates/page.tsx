@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Sparkles,
@@ -15,6 +15,8 @@ import {
   Calendar,
   ExternalLink,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Filter,
   X,
 } from "lucide-react"
@@ -332,6 +334,8 @@ function formatDisplayDate(dateStr: string): string {
   return `${month}/${day}（${weekdays[d.getDay()]}）`
 }
 
+const SLIDER_VISIBLE_COUNT = 3
+
 const stagger = {
   container: { animate: { transition: { staggerChildren: 0.04 } } },
   item: {
@@ -344,6 +348,34 @@ export default function UpdatesPage() {
   const [activeFilter, setActiveFilter] = useState<NewsCategory | "all">("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
+  // Slider state
+  const sliderRef = useRef<HTMLDivElement>(null)
+  const [sliderPage, setSliderPage] = useState(0)
+  const highlightItems = useMemo(() => NEWS_ITEMS.filter((n) => n.isHighlight), [])
+
+  const scrollSlider = useCallback((direction: "left" | "right") => {
+    const el = sliderRef.current
+    if (!el) return
+    const cardWidth = el.scrollWidth / highlightItems.length
+    const scrollAmount = cardWidth * SLIDER_VISIBLE_COUNT
+    el.scrollBy({ left: direction === "right" ? scrollAmount : -scrollAmount })
+  }, [highlightItems.length])
+
+  const scrollToPage = useCallback((page: number) => {
+    const el = sliderRef.current
+    if (!el) return
+    const cardWidth = el.scrollWidth / highlightItems.length
+    el.scrollTo({ left: page * cardWidth * SLIDER_VISIBLE_COUNT })
+  }, [highlightItems.length])
+
+  const handleSliderScroll = useCallback(() => {
+    const el = sliderRef.current
+    if (!el) return
+    const cardWidth = el.scrollWidth / highlightItems.length
+    const page = Math.round(el.scrollLeft / (cardWidth * SLIDER_VISIBLE_COUNT))
+    setSliderPage(page)
+  }, [highlightItems.length])
 
   const updateDates = useMemo(() => NEWS_ITEMS.map((n) => n.date), [])
 
@@ -482,14 +514,64 @@ export default function UpdatesPage() {
             </motion.div>
           )}
 
-          {/* Highlight Cards (only when no filters active) */}
+          {/* Highlight Slider (only when no filters active) */}
           {!hasActiveFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {NEWS_ITEMS.filter((n) => n.isHighlight).map((item) => {
-                const Icon = item.icon
-                return (
-                  <motion.div key={item.id} variants={stagger.item}>
-                    <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="block h-full">
+            <motion.div variants={stagger.item} className="relative">
+              {/* Header + nav arrows */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={14} className="text-primary" />
+                  <span className="font-display text-sm font-bold text-foreground">注目のアップデート</span>
+                  <span className="text-[10px] text-muted-foreground">({highlightItems.length})</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {/* Dot indicators */}
+                  <div className="flex items-center gap-1 mr-2">
+                    {Array.from({ length: Math.ceil(highlightItems.length / SLIDER_VISIBLE_COUNT) }).map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => scrollToPage(i)}
+                        className={`w-1.5 h-1.5 rounded-full transition-all ${
+                          sliderPage === i ? "bg-primary w-4" : "bg-border hover:bg-muted-foreground/40"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => scrollSlider("left")}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center border border-border bg-card hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-default"
+                    disabled={sliderPage === 0}
+                  >
+                    <ChevronLeft size={14} className="text-muted-foreground" />
+                  </button>
+                  <button
+                    onClick={() => scrollSlider("right")}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center border border-border bg-card hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-default"
+                    disabled={sliderPage >= Math.ceil(highlightItems.length / SLIDER_VISIBLE_COUNT) - 1}
+                  >
+                    <ChevronRight size={14} className="text-muted-foreground" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Scrollable track */}
+              <div
+                ref={sliderRef}
+                onScroll={handleSliderScroll}
+                className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-1"
+                style={{ scrollBehavior: "smooth" }}
+              >
+                {highlightItems.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <a
+                      key={item.id}
+                      href={item.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block flex-none snap-start"
+                      style={{ width: `calc((100% - ${(SLIDER_VISIBLE_COUNT - 1) * 16}px) / ${SLIDER_VISIBLE_COUNT})` }}
+                    >
                       <Card className="border-border hover:shadow-lg transition-all h-full group overflow-hidden">
                         <div className="h-1.5" style={{ backgroundColor: item.color }} />
                         <CardContent className="pt-5 pb-5">
@@ -507,7 +589,7 @@ export default function UpdatesPage() {
                               {CATEGORY_CONFIG[item.category].label}
                             </Badge>
                           </div>
-                          <h3 className="font-display font-bold text-sm text-foreground mb-1.5 group-hover:text-primary transition-colors leading-snug">
+                          <h3 className="font-display font-bold text-sm text-foreground mb-1.5 group-hover:text-primary transition-colors leading-snug line-clamp-2">
                             {item.title}
                           </h3>
                           <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
@@ -525,10 +607,10 @@ export default function UpdatesPage() {
                         </CardContent>
                       </Card>
                     </a>
-                  </motion.div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            </motion.div>
           )}
 
           {/* News Timeline */}

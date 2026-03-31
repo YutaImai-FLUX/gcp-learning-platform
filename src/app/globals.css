@@ -111,6 +111,14 @@
     border-radius: 3px;
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .gcp-console-bg {
     background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #1565c0 100%);
   }
