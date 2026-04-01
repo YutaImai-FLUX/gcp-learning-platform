@@ -128,8 +128,20 @@ export function Sidebar() {
     if (pathname.startsWith("/updates")) initial.add("/updates")
     return initial
   })
-  const { collapsed, toggle } = useSidebarStore()
+  const { collapsed: desktopCollapsed, toggle, mobileOpen, setMobileOpen } = useSidebarStore()
   const { hasNew: hasNewUpdate, markAsSeen: markUpdatesSeen } = useUpdatesBadge()
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    setIsMobile(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener("change", handler)
+    return () => mq.removeEventListener("change", handler)
+  }, [])
+
+  // モバイルでは常に展開表示
+  const collapsed = isMobile ? false : desktopCollapsed
 
   // /updates 系ページ表示時に既読にする
   useEffect(() => {
@@ -137,6 +149,11 @@ export function Sidebar() {
       markUpdatesSeen()
     }
   }, [pathname, markUpdatesSeen])
+
+  // ページ遷移時にモバイルメニューを閉じる
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname, setMobileOpen])
 
   // Ctrl+B でサイドバー開閉
   useEffect(() => {
@@ -151,12 +168,26 @@ export function Sidebar() {
   }, [toggle])
 
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-0 h-full bg-white/80 dark:bg-[#1c1f26]/80 backdrop-blur-xl border-r border-border flex flex-col z-40 transition-[width] duration-200",
-        collapsed ? "w-16" : "w-64"
+    <>
+      {/* モバイル: オーバーレイ背景 */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
-    >
+
+      <aside
+        className={cn(
+          "fixed left-0 top-0 h-full bg-white/80 dark:bg-[#1c1f26]/80 backdrop-blur-xl border-r border-border flex flex-col z-50 transition-all duration-200",
+          // デスクトップ
+          "max-md:w-64",
+          // モバイル: スライドイン
+          mobileOpen ? "max-md:translate-x-0" : "max-md:-translate-x-full",
+          // デスクトップ: 従来のcollapse
+          collapsed ? "md:w-16" : "md:w-64"
+        )}
+      >
       {/* Logo / Toggle */}
       <div className={cn("flex items-center border-b border-border min-h-[57px]", collapsed ? "justify-center px-2 py-3" : "justify-between pl-5 pr-3 py-3")}>
         {!collapsed && (
@@ -334,5 +365,6 @@ export function Sidebar() {
         )}
       </div>
     </aside>
+    </>
   )
 }

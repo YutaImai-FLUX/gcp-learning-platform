@@ -8,7 +8,7 @@ export function MainContent({ children }: { children: React.ReactNode }) {
 
   return (
     <main
-      className={`mt-14 min-h-[calc(100vh-3.5rem)] transition-[margin-left] duration-200 ${collapsed ? "ml-16" : "ml-64"}`}
+      className={`mt-14 min-h-[calc(100vh-3.5rem)] transition-[margin-left] duration-200 ml-0 ${collapsed ? "md:ml-16" : "md:ml-64"}`}
       style={{
         background: `
           radial-gradient(ellipse at 15% 0%, var(--accent) 0%, transparent 50%),

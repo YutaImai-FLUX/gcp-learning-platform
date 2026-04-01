@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Search, Moon, Sun, Command, User, LogOut } from "lucide-react"
+import { Search, Moon, Sun, Command, User, LogOut, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSidebarStore } from "@/lib/stores/useSidebarStore"
 import { CommandPalette } from "@/components/search/CommandPalette"
@@ -13,7 +13,7 @@ import { auth as getAuth } from "@/lib/firebase"
 export function Header() {
   const [dark, setDark] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
-  const collapsed = useSidebarStore((s) => s.collapsed)
+  const { collapsed, setMobileOpen } = useSidebarStore()
   const { user } = useAuth()
 
   const email = user?.email ?? null
@@ -55,7 +55,17 @@ export function Header() {
 
   return (
     <>
-      <header className={`fixed top-0 right-0 h-14 bg-white/80 dark:bg-[#1c1f26]/80 backdrop-blur-xl border-b border-border z-30 flex items-center px-3 sm:px-6 gap-2 sm:gap-4 transition-[left] duration-200 ${collapsed ? "left-16" : "left-64"}`}>
+      <header className={`fixed top-0 right-0 h-14 bg-white/80 dark:bg-[#1c1f26]/80 backdrop-blur-xl border-b border-border z-30 flex items-center px-3 sm:px-6 gap-2 sm:gap-4 transition-[left] duration-200 left-0 ${collapsed ? "md:left-16" : "md:left-64"}`}>
+        {/* モバイル: ハンバーガーメニュー */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 md:hidden shrink-0"
+          onClick={() => setMobileOpen(true)}
+        >
+          <Menu size={20} />
+        </Button>
+
         {/* Search trigger */}
         <button
           onClick={() => setPaletteOpen(true)}
