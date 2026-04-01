@@ -1,23 +1,30 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Moon, Sun, Command, User } from "lucide-react"
+import Image from "next/image"
+import { Search, Moon, Sun, Command, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSidebarStore } from "@/lib/stores/useSidebarStore"
 import { CommandPalette } from "@/components/search/CommandPalette"
+import { useAuth } from "@/components/auth/AuthProvider"
+import { signOut } from "firebase/auth"
+import { auth as getAuth } from "@/lib/firebase"
 
 export function Header() {
   const [dark, setDark] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
-  const [email, setEmail] = useState<string | null>(null)
   const collapsed = useSidebarStore((s) => s.collapsed)
+  const { user } = useAuth()
 
-  useEffect(() => {
-    fetch("/api/me")
-      .then((r) => r.json())
-      .then((d) => setEmail(d.email))
-      .catch(() => {})
-  }, [])
+  const email = user?.email ?? null
+  const displayName = user?.displayName ?? email
+  const photoURL = user?.photoURL ?? null
+
+  async function handleSignOut() {
+    await signOut(getAuth())
+    await fetch("/api/auth/session", { method: "DELETE" })
+    window.location.href = "/login"
+  }
 
   useEffect(() => {
     const saved = localStorage.getItem("theme")
@@ -76,10 +83,31 @@ export function Header() {
           </Button>
           {email && (
             <div className="flex items-center gap-2 ml-2">
-              <User size={16} className="text-muted-foreground" />
+              {photoURL ? (
+                <Image
+                  src={photoURL}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                  referrerPolicy="no-referrer"
+                  unoptimized
+                />
+              ) : (
+                <User size={16} className="text-muted-foreground" />
+              )}
               <span className="text-xs text-muted-foreground hidden sm:inline">
-                {email}
+                {displayName}
               </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleSignOut}
+                title="ログアウト"
+              >
+                <LogOut size={14} />
+              </Button>
             </div>
           )}
         </div>

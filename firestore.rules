@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // allowedUsers コレクション: サーバーサイド (Admin SDK) のみアクセス
+    // クライアントからの読み書きは一切禁止
+    match /allowedUsers/{document=**} {
+      allow read, write: if false;
+    }
+
+    // その他のコレクションもデフォルト拒否
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

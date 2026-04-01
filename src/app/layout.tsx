@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar"
 import { Header } from "@/components/layout/Header"
 import { MainContent } from "@/components/layout/MainContent"
 import { GameNotifications } from "@/components/game/GameNotifications"
+import { AuthProvider } from "@/components/auth/AuthProvider"
 
 export const metadata: Metadata = {
   title: "GCP Interactive Learning Platform",
@@ -18,10 +19,12 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className="font-sans bg-background text-foreground antialiased">
-        <Sidebar />
-        <Header />
-        <MainContent>{children}</MainContent>
-        <GameNotifications />
+        <AuthProvider>
+          <Sidebar />
+          <Header />
+          <MainContent>{children}</MainContent>
+          <GameNotifications />
+        </AuthProvider>
       </body>
     </html>
   )
