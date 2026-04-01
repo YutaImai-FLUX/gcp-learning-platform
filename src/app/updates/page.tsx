@@ -51,6 +51,75 @@ const CATEGORY_CONFIG: Record<NewsCategory, { label: string; color: string; icon
 
 const NEWS_ITEMS: NewsItem[] = [
   {
+    id: "secops-data-processing-pipelines-preview",
+    date: "2026-04-01",
+    category: "security",
+    title: "Google Security Operations にデータ処理パイプラインが追加 -- 取り込み前フィルタリングで機密データ保護",
+    description:
+      "Google Security Operations（SecOps）に、取り込み前にセキュリティデータをフィルタリング・変換・リダクションできる「データ処理パイプライン」機能が追加。不要なデータを排除してコストを削減しながら、機密情報の保護を強化します。",
+    highlights: [
+      "取り込み前にセキュリティデータをフィルタリング・変換・リダクションして機密情報を保護",
+      "不要なデータを排除することで SecOps の取り込みコストを削減",
+      "SOAR の Google Cloud 移行デッドラインが 2026年9月30日まで延長",
+    ],
+    sourceUrl: "https://cloud.google.com/chronicle/docs/secops/release-notes",
+    sourceLabel: "Google SecOps Release Notes",
+    icon: Shield,
+    color: "#EA4335",
+  },
+  {
+    id: "apigee-api-hub-spec-boost-preview",
+    date: "2026-03-31",
+    category: "devops",
+    title: "Apigee API Hub が API Gateway 統合と AI Specification Boost をパブリックプレビューで提供",
+    description:
+      "API スプロールへの対策として、Apigee API Hub が API Gateway との自動連携と AI による API ドキュメント強化機能「Specification Boost」をパブリックプレビューで提供開始。Google DeepMind 製マルチエージェントツールが API 仕様を自動エンリッチし、AI エージェントが確実に API を利用できる状態を実現します。",
+    highlights: [
+      "API Gateway との統合で API メタデータを単一コントロールプレーンに自動集約し、シャドー API を排除",
+      "AI が API 仕様を分析・強化し、使用例・エラードキュメントを自動生成してエージェント対応 API を実現 (Preview)",
+      "元の仕様を上書きせず並列バージョン（specboost-draft）を生成し差分比較が可能",
+    ],
+    sourceUrl: "https://cloud.google.com/blog/products/api-management/combat-api-sprawl-using-apigee-api-hub",
+    sourceLabel: "Google Cloud Blog",
+    icon: Network,
+    color: "#5f6368",
+    isHighlight: true,
+  },
+  {
+    id: "cloud-sql-conversational-analytics-preview",
+    date: "2026-03-30",
+    category: "data",
+    title: "Cloud SQL で自然言語クエリ「Conversational Analytics」がプレビュー公開",
+    description:
+      "Cloud SQL for MySQL・PostgreSQL に自然言語でデータベースを照会できる「Conversational Analytics」がプレビューリリース。Conversational Analytics API が複雑な対話を精確な SQL クエリに変換し、オペレーショナルデータから即座にインサイトを取得可能になります。",
+    highlights: [
+      "自然言語から SQL クエリへのリアルタイム変換で、SQL の知識なしにデータ分析が可能 (Preview)",
+      "MySQL・PostgreSQL 両方の Cloud SQL インスタンスに対応",
+      "Looker では AlloyDB for PostgreSQL 接続の GA と、ダッシュボード内 Conversational Analytics エージェントも同時リリース",
+    ],
+    sourceUrl: "https://docs.cloud.google.com/sql/docs/release-notes",
+    sourceLabel: "Cloud SQL Release Notes",
+    icon: Database,
+    color: "#FBBC05",
+  },
+  {
+    id: "cloud-trace-mcp-server-preview",
+    date: "2026-03-30",
+    category: "devops",
+    title: "Cloud Trace API MCP サーバーがプレビュー公開 -- AI エージェントがトレースデータを直接操作可能に",
+    description:
+      "Cloud Trace API の MCP（Model Context Protocol）サーバーがプレビューリリース。AI エージェントや AI アプリケーションが Cloud Trace のトレースデータを直接操作・分析できるようになり、可観測性ワークフローの自動化が加速。3月30日以降の新規プロジェクトでは Logging・Monitoring・Trace API 有効化時に Telemetry API も自動で有効化されます。",
+    highlights: [
+      "MCP サーバー経由で AI エージェントが Cloud Trace データにアクセス・分析可能 (Preview)",
+      "3月30日以降の新規プロジェクトで Logging/Monitoring/Trace API 有効化時に Telemetry API が自動有効化",
+      "AI エージェントによるパフォーマンス問題の自動診断・レイテンシ分析ワークフローを実現",
+    ],
+    sourceUrl: "https://cloud.google.com/trace/docs/release-notes",
+    sourceLabel: "Cloud Trace Release Notes",
+    icon: Network,
+    color: "#5f6368",
+  },
+  {
     id: "gemini-3-1-flash-image-preview",
     date: "2026-03-28",
     category: "ai",
@@ -241,76 +310,6 @@ const NEWS_ITEMS: NewsItem[] = [
     sourceLabel: "Gemini API Release Notes",
     icon: Brain,
     color: "#4285F4",
-  },
-  {
-    id: "gemini-workspace-march-2026",
-    date: "2026-03-12",
-    category: "ai",
-    title: "Gemini が Google Workspace を大幅強化 -- Drive・Docs・Sheets・Slides に AI 概要機能",
-    description:
-      "Gemini が Google Docs・Sheets・Slides・Drive において大幅アップグレード。ファイル・メール・Web の情報を統合参照する個人化機能がベータ公開。Google Drive では AI 概要が検索結果上部に表示。",
-    highlights: [
-      "Google Drive の AI 概要機能で検索結果を引用付き自動要約",
-      "Docs・Sheets・Slides でファイル・メール・Web の情報を横断参照",
-      "Google AI Ultra/Pro サブスクライバー向けにまずグローバルでベータ提供開始",
-    ],
-    sourceUrl: "https://blog.google/products-and-platforms/products/workspace/gemini-workspace-updates-march-2026/",
-    sourceLabel: "Google Blog",
-    icon: Sparkles,
-    color: "#34A853",
-    isHighlight: true,
-  },
-  {
-    id: "compute-engine-instance-flexibility-ga",
-    date: "2026-03-10",
-    category: "cloud",
-    title: "Compute Engine「Instance Flexibility」GA & Hyperdisk スループット倍増",
-    description:
-      "Compute Engine の Instance Flexibility が一般提供（GA）開始。複数マシンタイプを指定して自動プロビジョニング。Hyperdisk Balanced High Availability の最大スループットが 2,400 MiB/s に倍増。",
-    highlights: [
-      "複数マシンタイプ指定によるキャパシティ自動選択プロビジョニングが GA",
-      "Hyperdisk Balanced High Availability の最大スループットが 2,400 MiB/s に倍増",
-      "Compute Engine アルファ API がプロジェクトレベルでセルフサービス GA",
-    ],
-    sourceUrl: "https://cloud.google.com/release-notes",
-    sourceLabel: "Google Cloud Release Notes",
-    icon: Cpu,
-    color: "#34A853",
-  },
-  {
-    id: "dataflow-parallel-update",
-    date: "2026-03-07",
-    category: "data",
-    title: "Dataflow ストリーミングジョブの自動並列アップデートワークフローをサポート",
-    description:
-      "Dataflow がストリーミングジョブ向けの自動並列アップデートワークフローをリリース。新しい置き換えジョブを既存ジョブと並行して起動し、完了後に旧ジョブを自動ドレイン。",
-    highlights: [
-      "新ジョブを並行起動→自動ドレインによるゼロダウンタイム更新を実現",
-      "ストリーミングジョブ更新時のデータ処理中断を大幅に削減",
-      "手動更新と比較してオペレーション負荷を大幅軽減",
-    ],
-    sourceUrl: "https://cloud.google.com/release-notes",
-    sourceLabel: "Google Cloud Release Notes",
-    icon: Database,
-    color: "#FBBC05",
-  },
-  {
-    id: "gemini-3-1-pro-preview",
-    date: "2026-03-05",
-    category: "ai",
-    title: "Gemini 3.1 Pro プレビュー公開 -- 強化された推論とエージェント機能",
-    description:
-      "Google が Gemini 3.1 Pro をプレビューリリース。複雑な問題解決に特化した最先端の推論モデルで、Vertex AI・Google AI Studio・Gemini CLI からアクセス可能。",
-    highlights: [
-      "MEDIUM 思考レベルパラメータ追加でコスト・性能・速度のバランスを最適化",
-      "SWEベンチマークで最高水準スコアを達成した高度なコーディング能力",
-      "100万トークンコンテキストウィンドウで長文・大規模コードリポジトリに対応",
-    ],
-    sourceUrl: "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-1-pro",
-    sourceLabel: "Vertex AI Documentation",
-    icon: Sparkles,
-    color: "#4285F4",
-    isHighlight: true,
   },
 ]
 
