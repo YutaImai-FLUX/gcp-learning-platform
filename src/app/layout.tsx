@@ -1,9 +1,5 @@
 import type { Metadata } from "next"
 import "./globals.css"
-import { Sidebar } from "@/components/layout/Sidebar"
-import { Header } from "@/components/layout/Header"
-import { MainContent } from "@/components/layout/MainContent"
-import { GameNotifications } from "@/components/game/GameNotifications"
 import { AuthProvider } from "@/components/auth/AuthProvider"
 
 export const metadata: Metadata = {
@@ -20,10 +16,7 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body className="font-sans bg-background text-foreground antialiased">
         <AuthProvider>
-          <Sidebar />
-          <Header />
-          <MainContent>{children}</MainContent>
-          <GameNotifications />
+          {children}
         </AuthProvider>
       </body>
     </html>
