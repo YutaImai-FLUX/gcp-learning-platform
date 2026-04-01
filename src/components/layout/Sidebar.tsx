@@ -29,6 +29,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Target,
+  Newspaper,
+  MessageSquareShare,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
@@ -114,7 +116,15 @@ const NAV_SECTIONS: NavSection[] = [
     label: "ツール",
     items: [
       { label: "提案シミュレーター", href: "/proposal", icon: FileText },
-      { label: "最新アップデート", href: "/updates", icon: Sparkles },
+      {
+        label: "最新アップデート",
+        href: "/updates",
+        icon: Sparkles,
+        children: [
+          { label: "製品アップデート", href: "/updates", icon: Newspaper },
+          { label: "X投稿まとめ", href: "/updates/x-posts", icon: MessageSquareShare },
+        ],
+      },
     ],
   },
 ]
@@ -125,14 +135,15 @@ export function Sidebar() {
     const initial = new Set<string>()
     if (pathname.startsWith("/demos")) initial.add("/demos")
     if (pathname.startsWith("/google-enterprise/")) initial.add("/google-enterprise")
+    if (pathname.startsWith("/updates")) initial.add("/updates")
     return initial
   })
   const { collapsed, toggle } = useSidebarStore()
   const { hasNew: hasNewUpdate, markAsSeen: markUpdatesSeen } = useUpdatesBadge()
 
-  // /updates ページ表示時に既読にする
+  // /updates 系ページ表示時に既読にする
   useEffect(() => {
-    if (pathname === "/updates") {
+    if (pathname.startsWith("/updates")) {
       markUpdatesSeen()
     }
   }, [pathname, markUpdatesSeen])
@@ -209,6 +220,7 @@ export function Sidebar() {
 
                 if (item.children) {
                   const isExpanded = expandedMenus.has(item.href)
+                  const showParentBadge = item.href === "/updates" && hasNewUpdate
                   return (
                     <div key={item.href}>
                       <button
@@ -233,14 +245,24 @@ export function Sidebar() {
                         title={collapsed ? item.label : undefined}
                       >
                         <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
-                          <Icon size={18} className="shrink-0" />
+                          <div className="relative shrink-0">
+                            <Icon size={18} />
+                            {showParentBadge && collapsed && (
+                              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-gcp-red ring-2 ring-white dark:ring-[#292a2d]" />
+                            )}
+                          </div>
                           {!collapsed && <span>{item.label}</span>}
                         </div>
                         {!collapsed && (
-                          <ChevronDown
-                            size={16}
-                            className={cn("transition-transform", isExpanded && "rotate-180")}
-                          />
+                          <div className="flex items-center gap-1.5">
+                            {showParentBadge && (
+                              <span className="w-2 h-2 rounded-full bg-gcp-red animate-pulse" />
+                            )}
+                            <ChevronDown
+                              size={16}
+                              className={cn("transition-transform", isExpanded && "rotate-180")}
+                            />
+                          </div>
                         )}
                       </button>
                       {isExpanded && !collapsed && (
@@ -256,7 +278,7 @@ export function Sidebar() {
                               )
                             }
                             const ChildIcon = child.icon
-                            const childActive = pathname === child.href
+                            const childActive = child.href === "/updates" ? pathname === "/updates" : pathname.startsWith(child.href)
                             return (
                               <Link
                                 key={child.href}

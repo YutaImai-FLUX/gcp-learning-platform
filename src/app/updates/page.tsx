@@ -420,11 +420,11 @@ export default function UpdatesPage() {
           <div className="relative">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles size={20} className="text-white/80" />
-              <span className="text-white/60 text-xs font-medium uppercase tracking-wider">Google Cloud &amp; AI Updates</span>
+              <span className="text-white/60 text-xs font-medium uppercase tracking-wider">Google Cloud &amp; AI Product Updates</span>
             </div>
-            <h1 className="font-display heading-display text-2xl sm:text-3xl mb-2">最新アップデート情報</h1>
+            <h1 className="font-display heading-display text-2xl sm:text-3xl mb-2">製品アップデート</h1>
             <p className="text-white/60 text-sm md:text-base">
-              Google Cloud・Gemini・AI エコシステムの最新ニュースとリリース情報
+              Google Cloud・Gemini・AI エコシステムの最新リリースノートとプロダクト情報
             </p>
           </div>
         </div>
