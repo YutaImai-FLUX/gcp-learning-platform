@@ -51,6 +51,18 @@ const CATEGORY_CONFIG: Record<PostCategory, { label: string; color: string }> = 
 
 const X_POSTS: XPost[] = [
   {
+    id: "2034412033215496418",
+    date: "2026-03-19",
+    category: "event",
+    text: "Google Cloud Agentic AI Summit '26 Spring\n\n基調講演\nAgentic AI が加速させる、\nビジネス変革の最前線！\n\n生成 AI が自律型 AI エージェント「Agentic AI」へ進化。「Gemini Enterprise」が自律的なワークフローを実現し、ビジネスの現場で具体的な成果を導き出します。\n\nhttps://cloudonair.withgoogle.com/events/agentic-ai-summit-26-spring",
+    url: "https://x.com/googlecloud_jp/status/2034412033215496418",
+    likes: 287,
+    retweets: 145,
+    replies: 32,
+    views: 195000,
+    hasMedia: true,
+  },
+  {
     id: "2034117592474919195",
     date: "2026-03-18",
     category: "event",
