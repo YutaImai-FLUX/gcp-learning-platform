@@ -29,8 +29,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Target,
-  Newspaper,
-  MessageSquareShare,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
@@ -116,15 +114,7 @@ const NAV_SECTIONS: NavSection[] = [
     label: "ツール",
     items: [
       { label: "提案シミュレーター", href: "/proposal", icon: FileText },
-      {
-        label: "最新アップデート",
-        href: "/updates",
-        icon: Sparkles,
-        children: [
-          { label: "製品アップデート", href: "/updates", icon: Newspaper },
-          { label: "X投稿まとめ", href: "/updates/x-posts", icon: MessageSquareShare },
-        ],
-      },
+      { label: "最新アップデート", href: "/updates", icon: Sparkles },
     ],
   },
 ]
