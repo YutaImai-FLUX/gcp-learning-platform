@@ -1,6 +1,14 @@
 import type { QuizQuestion } from "@/lib/types/quiz"
+import { CDL_EXTRA_QUESTIONS } from "./quiz-questions/cdl-questions"
+import { ACE_EXTRA_QUESTIONS } from "./quiz-questions/ace-questions"
+import { PCA_EXTRA_QUESTIONS } from "./quiz-questions/pca-questions"
+import { PDE_EXTRA_QUESTIONS } from "./quiz-questions/pde-questions"
+import { PMLE_EXTRA_QUESTIONS } from "./quiz-questions/pmle-questions"
+import { PCNE_EXTRA_QUESTIONS } from "./quiz-questions/pcne-questions"
+import { PCSE_EXTRA_QUESTIONS } from "./quiz-questions/pcse-questions"
+import { PCD_EXTRA_QUESTIONS } from "./quiz-questions/pcd-questions"
 
-export const QUIZ_QUESTIONS: QuizQuestion[] = [
+const BASE_QUESTIONS: QuizQuestion[] = [
   // ═══════════════════════════════════════════════════════════
   // CDL (Cloud Digital Leader)
   // ═══════════════════════════════════════════════════════════
@@ -1513,6 +1521,18 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       "FirestoreのonSnapshot（リアルタイムリスナー）を使用すると、ドキュメントやコレクションの変更をリアルタイムにクライアントに通知できます。WebSocketsのような永続接続を使用します。",
     tags: ["firestore", "realtime", "onsnapshot"],
   },
+]
+
+export const QUIZ_QUESTIONS: QuizQuestion[] = [
+  ...BASE_QUESTIONS,
+  ...CDL_EXTRA_QUESTIONS,
+  ...ACE_EXTRA_QUESTIONS,
+  ...PCA_EXTRA_QUESTIONS,
+  ...PDE_EXTRA_QUESTIONS,
+  ...PMLE_EXTRA_QUESTIONS,
+  ...PCNE_EXTRA_QUESTIONS,
+  ...PCSE_EXTRA_QUESTIONS,
+  ...PCD_EXTRA_QUESTIONS,
 ]
 
 export function getQuestionsByCert(certId: string): QuizQuestion[] {

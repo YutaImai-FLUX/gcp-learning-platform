@@ -5,6 +5,16 @@ import { adminAuth } from "@/lib/firebase-admin"
 const SESSION_COOKIE_NAME = "__session"
 
 export async function GET() {
+  // 開発環境ではモックユーザーを返す
+  if (process.env.NODE_ENV !== "production") {
+    return NextResponse.json({
+      email: "dev@flux-g.com",
+      name: "Dev User",
+      picture: null,
+      source: "dev",
+    })
+  }
+
   // 1. Firebase Auth セッションCookieから取得（優先）
   const sessionCookie = cookies().get(SESSION_COOKIE_NAME)?.value
   if (sessionCookie) {

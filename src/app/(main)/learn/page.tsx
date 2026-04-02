@@ -73,7 +73,7 @@ export default function LearnPage() {
       <motion.div variants={stagger.item}>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { label: "総問題数", value: "100+", unit: "問", icon: FileText, color: "text-gcp-blue", bg: "bg-gcp-blue-light" },
+            { label: "総問題数", value: "330+", unit: "問", icon: FileText, color: "text-gcp-blue", bg: "bg-gcp-blue-light" },
             { label: "資格コース", value: String(CERTIFICATIONS.length), unit: "種", icon: GraduationCap, color: "text-gcp-yellow", bg: "bg-[#fef7e0]" },
             { label: "合格ライン", value: "70", unit: "%", icon: Award, color: "text-gcp-green", bg: "bg-[#e6f4ea]" },
           ].map((s) => {

@@ -4,6 +4,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { onAuthStateChanged, type User } from "firebase/auth"
 import { auth as getAuth } from "@/lib/firebase"
 
+const IS_DEV = process.env.NODE_ENV !== "production"
+
 interface AuthContextValue {
   user: User | null
   loading: boolean
@@ -17,9 +19,10 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!IS_DEV)
 
   useEffect(() => {
+    if (IS_DEV) return
     const unsubscribe = onAuthStateChanged(getAuth(), (u) => {
       setUser(u)
       setLoading(false)

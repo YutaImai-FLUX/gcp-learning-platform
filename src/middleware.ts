@@ -5,6 +5,11 @@ const SESSION_COOKIE_NAME = "__session"
 const PUBLIC_PATHS = ["/login", "/unauthorized", "/api/auth/"]
 
 export function middleware(request: NextRequest) {
+  // 開発環境では認証スキップ
+  if (process.env.NODE_ENV !== "production") {
+    return NextResponse.next()
+  }
+
   const { pathname } = request.nextUrl
 
   // 公開パスはスキップ
