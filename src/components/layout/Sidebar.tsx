@@ -18,8 +18,6 @@ import {
   Zap,
   ChevronDown,
   Bot,
-  Sword,
-  Layers,
   Map,
   Shield,
   Key,
@@ -66,10 +64,14 @@ const NAV_SECTIONS: NavSection[] = [
   {
     label: "学習",
     items: [
-      { label: "資格学習センター", href: "/learn", icon: GraduationCap },
-      { label: "ダンジョン冒険", href: "/dungeon", icon: Sword },
-      { label: "フラッシュカード", href: "/flashcards", icon: Layers },
+      { label: "資格学習", href: "/learn", icon: GraduationCap },
       { label: "デイリーチャレンジ", href: "/daily", icon: Target },
+    ],
+  },
+  {
+    label: "進捗",
+    items: [
+      { label: "アナリティクス", href: "/analytics", icon: BarChart3 },
       { label: "資格ロードマップ", href: "/roadmap", icon: Map },
     ],
   },
@@ -236,7 +238,10 @@ export function Sidebar() {
 
             <div className="space-y-0.5">
               {section.items.map((item) => {
-                const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+                const isActive = item.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(item.href)
+                    || (item.href === "/learn" && (pathname.startsWith("/dungeon") || pathname.startsWith("/flashcards") || pathname.startsWith("/questions")))
                 const Icon = item.icon
 
                 if (item.children) {

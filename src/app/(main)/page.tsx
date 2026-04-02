@@ -205,8 +205,12 @@ function ReturningUserDashboard() {
   const lastStudied = getLastStudiedCert(certProgress)
   const lastCert = lastStudied ? CERTIFICATIONS.find((c) => c.id === lastStudied.certId) : null
 
-  const targetCert = profile?.targetCerts?.[0] ?? lastStudied?.certId
+  const targetCerts = profile?.targetCerts ?? []
+  const targetCert = targetCerts[0] ?? lastStudied?.certId
   const studyRecs = targetCert ? getStudyRecommendations(quizHistory, targetCert) : []
+  const targetCertData = targetCerts
+    .map((id) => CERTIFICATIONS.find((c) => c.id === id))
+    .filter(Boolean)
 
   return (
     <motion.div
@@ -247,6 +251,41 @@ function ReturningUserDashboard() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Target Certs from onboarding */}
+      {targetCertData.length > 0 && (
+        <motion.div variants={stagger.item}>
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Target size={15} className="text-primary" />
+              <span className="text-sm font-bold text-foreground">目標資格</span>
+              <Link href="/onboarding" className="text-[10px] text-muted-foreground hover:text-primary ml-auto">
+                変更
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {targetCertData.map((cert) => cert && (
+                <Link
+                  key={cert.id}
+                  href={`/learn/${cert.id}`}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border hover:border-primary/40 transition-colors group"
+                >
+                  <div
+                    className="w-7 h-7 rounded-md flex items-center justify-center text-white text-[9px] font-bold shrink-0"
+                    style={{ backgroundColor: cert.color }}
+                  >
+                    {cert.shortName.slice(0, 3)}
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium text-foreground group-hover:text-primary">{cert.shortName}</div>
+                    <div className="text-[10px] text-muted-foreground">{cert.level}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Action Cards: Continue + Quick Actions — asymmetric */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -324,8 +363,8 @@ function ReturningUserDashboard() {
             <CardContent className="space-y-1.5">
               {[
                 { href: "/daily", icon: Target, iconBg: "bg-gcp-red/10", iconColor: "text-gcp-red", title: "デイリーチャレンジ", desc: "5問の弱点克服クイズ" },
-                { href: "/dungeon", icon: Sword, iconBg: "bg-gcp-purple/10", iconColor: "text-gcp-purple", title: "ダンジョン冒険", desc: "RPGバトルで資格攻略" },
-                { href: "/flashcards", icon: Layers, iconBg: "bg-gcp-blue/10", iconColor: "text-gcp-blue", title: "フラッシュカード", desc: "スワイプで用語暗記" },
+                { href: lastStudied ? `/dungeon/${lastStudied.certId}` : "/dungeon", icon: Sword, iconBg: "bg-gcp-purple/10", iconColor: "text-gcp-purple", title: "ダンジョン冒険", desc: "RPGバトルで資格攻略" },
+                { href: lastStudied ? `/flashcards/${lastStudied.certId}` : "/flashcards", icon: Layers, iconBg: "bg-gcp-blue/10", iconColor: "text-gcp-blue", title: "フラッシュカード", desc: "スワイプで用語暗記" },
               ].map((action) => {
                 const Icon = action.icon
                 return (

@@ -1546,3 +1546,18 @@ export function getQuestionsByDomain(certId: string, domain: string): QuizQuesti
 export function shuffleQuestions(questions: QuizQuestion[]): QuizQuestion[] {
   return [...questions].sort(() => Math.random() - 0.5)
 }
+
+/** Shuffle option order within each question and update correctIndex accordingly */
+export function shuffleOptions(questions: QuizQuestion[]): QuizQuestion[] {
+  return questions.map((q) => {
+    const indices = q.options.map((_, i) => i)
+    // Fisher-Yates shuffle
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]]
+    }
+    const newOptions = indices.map((i) => q.options[i])
+    const newCorrectIndex = indices.indexOf(q.correctIndex)
+    return { ...q, options: newOptions, correctIndex: newCorrectIndex }
+  })
+}

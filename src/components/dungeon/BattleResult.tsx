@@ -1,9 +1,24 @@
 "use client"
 
 import { motion } from "framer-motion"
-import type { BattleState } from "@/lib/types/dungeon"
+import type { BattleState, BattleRank } from "@/lib/types/dungeon"
 import type { ThemeConfig } from "@/lib/game/dungeon-themes"
-import { Trophy, RotateCcw, Star, ArrowRight, Swords, Heart } from "lucide-react"
+import { calculateBattleRank } from "@/lib/game/dungeon-config"
+import { Trophy, RotateCcw, Star, ArrowRight, Swords, Heart, Medal } from "lucide-react"
+
+const RANK_COLORS: Record<BattleRank, { text: string; bg: string }> = {
+  S: { text: "#FFD700", bg: "rgba(255,215,0,0.15)" },
+  A: { text: "#4CAF50", bg: "rgba(76,175,80,0.15)" },
+  B: { text: "#2196F3", bg: "rgba(33,150,243,0.15)" },
+  C: { text: "#9E9E9E", bg: "rgba(158,158,158,0.15)" },
+}
+
+const RANK_LABELS: Record<BattleRank, string> = {
+  S: "完璧！",
+  A: "優秀！",
+  B: "良好",
+  C: "もう少し",
+}
 
 interface BattleResultProps {
   battle: BattleState
@@ -16,6 +31,9 @@ export function BattleResult({ battle, theme, onContinue, onRetry }: BattleResul
   const isVictory = battle.result === "victory"
   const correctCount = battle.answers.filter((a, i) => a === i).length
   const totalCount = battle.questionIds.length
+  const rank = isVictory
+    ? calculateBattleRank(correctCount, totalCount, battle.playerHP, battle.maxPlayerHP)
+    : null
 
   return (
     <motion.div
@@ -60,6 +78,29 @@ export function BattleResult({ battle, theme, onContinue, onRetry }: BattleResul
         </p>
       </div>
 
+      {/* Rank badge (victory only) */}
+      {rank && (
+        <motion.div
+          className="flex justify-center -mt-2 mb-1"
+          initial={{ scale: 0, rotate: -20 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.4, type: "spring", stiffness: 300 }}
+        >
+          <div
+            className="flex items-center gap-2 px-4 py-2 rounded-full border"
+            style={{ backgroundColor: RANK_COLORS[rank].bg, borderColor: RANK_COLORS[rank].text }}
+          >
+            <Medal size={18} style={{ color: RANK_COLORS[rank].text }} />
+            <span className="text-2xl font-black" style={{ color: RANK_COLORS[rank].text }}>
+              {rank}
+            </span>
+            <span className="text-xs font-medium" style={{ color: RANK_COLORS[rank].text }}>
+              {RANK_LABELS[rank]}
+            </span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Stats */}
       <div className="px-6 py-4">
         <div className="grid grid-cols-3 gap-3">
@@ -92,13 +133,21 @@ export function BattleResult({ battle, theme, onContinue, onRetry }: BattleResul
       {/* Actions */}
       <div className="px-6 pb-5 flex gap-3 justify-center">
         {isVictory ? (
-          <button
-            onClick={onContinue}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90"
-            style={{ backgroundColor: theme.accentColor }}
-          >
-            マップに戻る <ArrowRight size={14} />
-          </button>
+          <>
+            <button
+              onClick={onContinue}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90"
+              style={{ backgroundColor: theme.accentColor }}
+            >
+              マップに戻る <ArrowRight size={14} />
+            </button>
+            <button
+              onClick={onRetry}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors"
+            >
+              <RotateCcw size={14} /> もう一度
+            </button>
+          </>
         ) : (
           <>
             <button

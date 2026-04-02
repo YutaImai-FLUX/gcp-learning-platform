@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import type { BattleState } from "@/lib/types/dungeon"
+import type { BattleState, DifficultyConfig } from "@/lib/types/dungeon"
 import type { ThemeConfig } from "@/lib/game/dungeon-themes"
 import type { CertificationId } from "@/lib/types/quiz"
 import { Swords, Zap, Crown, Shield, Sparkles } from "lucide-react"
@@ -22,19 +22,17 @@ interface BattleScreenProps {
   questions: QuizQuestion[]
   theme: ThemeConfig
   isBoss: boolean
+  enemyName: string
+  difficulty: DifficultyConfig
   onComplete: (result: BattleState) => void
 }
 
-const MAX_PLAYER_HP = 100
-const MAX_ENEMY_HP = 100
-const DAMAGE_PER_CORRECT = 25
-const DAMAGE_PER_WRONG = 20
-
-export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }: BattleScreenProps) {
+export function BattleScreen({ roomLabel, questions, theme, isBoss, enemyName, difficulty, onComplete }: BattleScreenProps) {
+  const maxPlayerHP = difficulty.playerHP
+  const maxEnemyHP = isBoss ? difficulty.bossHP : difficulty.enemyHP
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [playerHP, setPlayerHP] = useState(MAX_PLAYER_HP)
-  const [enemyHP, setEnemyHP] = useState(isBoss ? 150 : MAX_ENEMY_HP)
-  const maxEnemyHP = isBoss ? 150 : MAX_ENEMY_HP
+  const [playerHP, setPlayerHP] = useState(maxPlayerHP)
+  const [enemyHP, setEnemyHP] = useState(maxEnemyHP)
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null))
   const [showResult, setShowResult] = useState(false)
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
@@ -54,17 +52,18 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
     newAnswers[currentIndex] = optionIndex
 
     if (isCorrect) {
-      const newEnemyHP = Math.max(0, enemyHP - DAMAGE_PER_CORRECT)
+      const newEnemyHP = Math.max(0, enemyHP - difficulty.damagePerCorrect)
       setEnemyHP(newEnemyHP)
       setShakeEnemy(true)
-      setShowDamage({ type: "correct", value: DAMAGE_PER_CORRECT })
-      setXpEarned((prev) => prev + (isBoss ? 15 : 10))
+      setShowDamage({ type: "correct", value: difficulty.damagePerCorrect })
+      const baseXP = isBoss ? 15 : 10
+      setXpEarned((prev) => prev + Math.round(baseXP * difficulty.xpMultiplier))
       setTimeout(() => setShakeEnemy(false), 400)
     } else {
-      const newPlayerHP = Math.max(0, playerHP - DAMAGE_PER_WRONG)
+      const newPlayerHP = Math.max(0, playerHP - difficulty.damagePerWrong)
       setPlayerHP(newPlayerHP)
       setShakePlayer(true)
-      setShowDamage({ type: "wrong", value: DAMAGE_PER_WRONG })
+      setShowDamage({ type: "wrong", value: difficulty.damagePerWrong })
       setTimeout(() => setShakePlayer(false), 400)
     }
 
@@ -73,8 +72,8 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
 
     setTimeout(() => {
       const nextIndex = currentIndex + 1
-      const isVictory = isCorrect && enemyHP - DAMAGE_PER_CORRECT <= 0
-      const isDefeat = !isCorrect && playerHP - DAMAGE_PER_WRONG <= 0
+      const isVictory = isCorrect && enemyHP - difficulty.damagePerCorrect <= 0
+      const isDefeat = !isCorrect && playerHP - difficulty.damagePerWrong <= 0
       const isLastQuestion = nextIndex >= questions.length
 
       if (isVictory || isDefeat || isLastQuestion) {
@@ -83,13 +82,13 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
           roomId: "",
           questionIds: questions.map((q) => q.id),
           currentIndex: nextIndex,
-          playerHP: isCorrect ? playerHP : Math.max(0, playerHP - DAMAGE_PER_WRONG),
-          enemyHP: isCorrect ? Math.max(0, enemyHP - DAMAGE_PER_CORRECT) : enemyHP,
-          maxPlayerHP: MAX_PLAYER_HP,
+          playerHP: isCorrect ? playerHP : Math.max(0, playerHP - difficulty.damagePerWrong),
+          enemyHP: isCorrect ? Math.max(0, enemyHP - difficulty.damagePerCorrect) : enemyHP,
+          maxPlayerHP: maxPlayerHP,
           maxEnemyHP: maxEnemyHP,
           answers: newAnswers,
           result: isDefeat ? "defeat" : "victory",
-          xpEarned: xpEarned + (isCorrect ? (isBoss ? 15 : 10) : 0),
+          xpEarned: xpEarned + (isCorrect ? Math.round((isBoss ? 15 : 10) * difficulty.xpMultiplier) : 0),
         }
         setShowResult(true)
         setTimeout(() => onComplete(result), 1500)
@@ -98,11 +97,26 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
         setSelectedOption(null)
       }
     }, 1200)
-  }, [selectedOption, currentQuestion, currentIndex, answers, enemyHP, playerHP, questions, isBoss, xpEarned, maxEnemyHP, onComplete])
+  }, [selectedOption, currentQuestion, currentIndex, answers, enemyHP, playerHP, questions, isBoss, xpEarned, maxEnemyHP, maxPlayerHP, difficulty, onComplete])
+
+  // Keyboard shortcuts: 1-4 or A-D to select answer
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (selectedOption !== null) return
+      const key = e.key.toLowerCase()
+      const keyMap: Record<string, number> = { "1": 0, "2": 1, "3": 2, "4": 3, a: 0, b: 1, c: 2, d: 3 }
+      const idx = keyMap[key]
+      if (idx !== undefined && idx < currentQuestion?.options.length) {
+        handleAnswer(idx)
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [selectedOption, currentQuestion, handleAnswer])
 
   if (!currentQuestion) return null
 
-  const playerHPPct = (playerHP / MAX_PLAYER_HP) * 100
+  const playerHPPct = (playerHP / maxPlayerHP) * 100
   const enemyHPPct = (enemyHP / maxEnemyHP) * 100
 
   return (
@@ -144,7 +158,7 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
                 <span className="text-xs font-bold">あなた</span>
               </div>
               <span className="text-xs font-mono text-muted-foreground">
-                {playerHP}/{MAX_PLAYER_HP}
+                {playerHP}/{maxPlayerHP}
               </span>
             </div>
             <div className="h-2.5 rounded-full overflow-hidden bg-border">
@@ -187,7 +201,7 @@ export function BattleScreen({ roomLabel, questions, theme, isBoss, onComplete }
                   {isBoss ? <Crown size={12} style={{ color: theme.accentColor }} /> : <Zap size={12} style={{ color: theme.accentColor }} />}
                 </div>
                 <span className="text-xs font-bold">
-                  {isBoss ? "ボス" : "モンスター"}
+                  {enemyName}
                 </span>
               </div>
               <span className="text-xs font-mono text-muted-foreground">

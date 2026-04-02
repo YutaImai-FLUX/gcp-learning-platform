@@ -3,21 +3,66 @@
 import { useParams, useSearchParams, useRouter } from "next/navigation"
 import { useEffect, useState, useMemo, useCallback, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, ArrowRight, Clock, CheckCircle, XCircle, Award, BarChart3, Filter, Zap, Layers } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock, CheckCircle, XCircle, Award, BarChart3, Zap, Layers, Settings2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent } from "@/components/ui/card"
 import { getCertById } from "@/lib/data/certifications"
-import { getQuestionsByCert, shuffleQuestions } from "@/lib/data/quiz-questions"
-import type { QuizQuestion } from "@/lib/types/quiz"
-import { DomainFilter } from "@/components/quiz/DomainFilter"
+import { getQuestionsByCert, shuffleQuestions, shuffleOptions } from "@/lib/data/quiz-questions"
+import type { QuizQuestion, CertificationId } from "@/lib/types/quiz"
 import { TimerBar } from "@/components/quiz/TimerBar"
 import { useGameStore } from "@/lib/stores/useGameStore"
 import { suggestDifficulty } from "@/lib/game/adaptive-difficulty"
+import { WeakDomainAlert } from "@/components/learn/WeakDomainAlert"
 
 const TIMER_SECONDS_PER_QUESTION = 60
+const QUESTION_COUNT_OPTIONS = [5, 10, 15, 20, 30] as const
+const DIFFICULTY_FILTER_OPTIONS = [
+  { value: "all", label: "すべて" },
+  { value: "easy", label: "Easy" },
+  { value: "medium", label: "Medium" },
+  { value: "hard", label: "Hard" },
+] as const
+const DEFAULT_QUESTION_COUNT = 5
+const EXAM_QUESTION_COUNT = 10
+
+function buildQuestions(
+  allQuestions: QuizQuestion[],
+  certId: string,
+  mode: string,
+  selectedDomain: string | null,
+  difficultyFilter: string,
+  questionCount: number,
+): QuizQuestion[] {
+  let filtered = allQuestions
+
+  if (selectedDomain) {
+    filtered = filtered.filter((q) => q.domain === selectedDomain)
+  }
+
+  if (difficultyFilter !== "all") {
+    filtered = filtered.filter((q) => q.difficulty === difficultyFilter)
+  }
+
+  if (mode === "review") {
+    const history = useGameStore.getState().quizHistory
+    const wrongIds = new Set(
+      history.filter((h) => h.certId === certId && !h.correct).map((h) => h.questionId)
+    )
+    const reviewQ = filtered.filter((q) => wrongIds.has(q.id))
+    if (reviewQ.length >= 3) {
+      filtered = reviewQ
+    }
+  }
+
+  const shuffled = shuffleQuestions(filtered)
+  const count = mode === "exam"
+    ? Math.min(filtered.length, EXAM_QUESTION_COUNT)
+    : Math.min(filtered.length, questionCount)
+  return shuffleOptions(shuffled.slice(0, count))
+}
 
 function QuizContent() {
   const { cert: certId } = useParams<{ cert: string }>()
@@ -41,47 +86,35 @@ function QuizContent() {
     return Array.from(set)
   }, [allQuestions])
 
+  // Settings state
+  const [questionCount, setQuestionCount] = useState(mode === "exam" ? EXAM_QUESTION_COUNT : DEFAULT_QUESTION_COUNT)
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all")
+  const [showSettings, setShowSettings] = useState(false)
+  const [quizStarted, setQuizStarted] = useState(false)
+
   const [selectedDomain, setSelectedDomain] = useState<string | null>(domainParam)
-  const [showDomainFilter, setShowDomainFilter] = useState(false)
-  const [questions, setQuestions] = useState<QuizQuestion[]>([])
+  // Use useState lazy initializer to prevent re-shuffle on quizHistory change
+  const [questions, setQuestions] = useState<QuizQuestion[]>(() =>
+    buildQuestions(allQuestions, certId, mode, domainParam, "all", mode === "exam" ? EXAM_QUESTION_COUNT : DEFAULT_QUESTION_COUNT)
+  )
   const [current, setCurrent] = useState(0)
-  const [answers, setAnswers] = useState<(number | null)[]>([])
+  const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null))
   const [showExplanation, setShowExplanation] = useState(false)
   const [completed, setCompleted] = useState(false)
   const [seconds, setSeconds] = useState(0)
   const [startTime] = useState(Date.now())
   const [timerRunning, setTimerRunning] = useState(mode === "timed")
 
-  // Initialize questions
+  // Re-initialize only when domain or certId changes (NOT quizHistory)
   useEffect(() => {
-    let filtered = allQuestions
-
-    // Domain filter
-    if (selectedDomain) {
-      filtered = filtered.filter((q) => q.domain === selectedDomain)
-    }
-
-    // Difficulty filter for adaptive mode
-    if (mode === "review") {
-      // Review mode: focus on questions the user got wrong before
-      const wrongIds = new Set(
-        quizHistory.filter((h) => h.certId === certId && !h.correct).map((h) => h.questionId)
-      )
-      const reviewQ = filtered.filter((q) => wrongIds.has(q.id))
-      if (reviewQ.length >= 3) {
-        filtered = reviewQ
-      }
-    }
-
-    const shuffled = shuffleQuestions(filtered)
-    const count = mode === "exam" ? Math.min(filtered.length, 10) : Math.min(filtered.length, 5)
-    const selected = shuffled.slice(0, count)
-    setQuestions(selected)
-    setAnswers(new Array(selected.length).fill(null))
+    const newQuestions = buildQuestions(allQuestions, certId, mode, selectedDomain, difficultyFilter, questionCount)
+    setQuestions(newQuestions)
+    setAnswers(new Array(newQuestions.length).fill(null))
     setCurrent(0)
     setCompleted(false)
     setShowExplanation(false)
-  }, [certId, mode, allQuestions, selectedDomain, quizHistory])
+    setQuizStarted(false)
+  }, [certId, mode, allQuestions, selectedDomain])
 
   useEffect(() => {
     if (completed || mode === "timed") return
@@ -104,7 +137,152 @@ function QuizContent() {
     }
   }, [current, answers, questions.length])
 
-  if (!cert || questions.length === 0) {
+  const handleStartQuiz = useCallback(() => {
+    const newQuestions = buildQuestions(allQuestions, certId, mode, selectedDomain, difficultyFilter, questionCount)
+    setQuestions(newQuestions)
+    setAnswers(new Array(newQuestions.length).fill(null))
+    setCurrent(0)
+    setCompleted(false)
+    setShowExplanation(false)
+    setQuizStarted(true)
+    setShowSettings(false)
+  }, [allQuestions, certId, mode, selectedDomain, difficultyFilter, questionCount])
+
+  if (!cert) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">資格が見つかりません</p>
+      </div>
+    )
+  }
+
+  // Settings screen (shown before quiz starts or when toggled)
+  if (!quizStarted || showSettings) {
+    const availableCount = (() => {
+      let filtered = allQuestions
+      if (selectedDomain) filtered = filtered.filter((q) => q.domain === selectedDomain)
+      if (difficultyFilter !== "all") filtered = filtered.filter((q) => q.difficulty === difficultyFilter)
+      return filtered.length
+    })()
+
+    return (
+      <div className="space-y-5 max-w-2xl">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => {
+            if (quizStarted) { setShowSettings(false) } else { router.push(`/learn/${certId}`) }
+          }} className="h-8 text-xs">
+            <ArrowLeft size={14} className="mr-1" />{quizStarted ? "戻る" : "学習ページ"}
+          </Button>
+          <Badge variant="secondary" className="text-xs">
+            {mode === "exam" ? "模擬試験" : mode === "review" ? "復習モード" : mode === "timed" ? "タイマーモード" : "練習モード"}
+          </Badge>
+        </div>
+
+        <Card className="border-border">
+          <CardContent className="p-5 space-y-5">
+            <div className="flex items-center gap-2">
+              <Settings2 size={18} style={{ color: cert.color }} />
+              <h2 className="font-bold text-base">クイズ設定</h2>
+            </div>
+
+            {/* Question count */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">問題数</label>
+              <div className="flex flex-wrap gap-2">
+                {QUESTION_COUNT_OPTIONS.map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setQuestionCount(n)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                      questionCount === n
+                        ? "text-white border-transparent"
+                        : "bg-background text-muted-foreground border-border hover:bg-muted"
+                    }`}
+                    style={questionCount === n ? { backgroundColor: cert.color } : undefined}
+                  >
+                    {n}問
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                利用可能: {availableCount}問
+              </p>
+            </div>
+
+            {/* Difficulty filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">難易度フィルタ</label>
+              <div className="flex flex-wrap gap-2">
+                {DIFFICULTY_FILTER_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setDifficultyFilter(opt.value)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                      difficultyFilter === opt.value
+                        ? "text-white border-transparent"
+                        : "bg-background text-muted-foreground border-border hover:bg-muted"
+                    }`}
+                    style={difficultyFilter === opt.value ? { backgroundColor: cert.color } : undefined}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              {suggestedDifficulty && (
+                <p className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                  <Zap size={10} /> 推奨: {suggestedDifficulty}
+                </p>
+              )}
+            </div>
+
+            {/* Domain filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">ドメイン</label>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => setSelectedDomain(null)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${
+                    !selectedDomain
+                      ? "text-white border-transparent"
+                      : "bg-background text-muted-foreground border-border hover:bg-muted"
+                  }`}
+                  style={!selectedDomain ? { backgroundColor: cert.color } : undefined}
+                >
+                  すべて
+                </button>
+                {domains.map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => setSelectedDomain(d)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all truncate max-w-xs ${
+                      selectedDomain === d
+                        ? "text-white border-transparent"
+                        : "bg-background text-muted-foreground border-border hover:bg-muted"
+                    }`}
+                    style={selectedDomain === d ? { backgroundColor: cert.color } : undefined}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Start button */}
+            <Button
+              onClick={handleStartQuiz}
+              disabled={availableCount === 0}
+              className="w-full text-white"
+              style={{ backgroundColor: cert.color }}
+            >
+              {availableCount === 0 ? "条件に合う問題がありません" : `${Math.min(questionCount, availableCount)}問でスタート`}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (questions.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-muted-foreground">問題を読み込み中...</p>
@@ -215,6 +393,9 @@ function QuizContent() {
           </CardContent>
         </Card>
 
+        {/* Weak domain alert */}
+        <WeakDomainAlert certId={certId as CertificationId} />
+
         {/* Wrong questions review */}
         {questions.filter((qq, i) => answers[i] !== qq.correctIndex).length > 0 && (
           <Card className="border-border">
@@ -251,11 +432,8 @@ function QuizContent() {
           <Button
             onClick={() => {
               setCompleted(false)
-              setCurrent(0)
-              setAnswers(new Array(questions.length).fill(null))
-              setShowExplanation(false)
-              const shuffled = shuffleQuestions(allQuestions)
-              setQuestions(shuffled.slice(0, questions.length))
+              setQuizStarted(false)
+              setShowSettings(true)
             }}
             style={{ backgroundColor: cert.color }}
             className="text-white"
@@ -294,11 +472,11 @@ function QuizContent() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowDomainFilter(!showDomainFilter)}
+            onClick={() => setShowSettings(true)}
             className="p-1.5 rounded hover:bg-muted transition-colors"
-            title="ドメインフィルタ"
+            title="クイズ設定"
           >
-            <Filter size={14} className={selectedDomain ? "text-gcp-blue" : "text-muted-foreground"} />
+            <Settings2 size={14} className="text-muted-foreground" />
           </button>
           {mode !== "timed" && (
             <div className="flex items-center gap-1 text-sm">
@@ -310,21 +488,6 @@ function QuizContent() {
           )}
         </div>
       </div>
-
-      {/* Domain filter */}
-      {showDomainFilter && (
-        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}>
-          <DomainFilter
-            domains={domains}
-            selected={selectedDomain}
-            onSelect={(d) => {
-              setSelectedDomain(d)
-              setShowDomainFilter(false)
-            }}
-            color={cert.color}
-          />
-        </motion.div>
-      )}
 
       {/* Timer bar for timed mode */}
       {mode === "timed" && (

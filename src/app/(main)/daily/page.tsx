@@ -1,36 +1,37 @@
 "use client"
 
-import { useMemo, useState, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import { Zap, Trophy, ArrowRight, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { useGameStore } from "@/lib/stores/useGameStore"
-import { QUIZ_QUESTIONS } from "@/lib/data/quiz-questions"
+import { QUIZ_QUESTIONS, shuffleOptions } from "@/lib/data/quiz-questions"
 import { detectWeakDomains } from "@/lib/game/weakness-detector"
 
 const DAILY_COUNT = 5
 
+function buildDailyQuestions() {
+  const quizHistory = useGameStore.getState().quizHistory
+  const weakDomains = detectWeakDomains(quizHistory)
+  const weakDomainNames = new Set(weakDomains.map((w) => `${w.certId}:${w.domain}`))
+
+  const weakQ = QUIZ_QUESTIONS.filter((q) => weakDomainNames.has(`${q.certId}:${q.domain}`))
+  const otherQ = QUIZ_QUESTIONS.filter((q) => !weakDomainNames.has(`${q.certId}:${q.domain}`))
+
+  const shuffledWeak = [...weakQ].sort(() => Math.random() - 0.5)
+  const shuffledOther = [...otherQ].sort(() => Math.random() - 0.5)
+
+  return shuffleOptions([...shuffledWeak, ...shuffledOther].slice(0, DAILY_COUNT))
+}
+
 export default function DailyChallengePage() {
-  const quizHistory = useGameStore((s) => s.quizHistory)
   const addXP = useGameStore((s) => s.addXP)
   const addQuizAttempt = useGameStore((s) => s.addQuizAttempt)
 
-  // Build daily questions — prioritize weak domains
-  const questions = useMemo(() => {
-    const weakDomains = detectWeakDomains(quizHistory)
-    const weakDomainNames = new Set(weakDomains.map((w) => `${w.certId}:${w.domain}`))
-
-    // Prioritize questions from weak domains
-    const weakQ = QUIZ_QUESTIONS.filter((q) => weakDomainNames.has(`${q.certId}:${q.domain}`))
-    const otherQ = QUIZ_QUESTIONS.filter((q) => !weakDomainNames.has(`${q.certId}:${q.domain}`))
-
-    const shuffledWeak = [...weakQ].sort(() => Math.random() - 0.5)
-    const shuffledOther = [...otherQ].sort(() => Math.random() - 0.5)
-
-    return [...shuffledWeak, ...shuffledOther].slice(0, DAILY_COUNT)
-  }, [quizHistory])
+  // Build once on mount — useState lazy init prevents re-shuffle on re-render
+  const [questions, setQuestions] = useState(buildDailyQuestions)
 
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(DAILY_COUNT).fill(null))
@@ -70,6 +71,7 @@ export default function DailyChallengePage() {
   }
 
   const handleRestart = () => {
+    setQuestions(buildDailyQuestions())
     setCurrent(0)
     setAnswers(new Array(DAILY_COUNT).fill(null))
     setCompleted(false)

@@ -20,6 +20,7 @@ const INITIAL_STATE: GameState = {
   quizHistory: [],
   demoCompletions: {},
   dungeonProgress: {},
+  srCards: {},
   notifications: [],
   lastActiveAt: Date.now(),
   createdAt: Date.now(),
@@ -223,6 +224,13 @@ export const useGameStore = create<GameStore>()(
         })
       },
 
+      updateSRCard: (card) => {
+        const state = get()
+        set({
+          srCards: { ...state.srCards, [card.questionId]: card },
+        })
+      },
+
       recordActivity: (xpEarned) => {
         const state = get()
         set({
@@ -297,6 +305,7 @@ export const useGameStore = create<GameStore>()(
         quizHistory: state.quizHistory,
         demoCompletions: state.demoCompletions,
         dungeonProgress: state.dungeonProgress,
+        srCards: state.srCards,
         lastActiveAt: state.lastActiveAt,
         createdAt: state.createdAt,
       }),

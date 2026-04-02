@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion"
 import type { FlashCard as FlashCardType } from "@/lib/data/flashcards"
 import { RotateCcw, Check, X } from "lucide-react"
@@ -12,6 +12,24 @@ interface FlashCardProps {
 
 export function FlashCardComponent({ card, onSwipe }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false)
+
+  // Keyboard shortcuts: ←/1 = review, →/2 = know, Space = flip
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "ArrowLeft" || e.key === "1") {
+      onSwipe("left")
+    } else if (e.key === "ArrowRight" || e.key === "2") {
+      onSwipe("right")
+    } else if (e.key === " " || e.key === "Enter") {
+      e.preventDefault()
+      setIsFlipped((prev) => !prev)
+    }
+  }, [onSwipe])
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [handleKeyDown])
+
   const x = useMotionValue(0)
   const rotate = useTransform(x, [-200, 200], [-15, 15])
   const leftOpacity = useTransform(x, [-100, 0], [1, 0])
@@ -98,7 +116,7 @@ export function FlashCardComponent({ card, onSwipe }: FlashCardProps) {
               )}
 
               <p className="text-[10px] text-muted-foreground text-center mt-2">
-                ← 復習 | 知ってる →
+                ← 復習 | 知ってる → &#x2003; <span className="hidden sm:inline opacity-50">Space:めくる</span>
               </p>
             </div>
           </motion.div>

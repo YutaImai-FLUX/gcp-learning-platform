@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Sword, Lock, CheckCircle2, ArrowRight, GitBranch } from "lucide-react"
+import { Sword, Lock, CheckCircle2, ArrowRight, GitBranch, Trophy, Star } from "lucide-react"
 import { useGameStore } from "@/lib/stores/useGameStore"
 import { DUNGEON_MAPS } from "@/lib/game/dungeon-config"
 import { DUNGEON_THEMES } from "@/lib/game/dungeon-themes"
@@ -160,6 +160,58 @@ export default function DungeonSelectPage() {
           )
         })}
       </div>
+
+      {/* Personal Best Scores */}
+      <motion.div variants={stagger.item}>
+        <Card className="border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-display text-sm flex items-center gap-2">
+              <Trophy size={14} className="text-gcp-yellow" />
+              ベストスコア
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {CERT_ORDER.map((certId) => {
+                const dungeon = DUNGEON_MAPS[certId]
+                const theme = DUNGEON_THEMES[dungeon.theme]
+                const bossProgress = dungeonProgress[`${certId}-boss`]
+                const totalXP = dungeon.rooms.reduce((sum, r) => {
+                  const rp = dungeonProgress[r.id]
+                  return sum + (rp?.bestScore ?? 0)
+                }, 0)
+
+                if (totalXP === 0) return null
+
+                return (
+                  <div
+                    key={certId}
+                    className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50"
+                  >
+                    <div className="text-lg shrink-0">{theme.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-foreground truncate">{dungeon.name}</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        獲得XP: {totalXP}
+                      </div>
+                    </div>
+                    {bossProgress?.cleared && (
+                      <div className="flex items-center gap-0.5">
+                        <Star size={12} style={{ color: theme.accentColor }} fill={theme.accentColor} />
+                      </div>
+                    )}
+                  </div>
+                )
+              }).filter(Boolean)}
+              {Object.keys(dungeonProgress).length === 0 && (
+                <p className="text-xs text-muted-foreground col-span-2 text-center py-3">
+                  ダンジョンを攻略してスコアを記録しよう！
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Skill Tree */}
       <motion.div variants={stagger.item}>

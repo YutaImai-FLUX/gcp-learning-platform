@@ -52,6 +52,8 @@ import { getDemosForCert, serviceNameToProductId, PRODUCT_TO_DEMO } from "@/lib/
 import { RelatedDemos, RelatedArchitectures } from "@/components/shared/RelatedContent"
 import { DEMO_CONTEXTS } from "@/lib/data/cross-references"
 import { useGameStore } from "@/lib/stores/useGameStore"
+import { CertStudyActions } from "@/components/learn/CertStudyActions"
+import type { CertificationId } from "@/lib/types/quiz"
 
 type TabKey = "overview" | "exam" | "plan" | "resources" | "labs" | "modules" | "security"
 
@@ -506,6 +508,9 @@ export default function CertDetailPage() {
       {/* Tab: 概要 */}
       {activeTab === "overview" && (
         <div className="space-y-6">
+          {/* Study mode action cards */}
+          <CertStudyActions certId={certId as CertificationId} certColor={cert.color} />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Domains */}
             <Card className="border-border">

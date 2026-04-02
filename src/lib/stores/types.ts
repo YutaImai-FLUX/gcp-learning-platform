@@ -1,4 +1,5 @@
 import type { CertificationId, DifficultyLevel } from "@/lib/types/quiz"
+import type { SRCard } from "@/lib/game/spaced-repetition"
 
 // ─── User Profile ───
 export interface UserProfile {
@@ -101,6 +102,7 @@ export interface GameState {
   quizHistory: QuizAttempt[]
   demoCompletions: Record<string, DemoCompletion>
   dungeonProgress: Record<string, DungeonRoomProgress> // keyed by roomId
+  srCards: Record<string, SRCard> // keyed by card/question ID
   notifications: GameNotification[]
   lastActiveAt: number
   createdAt: number
@@ -121,6 +123,8 @@ export interface GameActions {
   trackDemoInteraction: (demoId: string) => void
   // Dungeon
   clearDungeonRoom: (certId: CertificationId, roomId: string, score?: number) => void
+  // Spaced Repetition
+  updateSRCard: (card: SRCard) => void
   // Activity & Streak
   recordActivity: (xpEarned: number) => void
   // Achievements

@@ -3,6 +3,20 @@ import type { CertificationId } from "./quiz"
 export type DungeonTheme = "forest" | "tech" | "castle" | "volcano" | "ice" | "ocean" | "cave" | "sky" | "cyber"
 export type RoomType = "start" | "study" | "quiz" | "lab" | "demo" | "treasure" | "boss"
 export type RoomStatus = "locked" | "available" | "active" | "cleared"
+export type DungeonDifficulty = "normal" | "hard" | "expert"
+export type BattleRank = "S" | "A" | "B" | "C"
+
+export interface DifficultyConfig {
+  label: string
+  description: string
+  playerHP: number
+  enemyHP: number
+  bossHP: number
+  damagePerCorrect: number
+  damagePerWrong: number
+  xpMultiplier: number
+  quizCountMultiplier: number
+}
 
 export interface DungeonNPC {
   name: string

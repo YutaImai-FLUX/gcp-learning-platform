@@ -4,19 +4,34 @@ import { useMemo, useState, useCallback } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, BookOpen, FlaskConical, PlayCircle, Gift, Map } from "lucide-react"
+import { ArrowLeft, BookOpen, FlaskConical, PlayCircle, Gift, Map, Flame, Sparkles } from "lucide-react"
 import type { CertificationId } from "@/lib/types/quiz"
-import type { BattleState } from "@/lib/types/dungeon"
-import { getDungeonMap } from "@/lib/game/dungeon-config"
+import type { BattleState, DungeonDifficulty } from "@/lib/types/dungeon"
+import { getDungeonMap, DIFFICULTY_CONFIGS, BOSS_NAMES } from "@/lib/game/dungeon-config"
+import { suggestDifficulty } from "@/lib/game/adaptive-difficulty"
 import { DUNGEON_THEMES } from "@/lib/game/dungeon-themes"
-import { QUIZ_QUESTIONS } from "@/lib/data/quiz-questions"
+import { QUIZ_QUESTIONS, shuffleOptions } from "@/lib/data/quiz-questions"
 import { useGameStore } from "@/lib/stores/useGameStore"
 import { DungeonMapView } from "@/components/dungeon/DungeonMap"
 import { DungeonHUD } from "@/components/dungeon/DungeonHUD"
 import { BattleScreen } from "@/components/dungeon/BattleScreen"
 import { BattleResult } from "@/components/dungeon/BattleResult"
+import { WeakDomainAlert } from "@/components/learn/WeakDomainAlert"
 
 type Phase = "map" | "battle" | "result"
+
+const DIFFICULTY_OPTIONS: { key: DungeonDifficulty; color: string; icon: string }[] = [
+  { key: "normal", color: "#4CAF50", icon: "⚔️" },
+  { key: "hard", color: "#FF9800", icon: "🔥" },
+  { key: "expert", color: "#F44336", icon: "💀" },
+]
+
+// Map adaptive difficulty ("easy"|"medium"|"hard") to dungeon difficulty
+const ADAPTIVE_TO_DUNGEON: Record<string, DungeonDifficulty> = {
+  easy: "normal",
+  medium: "hard",
+  hard: "expert",
+}
 
 const ROOM_TYPE_INFO: Record<string, { icon: React.ElementType; description: string }> = {
   study: { icon: BookOpen, description: "学習モジュールを読んで知識を深めよう" },
@@ -31,7 +46,17 @@ export default function DungeonCertPage() {
   const dungeon = useMemo(() => getDungeonMap(certId), [certId])
   const theme = DUNGEON_THEMES[dungeon.theme]
 
+  const quizHistory = useGameStore((s) => s.quizHistory)
+  const suggestedLevel = useMemo(() => {
+    const certHistory = quizHistory.filter((h) => h.certId === certId)
+    if (certHistory.length < 5) return null
+    const suggested = suggestDifficulty(certHistory)
+    return ADAPTIVE_TO_DUNGEON[suggested] ?? "normal"
+  }, [quizHistory, certId])
+
   const [phase, setPhase] = useState<Phase>("map")
+  const [difficulty, setDifficulty] = useState<DungeonDifficulty>("normal")
+  const difficultyConfig = DIFFICULTY_CONFIGS[difficulty]
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null)
   const [battleResult, setBattleResult] = useState<BattleState | null>(null)
 
@@ -46,9 +71,11 @@ export default function DungeonCertPage() {
       filtered = filtered.filter((q) => q.domain === activeRoom.quizDomain)
     }
 
-    const count = activeRoom.quizCount ?? 5
+    const baseCount = activeRoom.quizCount ?? 5
+    const count = Math.round(baseCount * difficultyConfig.quizCountMultiplier)
     const shuffled = [...filtered].sort(() => Math.random() - 0.5)
-    return shuffled.slice(0, count).map((q) => ({
+    const selected = shuffleOptions(shuffled.slice(0, count))
+    return selected.map((q) => ({
       id: q.id,
       question: q.question,
       options: q.options,
@@ -56,7 +83,7 @@ export default function DungeonCertPage() {
       explanation: q.explanation,
       domain: q.domain,
     }))
-  }, [activeRoom, certId])
+  }, [activeRoom, certId, difficultyConfig.quizCountMultiplier])
 
   const handleRoomSelect = useCallback((roomId: string) => {
     const room = dungeon.rooms.find((r) => r.id === roomId)
@@ -136,6 +163,54 @@ export default function DungeonCertPage() {
         )}
       </motion.div>
 
+      {/* Difficulty selector */}
+      {phase === "map" && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2"
+        >
+          <Flame size={14} className="text-muted-foreground" />
+          <span className="text-xs text-muted-foreground font-medium">難易度:</span>
+          {DIFFICULTY_OPTIONS.map((opt) => {
+            const cfg = DIFFICULTY_CONFIGS[opt.key]
+            const isActive = difficulty === opt.key
+            const isSuggested = suggestedLevel === opt.key
+            return (
+              <button
+                key={opt.key}
+                onClick={() => setDifficulty(opt.key)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                  isActive
+                    ? "text-white border-transparent"
+                    : "bg-background text-muted-foreground border-border hover:border-current"
+                }`}
+                style={isActive ? { backgroundColor: opt.color, borderColor: opt.color } : undefined}
+                title={cfg.description}
+              >
+                <span>{opt.icon}</span>
+                {cfg.label}
+                {isSuggested && !isActive && (
+                  <Sparkles size={10} className="text-amber-500" />
+                )}
+              </button>
+            )
+          })}
+          {suggestedLevel && suggestedLevel !== difficulty && (
+            <button
+              onClick={() => setDifficulty(suggestedLevel)}
+              className="flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 hover:underline"
+            >
+              <Sparkles size={10} />
+              推奨: {DIFFICULTY_CONFIGS[suggestedLevel].label}
+            </button>
+          )}
+        </motion.div>
+      )}
+
+      {/* Weak domain alert */}
+      {phase === "map" && <WeakDomainAlert certId={certId} />}
+
       {/* HUD */}
       <DungeonHUD certId={certId} dungeon={dungeon} theme={theme} />
 
@@ -169,6 +244,8 @@ export default function DungeonCertPage() {
               questions={battleQuestions}
               theme={theme}
               isBoss={activeRoom.type === "boss"}
+              enemyName={activeRoom.type === "boss" ? BOSS_NAMES[certId] : "モンスター"}
+              difficulty={difficultyConfig}
               onComplete={handleBattleComplete}
             />
           </motion.div>
