@@ -27,6 +27,10 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Target,
+  Briefcase,
+  Users,
+  TrendingUp,
+  GitBranch,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
@@ -110,6 +114,12 @@ const NAV_SECTIONS: NavSection[] = [
           { label: "AWT プリセールス", href: "/google-enterprise/awt", icon: Bot },
         ],
       },
+    ],
+  },
+  {
+    label: "NTTデータ案件管理",
+    items: [
+      { label: "案件ダッシュボード", href: "/nttd", icon: Briefcase },
     ],
   },
   {
