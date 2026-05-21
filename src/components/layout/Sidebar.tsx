@@ -22,6 +22,7 @@ import {
   Shield,
   Key,
   Building2,
+  MonitorPlay,
   FileSearch,
   Sparkles,
   PanelLeftClose,
@@ -112,6 +113,7 @@ const NAV_SECTIONS: NavSection[] = [
         icon: Building2,
         children: [
           { label: "AWT プリセールス", href: "/google-enterprise/awt", icon: Bot },
+          { label: "導入デモ", href: "/google-enterprise/hands-on", icon: MonitorPlay },
         ],
       },
     ],
