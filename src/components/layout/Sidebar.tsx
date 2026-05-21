@@ -22,11 +22,16 @@ import {
   Shield,
   Key,
   Building2,
+  MonitorPlay,
   FileSearch,
   Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
   Target,
+  Briefcase,
+  Users,
+  TrendingUp,
+  GitBranch,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
@@ -108,8 +113,15 @@ const NAV_SECTIONS: NavSection[] = [
         icon: Building2,
         children: [
           { label: "AWT プリセールス", href: "/google-enterprise/awt", icon: Bot },
+          { label: "導入デモ", href: "/google-enterprise/hands-on", icon: MonitorPlay },
         ],
       },
+    ],
+  },
+  {
+    label: "NTTデータ案件管理",
+    items: [
+      { label: "案件ダッシュボード", href: "/nttd", icon: Briefcase },
     ],
   },
   {
