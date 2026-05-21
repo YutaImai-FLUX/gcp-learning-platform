@@ -243,8 +243,6 @@ export function NttdHub() {
 
   const overlaps = useMemo(() => detectOverlaps(projects), [projects])
 
-  const selectedProject = projects.find((p) => p.id === selectedId) ?? null
-
   const openNew = () => {
     setEditingProject(null)
     setDrawerOpen(true)

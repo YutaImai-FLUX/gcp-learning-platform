@@ -29,9 +29,6 @@ import {
   PanelLeftOpen,
   Target,
   Briefcase,
-  Users,
-  TrendingUp,
-  GitBranch,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
