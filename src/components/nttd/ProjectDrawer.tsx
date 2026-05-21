@@ -13,7 +13,7 @@ import type { Project, Milestone } from "@/lib/types/project"
 import { MEMBERS, PRIORITIES, PROJECT_STATUSES, STATUS_LABELS, daysUntil } from "@/lib/types/project"
 import {
   PRESALES_TEMPLATES, ALL_FDE_TEMPLATES,
-  getPresalesTemplate, getFdeTemplate,
+  getFdeTemplate,
   buildMilestones, REVIEWER_COLORS,
 } from "@/lib/nttd-templates"
 import { cn } from "@/lib/utils"
@@ -33,7 +33,6 @@ function MilestoneRow({
 }) {
   const days = milestone.date ? daysUntil(milestone.date) : null
   const isOverdue = days !== null && days < 0 && !milestone.completed
-  const isUrgent = days !== null && days >= 0 && days <= 3 && !milestone.completed
   const reviewerStyle = milestone.reviewer ? REVIEWER_COLORS[milestone.reviewer] : null
   const trackDot = milestone.track === "presales" ? "bg-sky-500" : "bg-emerald-500"
 
@@ -216,7 +215,6 @@ export function ProjectDrawer({ project, onSave, onDelete, onClose }: Props) {
   // When template changes, merge: keep existing dates, add new phases, remove old phases
   const handlePresalesTemplateChange = (newId: string) => {
     setPresalesTemplateId(newId)
-    const template = getPresalesTemplate(newId)
     const fde = getFdeTemplate(fdeTemplateId)
     const fresh = buildMilestones(newId, fdeTemplateId)
     // Preserve dates for matching phase IDs

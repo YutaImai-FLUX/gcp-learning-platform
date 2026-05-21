@@ -28,11 +28,6 @@ const PROJECT_COLORS = [
   "#0891b2", // cyan
 ]
 
-const TRACK_SHAPES = {
-  presales: "circle",
-  fde: "diamond",
-} as const
-
 // ─── Geometry helpers ─────────────────────────────────────────────────────────
 
 function toMs(dateStr: string): number {
