@@ -7,22 +7,31 @@ export type ShellType =
   | "workspace-signup"
   | "accounts"
   | "dns"
-  | "end-user-app"
+  | "end-user-app";
 
 export interface DemoStepGuideContent {
-  what: string
-  why: string
-  pitfall?: string
+  what: string;
+  why: string;
+  pitfall?: string;
+}
+
+export type CalloutTone = "blue" | "green" | "yellow" | "red";
+
+export interface Callout {
+  title: string;
+  body: string;
+  tone?: CalloutTone;
 }
 
 export interface DemoStep {
-  id: string
-  order: number
-  product: string
-  title: string
-  url: string
-  shell: ShellType
-  guide: DemoStepGuideContent
+  id: string;
+  order: number;
+  product: string;
+  title: string;
+  url: string;
+  shell: ShellType;
+  guide: DemoStepGuideContent;
+  callouts: Callout[];
 }
 
 export const DEMO_STEPS: DemoStep[] = [
@@ -39,6 +48,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "個人 Gmail で申込んでしまうと、後で別管理者へ移管しにくい。原則として組織で管理する専用アドレスを準備する。",
     },
+    callouts: [
+      {
+        title: "個人 Gmail で作らない",
+        body: "業務用の専用アドレスで申込みます。退職・異動でテナント管理が止まらないように。",
+        tone: "blue",
+      },
+      {
+        title: "2 段階認証は必須",
+        body: "管理者アカウントは MFA を必ず有効化。フィッシング攻撃の最初の的になります。",
+        tone: "yellow",
+      },
+      {
+        title: "管理者は最低 2 名で",
+        body: "バス係数 1 にしないこと。プライマリ + バックアップ管理者を準備します。",
+        tone: "green",
+      },
+    ],
   },
   {
     id: "cloud-identity-signup",
@@ -53,6 +79,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "既に Google Workspace 契約済みの組織は別途申込み不要。Workspace の管理コンソールから直接 Google Cloud にアクセスできる。",
     },
+    callouts: [
+      {
+        title: "Free でも組織機能はフル",
+        body: "Cloud Identity Free でも Organization / IAM / 監査ログはすべて利用できます。",
+        tone: "green",
+      },
+      {
+        title: "ドメイン名は永久不変",
+        body: "ここで入力したドメインがテナント識別子になります。タイポ厳禁。",
+        tone: "red",
+      },
+      {
+        title: "Workspace 契約済みなら不要",
+        body: "既に Workspace を使っている組織はこのステップをスキップ。Admin Console から GCP に直行できます。",
+        tone: "blue",
+      },
+    ],
   },
   {
     id: "domain-verify",
@@ -67,6 +110,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "TXT 反映には DNS の TTL に応じた待機時間が必要（数分〜数時間）。dig や nslookup で TXT が引けることを確認してから「確認」ボタンを押す。",
     },
+    callouts: [
+      {
+        title: "値は完全一致で",
+        body: "前後にスペースが混入したり、引用符を含めると検証が必ず失敗します。",
+        tone: "red",
+      },
+      {
+        title: "TTL は短めに",
+        body: "300 秒推奨。検証後に書き換える可能性があるため、長すぎると待機時間に直結します。",
+        tone: "yellow",
+      },
+      {
+        title: "dig で事前確認",
+        body: "「dig +short TXT yamatoseiki.co.jp」で反映を確認してから「確認」ボタンを押すと一発で通ります。",
+        tone: "blue",
+      },
+    ],
   },
   {
     id: "org-confirm",
@@ -81,6 +141,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "個人 Gmail でログインしていると組織ノードは見えない。必ず Cloud Identity で作った管理者アカウント（例 admin@yamatoseiki.co.jp）でログインする。",
     },
+    callouts: [
+      {
+        title: "組織ノードは自動生成",
+        body: "DNS 検証完了と同時に Google Cloud 上に組織が現れます。手動作成手順は存在しません。",
+        tone: "green",
+      },
+      {
+        title: "Resource Hierarchy の最上位",
+        body: "ここから全リソースが配下に作られます。Folder / Project / 各リソースは組織の子。",
+        tone: "blue",
+      },
+      {
+        title: "組織 ID は永続",
+        body: "数字 12 桁の Organization ID は変更不可。命名規則文書・運用 Runbook に必ず記載。",
+        tone: "yellow",
+      },
+    ],
   },
   {
     id: "billing-create",
@@ -95,8 +172,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "通貨は作成後変更不可（JPY を選ぶ）。エンタープライズは Google Cloud パートナー経由のリセラー請求書払いが定番。",
     },
+    callouts: [
+      {
+        title: "通貨は永久不変",
+        body: "一度 JPY で作ったら USD には変えられません。為替リスクと請求体験のバランスで判断。",
+        tone: "red",
+      },
+      {
+        title: "リセラー経由がエンプラ定番",
+        body: "月次・日本円・請求書払いを実現する唯一の現実解。直契約は審査 2 週間。",
+        tone: "blue",
+      },
+      {
+        title: "クレカは PoC 用",
+        body: "本番運用でクレカ払いは経理が承認しません。最初からリセラー契約を進めるとスムーズです。",
+        tone: "yellow",
+      },
+    ],
   },
-  // ★ NEW: 予算アラート設定 (実務経験者視点 - D: コスト統制)
   {
     id: "budget-alerts",
     order: 6,
@@ -110,6 +203,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "通知先メールは必ず情シス管理者と財務部門の両方を指定する。Pub/Sub 連携にすれば Slack / Teams にも飛ばせる。アラート閾値超過後も課金は止まらない点に注意（停止ロジックは Cloud Functions で別途実装）。",
     },
+    callouts: [
+      {
+        title: "通知のみ・停止しない",
+        body: "Budget Alert は通知だけです。自動停止には Pub/Sub → Cloud Functions で BillingAccount を unlink する自前実装が必要。",
+        tone: "red",
+      },
+      {
+        title: "経理にもメールを",
+        body: "情シスだけだと予算超過のエスカレが止まる典型。CC に財務部門のメーリングリストを必ず追加。",
+        tone: "yellow",
+      },
+      {
+        title: "Pub/Sub で Slack 連携",
+        body: "Pub/Sub 経由で Slack / Teams に流せば、エンジニアが Cloud Console を見ていなくても気付けます。",
+        tone: "blue",
+      },
+    ],
   },
   {
     id: "project-create",
@@ -124,8 +234,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "Billing 紐付けを忘れると次のステップ（API 有効化）で 403 エラー。お支払いメニューから紐付け状態を必ず確認。",
     },
+    callouts: [
+      {
+        title: "Project ID は変更不可",
+        body: "「ge-poc」のような短い ID ではなく、組織内で一意になる「gemini-poc-prod-23874」のような命名を。",
+        tone: "red",
+      },
+      {
+        title: "Folder 配下に配置",
+        body: "Production / Staging / Sandbox の各 Folder 配下に作ると、Org Policy が自動継承されます。",
+        tone: "green",
+      },
+      {
+        title: "Billing 紐付け忘れに注意",
+        body: "紐付けないと次の API 有効化が必ず 403 で失敗。お支払いメニューで紐付け状態を必ず確認。",
+        tone: "yellow",
+      },
+    ],
   },
-  // ★ NEW: 組織ポリシー & フォルダ階層 (A: ガバナンス設計)
   {
     id: "org-policy",
     order: 8,
@@ -139,6 +265,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "Domain Restricted Sharing を ON にすると、外部 Google アカウントとのリソース共有が一切できなくなる。要件に応じて Allow List を維持。「Disable Service Account Key Creation」は鍵管理を強制するので、開発フローと併せて設計する。",
     },
+    callouts: [
+      {
+        title: "組織レベルが起点",
+        body: "親で設定すると配下のすべてのリソースに自動継承。後付けより圧倒的に管理が楽です。",
+        tone: "blue",
+      },
+      {
+        title: "Dry-run で違反検出",
+        body: "「gcloud asset analyze-org-policies」で既存リソースの違反を事前に洗い出してから適用。",
+        tone: "green",
+      },
+      {
+        title: "SA Key 禁止は WIF とセット",
+        body: "「Disable Service Account Key Creation」は Workload Identity / WIF 採用前提。先に開発フローを整える。",
+        tone: "yellow",
+      },
+    ],
   },
   {
     id: "api-enable",
@@ -153,8 +296,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "組織ポリシー『Restrict Allowed APIs』で allowlist が設定されていると有効化が拒否される。Step 8 で先に Allow List に含めておくこと。",
     },
+    callouts: [
+      {
+        title: "Allowlist で詰まる",
+        body: "Step 8 で組織ポリシーを設定済みなら、API が allowlist に入っていないと「403」で拒否されます。",
+        tone: "red",
+      },
+      {
+        title: "4 API は前提条件",
+        body: "1 つでも欠けると WIF / AI App / KMS が動きません。必ず 4 つ全部有効化。",
+        tone: "yellow",
+      },
+      {
+        title: "Quota も同時確認",
+        body: "大規模利用なら IAM > Quotas で Discovery Engine API の Rate Limit を事前に増加申請。",
+        tone: "blue",
+      },
+    ],
   },
-  // ★ NEW: IAM 設計 (B: 最小権限・グループベース)
   {
     id: "iam-roles",
     order: 10,
@@ -168,6 +327,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "「とりあえず Editor」が事故の元。Editor は Service Account 作成・Org Policy 一部上書きもできてしまう。条件付き IAM (時間・IP・タグ条件) を併用するとさらに強い。",
     },
+    callouts: [
+      {
+        title: "Owner / Editor は禁忌",
+        body: "個人アカウントに付与しない。Owner は組織管理者・ブートストラップ時のみ、Editor は緊急用に限定。",
+        tone: "red",
+      },
+      {
+        title: "グループベースで",
+        body: "個人ではなく Cloud Identity Group に付与。退職・異動でロールが残るトラブルを根絶。",
+        tone: "green",
+      },
+      {
+        title: "Conditional IAM 活用",
+        body: "外部監査人は「平日のみ」「特定 IP のみ」のような条件付き許可で。期間限定付与が安全。",
+        tone: "blue",
+      },
+    ],
   },
   {
     id: "wif-pool",
@@ -182,8 +358,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "プール ID は後から変更不可。命名は org-wide で一意になるようにする（例 wif-employees-pool）。",
     },
+    callouts: [
+      {
+        title: "組織レベルのリソース",
+        body: "Project ではなく Organization 配下に作成。同じプールを複数プロジェクトから参照できます。",
+        tone: "blue",
+      },
+      {
+        title: "Pool ID は永続",
+        body: "一度作ったら名前変更不可。命名は組織全体で一意に。例: wif-employees-pool。",
+        tone: "red",
+      },
+      {
+        title: "セッション有効化を忘れずに",
+        body: "「ユーザーセッションを有効化」を OFF のまま作ると GE 利用時に認証エラー。",
+        tone: "yellow",
+      },
+    ],
   },
-  // ★ NEW: SCIM プロビジョニング (C: 事前 IAM 設計)
   {
     id: "scim-provision",
     order: 12,
@@ -197,6 +389,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "Entra 側で『プロビジョニング対象グループ』を絞り込まないと全社員が同期されてしまう。プロビジョニングトークンの有効期限管理（年1回ローテーション）も忘れずに。",
     },
+    callouts: [
+      {
+        title: "WIF の進化形",
+        body: "WIF だけだと初回ログインまでユーザー不在。SCIM で先回り同期して IAM 付与を事前完了。",
+        tone: "green",
+      },
+      {
+        title: "トークン期限 1 年",
+        body: "シークレットトークンは 1 年で失効。Secret Manager Rotation Policy + Calendar リマインダで管理。",
+        tone: "red",
+      },
+      {
+        title: "スコープ絞り込み必須",
+        body: "Entra 側で「部門 / グループ」フィルタを設定。全社員同期は事故の元。",
+        tone: "yellow",
+      },
+    ],
   },
   {
     id: "wif-provider",
@@ -211,6 +420,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "属性マッピングは超重要。.toLowerCase() の漏れ / グループが oid（GUID）で送出される設定 / Entra 側 Optional Claims の追加忘れがハマりどころ Top 3。",
     },
+    callouts: [
+      {
+        title: ".toLowerCase() が命綱",
+        body: "Entra の UPN は大文字混在しがち。小文字化を入れないと SharePoint ACL とマッチしません。",
+        tone: "red",
+      },
+      {
+        title: "displayName 送出に切替",
+        body: "Entra デフォルトは oid (GUID) 送出。これだと SharePoint の グループ表示名 ACL と紐付かない。",
+        tone: "yellow",
+      },
+      {
+        title: "メタデータは XML 直接でも可",
+        body: "URL が公開できない閉域環境では、メタデータ XML ファイルをアップロード方式で投入できます。",
+        tone: "blue",
+      },
+    ],
   },
   {
     id: "ge-subscription",
@@ -225,6 +451,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "シートは後からいつでも追加可能。PoC で全社分を一気に買うと未消化リスクが高い。スモールスタートが鉄則。",
     },
+    callouts: [
+      {
+        title: "スモールスタート",
+        body: "PoC は実利用者の 80% から開始。シート追加は即時反映なので慌てて多めに買わない。",
+        tone: "green",
+      },
+      {
+        title: "シートは月割計算",
+        body: "増減は月割で即日適用。途中追加・削減もペナルティなし。",
+        tone: "blue",
+      },
+      {
+        title: "Plus は本当に必要か",
+        body: "Standard の 1.5 倍単価。Live API / Premium Support が本当に要るか PoC で見極めを。",
+        tone: "yellow",
+      },
+    ],
   },
   {
     id: "user-licensing",
@@ -239,6 +482,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "対象 Workforce プールとマルチリージョン（global / us / eu）の指定を忘れない。global を選ぶケースが多い。",
     },
+    callouts: [
+      {
+        title: "自動割当が正解",
+        body: "手動だと運用破綻 + ユーザー漏れで炎上が典型。WIF + 自動割当はセット必須。",
+        tone: "green",
+      },
+      {
+        title: "マルチリージョン選択",
+        body: "global を選べばどこからでも利用可。データ所在制約があれば us / eu を選択。",
+        tone: "blue",
+      },
+      {
+        title: "退職者は自動回収",
+        body: "SCIM 連携が効いていれば、退職者は即座にプロビジョン解除 → GE ライセンス回収。",
+        tone: "yellow",
+      },
+    ],
   },
   {
     id: "ai-app-create",
@@ -253,6 +513,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "認証プロバイダを紐付け忘れると、デフォルトの Google アカウント認証になり、組織外ユーザーがアクセスできる状態に。Settings > Authentication で必ず確認。",
     },
+    callouts: [
+      {
+        title: "認証プロバイダ必須",
+        body: "未紐付け公開は組織外漏洩リスク。Settings > Authentication で WIF プール紐付けを必ず確認。",
+        tone: "red",
+      },
+      {
+        title: "Search 型が王道",
+        body: "「検索 → 引用 → 要約」は RAG のテンプレ。PoC は Search 型から始めるのがハマりにくい。",
+        tone: "blue",
+      },
+      {
+        title: "App ID は永続",
+        body: "URL の一部になるため変更不可。テナント全体で一意な ID 命名規則を決めておくと運用が楽。",
+        tone: "yellow",
+      },
+    ],
   },
   {
     id: "datastore-create",
@@ -267,8 +544,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "アクセス制御 ON / OFF は作成時のみ設定可能、後から変更不可。OFF で作ったら作り直し確定（プロジェクト遅延の最大要因）。本番運用想定では必ず ON で作る。",
     },
+    callouts: [
+      {
+        title: "★ ACL ON は作成時のみ",
+        body: "後から ON にする操作は存在しません。OFF で作ったら全削除して作り直し。",
+        tone: "red",
+      },
+      {
+        title: "Documents タブが空に見える",
+        body: "ACL ON だと管理者にも一覧非表示。仕様であって障害ではありません。",
+        tone: "yellow",
+      },
+      {
+        title: "インジェスト 2 時間",
+        body: "5,000 件規模で数十分〜数時間。完了前の検索は部分結果なので品質評価は完了後に。",
+        tone: "blue",
+      },
+    ],
   },
-  // ★ NEW: CMEK / VPC Service Controls (H: データ境界・暗号化)
   {
     id: "cmek-vpc-sc",
     order: 18,
@@ -282,6 +575,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "VPC Service Controls の Perimeter を間違えると正規ユーザーまでブロックされる。Dry-run モードでログを取りながら段階適用するのが鉄則。KMS 鍵のローテーション（推奨 90 日）と Audit Log 監視も忘れずに。",
     },
+    callouts: [
+      {
+        title: "金融・公共では必須",
+        body: "顧客管理鍵 (CMEK) + 境界制御 (VPC SC) で「物理的に守れる」状態に。要件業界では本契約の前提条件。",
+        tone: "blue",
+      },
+      {
+        title: "Dry-run で慣らす",
+        body: "VPC SC をいきなり Enforce にすると正規アクセスもブロック。ログ収集モードで違反パターンを洗ってから本適用。",
+        tone: "yellow",
+      },
+      {
+        title: "鍵削除は復号不可",
+        body: "KMS 鍵を削除するとデータは永久に読めません。Destroyer ロールは情シス管理者のみに限定。",
+        tone: "red",
+      },
+    ],
   },
   {
     id: "bind-datastore",
@@ -296,6 +606,23 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "バインド後にインジェスト完了を待つ必要がある（5,000 件規模で数十分〜数時間）。インジェスト中は検索結果が不完全になる。",
     },
+    callouts: [
+      {
+        title: "複数バインド可",
+        body: "1 つの App に SharePoint + Drive + Confluence など複数 Data Store を紐付けて横断検索できます。",
+        tone: "blue",
+      },
+      {
+        title: "インジェスト中も検索可",
+        body: "部分結果が返ります。「完全」に見えて実は未取込みのケースに注意 — 完了は別タブで確認。",
+        tone: "yellow",
+      },
+      {
+        title: "Reindex は別操作",
+        body: "ソース文書更新は自動再取込みされません。Refresh スケジュール (日次 / 週次) を別途設定。",
+        tone: "green",
+      },
+    ],
   },
   {
     id: "search-preview",
@@ -310,8 +637,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "管理コンソールの Documents タブにファイル一覧が表示されないのは仕様（アクセス制御 ON のため）。動作確認は必ずアプリのプレビュー画面で行う。",
     },
+    callouts: [
+      {
+        title: "ACL の実証地点",
+        body: "権限のない文書が本当に除外されるか、ここで現場ユーザーアカウントで確認します。",
+        tone: "green",
+      },
+      {
+        title: "PoC ユーザーで検証",
+        body: "管理者アカウントだと ACL が緩いケースが多い。必ず実エンドユーザーで動作確認を。",
+        tone: "blue",
+      },
+      {
+        title: "引用必須",
+        body: "引用が出ない回答は使わせない。利用ガイドライン (Step 23) に明文化。",
+        tone: "yellow",
+      },
+    ],
   },
-  // ★ NEW: Audit Log & 監査 (E: 監査・コンプライアンス)
   {
     id: "audit-log",
     order: 21,
@@ -325,8 +668,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "デフォルトの 90 日保存では監査要件（多くは 1 年以上）を満たせない。BigQuery シンクで永続化＋ロック設定が必須。Data Access ログを全 API で取ると課金が一気に跳ねるので、対象 API を IAM / Discovery Engine / KMS に絞り込む。",
     },
+    callouts: [
+      {
+        title: "Data Access は課金注意",
+        body: "全 API ON で月数十万円になることも。対象を Discovery Engine / IAM / KMS に絞り込む。",
+        tone: "red",
+      },
+      {
+        title: "BigQuery で永続化",
+        body: "90 日デフォルトでは ISO27001 等の監査要件を満たせません。BigQuery シンク + 改竄防止ロックが必須。",
+        tone: "yellow",
+      },
+      {
+        title: "Google の覗き見対策",
+        body: "Access Transparency で Google サポート社員のアクセスログも記録。Access Approval で事前承認制も可。",
+        tone: "blue",
+      },
+    ],
   },
-  // ★ NEW: 回答品質評価 & KPI (K: 動くから価値が出るへ)
   {
     id: "quality-kpi",
     order: 22,
@@ -340,8 +699,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "Faithfulness と Groundedness の違いを混同しがち（前者: 引用に矛盾しないか、後者: 引用が回答を支持しているか）。User Feedback 👍👎 をスコアの一次情報にしないこと（採点バイアスが強い）。Gold Set は業務担当者と一緒に作る。",
     },
+    callouts: [
+      {
+        title: "Faithful ≠ Grounded",
+        body: "Faithful は「引用に矛盾しないか」、Grounded は「引用が回答を支持するか」。両方測ること。",
+        tone: "blue",
+      },
+      {
+        title: "Gold Set は業務担当者と",
+        body: "IT 部門だけで作ると現場の質問とズレる。営業 / 品証 / 経理から実クエリを集める。",
+        tone: "green",
+      },
+      {
+        title: "👍👎 は一次指標にしない",
+        body: "ユーザーは「期待外れ」=「役に立たない」と押すバイアスあり。自動評価と組合せて判断。",
+        tone: "yellow",
+      },
+    ],
   },
-  // ★ NEW: チェンジマネジメント (L: 使われない PoC を防ぐ)
   {
     id: "change-mgmt",
     order: 23,
@@ -355,7 +730,24 @@ export const DEMO_STEPS: DemoStep[] = [
       pitfall:
         "Pilot 参加者を「IT リテラシーが高い人」だけで揃えると、本番展開で別の層が脱落する。各部門の代表（営業 / 品証 / 経理 / 工場）から多様にサンプリングする。利用ガイドラインに『機密情報を入力しない』を明示しないと事故る。",
     },
+    callouts: [
+      {
+        title: "ゲート未達は延期判断",
+        body: "数値ゲートをクリアしなかったら次フェーズを延期する勇気を。無理に進めて全社展開で炎上が最悪。",
+        tone: "yellow",
+      },
+      {
+        title: "Don't を明記",
+        body: "「機密情報を入力しない」「外部転送禁止」は Day1 から教育。利用ガイドラインに必ず含める。",
+        tone: "red",
+      },
+      {
+        title: "技術完成 ≠ 成功",
+        body: "使われない PoC は失敗です。定着 (アクティブ率 / NPS) が真のゴール。チェンジマネジメントを軽視しない。",
+        tone: "blue",
+      },
+    ],
   },
-]
+];
 
-export const TOTAL_STEPS = DEMO_STEPS.length
+export const TOTAL_STEPS = DEMO_STEPS.length;
