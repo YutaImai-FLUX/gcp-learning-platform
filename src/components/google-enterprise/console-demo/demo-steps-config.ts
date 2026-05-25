@@ -1,27 +1,28 @@
-// Gemini Enterprise 導入デモ - 15 ステップ定義
+// Gemini Enterprise 導入デモ - 23 ステップ定義
 // 出典: docs/refferance/Gemini_Enterprise導入・セットアップ完全ガイド.pdf
+// + GCP 実務経験者視点で不足フェーズを補完 (v2: 15 → 23)
 
 export type ShellType =
   | "gcp-console"
   | "workspace-signup"
   | "accounts"
   | "dns"
-  | "end-user-app";
+  | "end-user-app"
 
 export interface DemoStepGuideContent {
-  what: string;
-  why: string;
-  pitfall?: string;
+  what: string
+  why: string
+  pitfall?: string
 }
 
 export interface DemoStep {
-  id: string;
-  order: number;
-  product: string;
-  title: string;
-  url: string;
-  shell: ShellType;
-  guide: DemoStepGuideContent;
+  id: string
+  order: number
+  product: string
+  title: string
+  url: string
+  shell: ShellType
+  guide: DemoStepGuideContent
 }
 
 export const DEMO_STEPS: DemoStep[] = [
@@ -95,9 +96,24 @@ export const DEMO_STEPS: DemoStep[] = [
         "通貨は作成後変更不可（JPY を選ぶ）。エンタープライズは Google Cloud パートナー経由のリセラー請求書払いが定番。",
     },
   },
+  // ★ NEW: 予算アラート設定 (実務経験者視点 - D: コスト統制)
+  {
+    id: "budget-alerts",
+    order: 6,
+    product: "Cloud Billing",
+    title: "予算とアラートを設定（FinOps の起点）",
+    url: "console.cloud.google.com/billing/budgets",
+    shell: "gcp-console",
+    guide: {
+      what: "請求アカウント / プロジェクト / ラベル単位で月額予算を定義し、50% / 90% / 100% / 120% のしきい値で通知を設定する。",
+      why: "「月末に請求書を見て初めて高額に気づく」が最頻の失敗。Budgets API + Pub/Sub 連携で、超過前にエンジニアと経理に同時通知できる。Gemini Enterprise はトークン課金が見えにくいため必須。",
+      pitfall:
+        "通知先メールは必ず情シス管理者と財務部門の両方を指定する。Pub/Sub 連携にすれば Slack / Teams にも飛ばせる。アラート閾値超過後も課金は止まらない点に注意（停止ロジックは Cloud Functions で別途実装）。",
+    },
+  },
   {
     id: "project-create",
-    order: 6,
+    order: 7,
     product: "Google Cloud Console",
     title: "プロジェクトを作成",
     url: "console.cloud.google.com/projectcreate",
@@ -109,9 +125,24 @@ export const DEMO_STEPS: DemoStep[] = [
         "Billing 紐付けを忘れると次のステップ（API 有効化）で 403 エラー。お支払いメニューから紐付け状態を必ず確認。",
     },
   },
+  // ★ NEW: 組織ポリシー & フォルダ階層 (A: ガバナンス設計)
+  {
+    id: "org-policy",
+    order: 8,
+    product: "IAM と管理 / 組織のポリシー",
+    title: "組織ポリシーとリソース階層を設計",
+    url: "console.cloud.google.com/iam-admin/orgpolicies",
+    shell: "gcp-console",
+    guide: {
+      what: "組織全体のガードレールとなる Org Policy（Domain Restricted Sharing / Allowed APIs / VPC Service Controls 等）を設定し、Folders で本番 / ステージング / サンドボックスを分離する。",
+      why: "本番 PJ 作成より前に防衛線を張る。組織ポリシーは全配下リソースに自動継承され、後付けより遥かに統制が効く。次の Step 9 (API 有効化) が失敗する原因 No.1 でもある。",
+      pitfall:
+        "Domain Restricted Sharing を ON にすると、外部 Google アカウントとのリソース共有が一切できなくなる。要件に応じて Allow List を維持。「Disable Service Account Key Creation」は鍵管理を強制するので、開発フローと併せて設計する。",
+    },
+  },
   {
     id: "api-enable",
-    order: 7,
+    order: 9,
     product: "API ライブラリ",
     title: "必要な API を 4 つ有効化",
     url: "console.cloud.google.com/apis/library",
@@ -120,12 +151,27 @@ export const DEMO_STEPS: DemoStep[] = [
       what: "Vertex AI API / Vertex AI Agent Builder API（旧 Discovery Engine API）/ IAM API / Security Token Service API の 4 つを有効化する。",
       why: "Gemini Enterprise のフロントエンド（AI Application）と WIF 認証フローを動かすための必須 API。",
       pitfall:
-        "組織ポリシー『Restrict Allowed APIs』で allowlist が設定されていると有効化が拒否される。情シスに API allowlist 解除を事前依頼する。",
+        "組織ポリシー『Restrict Allowed APIs』で allowlist が設定されていると有効化が拒否される。Step 8 で先に Allow List に含めておくこと。",
+    },
+  },
+  // ★ NEW: IAM 設計 (B: 最小権限・グループベース)
+  {
+    id: "iam-roles",
+    order: 10,
+    product: "IAM と管理",
+    title: "IAM ロールをグループ単位で設計・付与",
+    url: "console.cloud.google.com/iam-admin/iam",
+    shell: "gcp-console",
+    guide: {
+      what: "管理者 / プリセールス / 業務ユーザー / 監査人の役割ごとに、必要最小限の事前定義ロール（Owner / Editor は基本使わない）をグループ単位で付与する。",
+      why: "IAM の鉄則は「最小権限 + グループベース」。個人にロールを直接付けると退職・異動で運用破綻する。Discovery Engine Admin / Viewer のようなプロダクト固有ロールも必要に応じて選定。",
+      pitfall:
+        "「とりあえず Editor」が事故の元。Editor は Service Account 作成・Org Policy 一部上書きもできてしまう。条件付き IAM (時間・IP・タグ条件) を併用するとさらに強い。",
     },
   },
   {
     id: "wif-pool",
-    order: 8,
+    order: 11,
     product: "IAM と管理",
     title: "Workforce Identity プールを作成",
     url: "console.cloud.google.com/iam-admin/workforce-identity-pools",
@@ -137,9 +183,24 @@ export const DEMO_STEPS: DemoStep[] = [
         "プール ID は後から変更不可。命名は org-wide で一意になるようにする（例 wif-employees-pool）。",
     },
   },
+  // ★ NEW: SCIM プロビジョニング (C: 事前 IAM 設計)
+  {
+    id: "scim-provision",
+    order: 12,
+    product: "IAM と管理 / SCIM",
+    title: "SCIM プロビジョニングで Entra ID とグループ同期",
+    url: "console.cloud.google.com/iam-admin/scim",
+    shell: "gcp-console",
+    guide: {
+      what: "Cloud Identity 側に SCIM エンドポイント URL とプロビジョニングトークンを発行し、Entra ID 側のエンタープライズアプリで「自動プロビジョニング」を ON にすることでユーザー・グループを定期同期する。",
+      why: "WIF だけだと「初回ログインしないとユーザー情報が届かない」。SCIM 併用でログイン前に Google Cloud 側にユーザー・グループが揃い、Step 10 の IAM ロール付与を事前に行える。エンタープライズ標準のあるべき姿。",
+      pitfall:
+        "Entra 側で『プロビジョニング対象グループ』を絞り込まないと全社員が同期されてしまう。プロビジョニングトークンの有効期限管理（年1回ローテーション）も忘れずに。",
+    },
+  },
   {
     id: "wif-provider",
-    order: 9,
+    order: 13,
     product: "IAM と管理",
     title: "プロバイダ（Entra ID）を追加・属性マッピング設定",
     url: "console.cloud.google.com/iam-admin/workforce-identity-pools/wif-employees-pool/providers/add",
@@ -153,7 +214,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "ge-subscription",
-    order: 10,
+    order: 14,
     product: "Gemini Enterprise",
     title: "Gemini Enterprise サブスクリプションを購入",
     url: "console.cloud.google.com/gemini-enterprise/subscriptions",
@@ -167,7 +228,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "user-licensing",
-    order: 11,
+    order: 15,
     product: "Gemini Enterprise",
     title: "ライセンスの自動割当を有効化",
     url: "console.cloud.google.com/gemini-enterprise/users",
@@ -181,7 +242,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "ai-app-create",
-    order: 12,
+    order: 16,
     product: "AI Application",
     title: "AI Application（Search タイプ）を作成",
     url: "console.cloud.google.com/gen-app-builder/engines/create",
@@ -195,7 +256,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "datastore-create",
-    order: 13,
+    order: 17,
     product: "AI Application",
     title: "Data Store を作成（アクセス制御 ON）",
     url: "console.cloud.google.com/gen-app-builder/data-stores/create",
@@ -204,18 +265,33 @@ export const DEMO_STEPS: DemoStep[] = [
       what: "SharePoint / Drive / Confluence 等のデータソースを選択し、「Data source access control」トグルを必ず ON にしてデータストアを作成。",
       why: "アクセス制御 ON のデータストアでは、ソース側 ACL（例: SharePoint の権限）がそのまま Gemini Enterprise に継承される。機密文書の権限境界を保てる唯一の方法。",
       pitfall:
-        "アクセス制御 ON / OFF は作成時のみ設定可能、後から変更不可。OFF で作ったら作り直し確定（プロジェクト遅延の最大要因）。本番運用想定で必ず ON で作る。",
+        "アクセス制御 ON / OFF は作成時のみ設定可能、後から変更不可。OFF で作ったら作り直し確定（プロジェクト遅延の最大要因）。本番運用想定では必ず ON で作る。",
+    },
+  },
+  // ★ NEW: CMEK / VPC Service Controls (H: データ境界・暗号化)
+  {
+    id: "cmek-vpc-sc",
+    order: 18,
+    product: "Cloud KMS / VPC Service Controls",
+    title: "CMEK と VPC Service Controls でデータ境界を強化",
+    url: "console.cloud.google.com/security/vpc-service-controls",
+    shell: "gcp-console",
+    guide: {
+      what: "Cloud KMS で顧客管理鍵（CMEK）を作成し Data Store に紐付け、VPC Service Controls でサービスペリメータを構築して Discovery Engine API へのアクセスを限定する。",
+      why: "金融・公共・自治体・医療など、暗号鍵を顧客側で持つ要件、データを物理境界の外に出さない要件がある業界では必須。Google 側で復号できる構造（CSEK ではない CMEK）と、API ペリメータで Exfiltration を防ぐ仕組みが両方必要。",
+      pitfall:
+        "VPC Service Controls の Perimeter を間違えると正規ユーザーまでブロックされる。Dry-run モードでログを取りながら段階適用するのが鉄則。KMS 鍵のローテーション（推奨 90 日）と Audit Log 監視も忘れずに。",
     },
   },
   {
     id: "bind-datastore",
-    order: 14,
+    order: 19,
     product: "AI Application",
     title: "AI App にデータストアをバインド",
     url: "console.cloud.google.com/gen-app-builder/engines/internal-knowledge-search",
     shell: "gcp-console",
     guide: {
-      what: "Step 12 で作った AI App の設定画面を開き、Step 13 で作ったデータストアをバインドして検索対象として認識させる。",
+      what: "Step 16 で作った AI App の設定画面を開き、Step 17 で作ったデータストアをバインドして検索対象として認識させる。",
       why: "AI App とデータストアは独立リソース。バインドして初めてユーザーが検索できる状態になる。複数データストアを一つの App にバインドする運用もよくある。",
       pitfall:
         "バインド後にインジェスト完了を待つ必要がある（5,000 件規模で数十分〜数時間）。インジェスト中は検索結果が不完全になる。",
@@ -223,18 +299,63 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "search-preview",
-    order: 15,
+    order: 20,
     product: "Gemini Enterprise（エンドユーザー視点）",
     title: "検索プレビューで実際の動作を確認",
     url: "internal-knowledge-search.app.gemini.cloud.google.com",
     shell: "end-user-app",
     guide: {
       what: "PoC ユーザーとしてログインし、自然言語クエリを入力。AI が回答 + 引用ソースを返してくれることを確認する。",
-      why: "ここまでの 14 ステップの集大成。Data Store のアクセス制御が効いているため、各ユーザーは「自分が SharePoint 上で閲覧可能な文書だけ」が回答に使われる。",
+      why: "ここまでの 19 ステップの集大成。Data Store のアクセス制御が効いているため、各ユーザーは「自分が SharePoint 上で閲覧可能な文書だけ」が回答に使われる。",
       pitfall:
         "管理コンソールの Documents タブにファイル一覧が表示されないのは仕様（アクセス制御 ON のため）。動作確認は必ずアプリのプレビュー画面で行う。",
     },
   },
-];
+  // ★ NEW: Audit Log & 監査 (E: 監査・コンプライアンス)
+  {
+    id: "audit-log",
+    order: 21,
+    product: "Cloud Logging / Access Transparency",
+    title: "監査ログと Access Transparency を有効化",
+    url: "console.cloud.google.com/iam-admin/audit",
+    shell: "gcp-console",
+    guide: {
+      what: "Admin Activity / Data Access / System Event / Policy Denied の 4 種類の監査ログを有効化し、BigQuery / Cloud Storage に長期エクスポート、Access Transparency で Google 社員のアクセスログまで取得する。",
+      why: "監査部門の必須要件。「いつ・誰が・何にアクセスしたか」が説明できないと本契約に進めない。Data Access ログは課金されるので対象 API を絞る設計が必要。Access Transparency は Google 側のオペレーションまで可視化するエンプラ特権。",
+      pitfall:
+        "デフォルトの 90 日保存では監査要件（多くは 1 年以上）を満たせない。BigQuery シンクで永続化＋ロック設定が必須。Data Access ログを全 API で取ると課金が一気に跳ねるので、対象 API を IAM / Discovery Engine / KMS に絞り込む。",
+    },
+  },
+  // ★ NEW: 回答品質評価 & KPI (K: 動くから価値が出るへ)
+  {
+    id: "quality-kpi",
+    order: 22,
+    product: "AI Application / 評価",
+    title: "回答品質（RAG eval）と KPI ダッシュボードを構築",
+    url: "console.cloud.google.com/gen-app-builder/evaluation",
+    shell: "gcp-console",
+    guide: {
+      what: "Faithfulness（忠実性）/ Groundedness（引用根拠）/ Answer Relevance / Coverage / Latency / Cost / User Feedback の 7 軸で回答品質を継続的に評価し、Cloud Monitoring ダッシュボードで可視化する。",
+      why: "「動く」と「業務で使える」の間には深い谷がある。評価データセットと指標を定義しないと、モデル更新時のリグレッションに気付けない。導入後 3-6 ヶ月の継続価値はここで決まる。",
+      pitfall:
+        "Faithfulness と Groundedness の違いを混同しがち（前者: 引用に矛盾しないか、後者: 引用が回答を支持しているか）。User Feedback 👍👎 をスコアの一次情報にしないこと（採点バイアスが強い）。Gold Set は業務担当者と一緒に作る。",
+    },
+  },
+  // ★ NEW: チェンジマネジメント (L: 使われない PoC を防ぐ)
+  {
+    id: "change-mgmt",
+    order: 23,
+    product: "Go-Live 計画",
+    title: "チェンジマネジメント & 段階展開を設計",
+    url: "internal-runbook/gemini-enterprise/go-live",
+    shell: "gcp-console",
+    guide: {
+      what: "Pilot（50 名 / 1 拠点）→ Limited（500 名 / 5 拠点）→ GA（全社 / 23 拠点）の 3 段階で展開計画を引き、各フェーズに KPI ゲート・利用ガイドライン・トレーニング・コミュニケーション計画を紐付ける。",
+      why: "エンプラ PoC で最頻の失敗は『技術は完成したが誰も使わない』。展開を一気にやらず、Pilot でユーザー満足度・誤回答率を測ってから次段へ。経営層への報告フォーマットも事前定義する。",
+      pitfall:
+        "Pilot 参加者を「IT リテラシーが高い人」だけで揃えると、本番展開で別の層が脱落する。各部門の代表（営業 / 品証 / 経理 / 工場）から多様にサンプリングする。利用ガイドラインに『機密情報を入力しない』を明示しないと事故る。",
+    },
+  },
+]
 
-export const TOTAL_STEPS = DEMO_STEPS.length;
+export const TOTAL_STEPS = DEMO_STEPS.length
