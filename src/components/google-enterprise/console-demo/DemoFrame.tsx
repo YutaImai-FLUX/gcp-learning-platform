@@ -20,6 +20,14 @@ import { Step12_AiAppCreate } from "./steps/Step12_AiAppCreate";
 import { Step13_DataStoreCreate } from "./steps/Step13_DataStoreCreate";
 import { Step14_BindDataStore } from "./steps/Step14_BindDataStore";
 import { Step15_SearchPreview } from "./steps/Step15_SearchPreview";
+import { Step16_BudgetAlerts } from "./steps/Step16_BudgetAlerts";
+import { Step17_OrgPolicy } from "./steps/Step17_OrgPolicy";
+import { Step18_IamRoles } from "./steps/Step18_IamRoles";
+import { Step19_ScimProvision } from "./steps/Step19_ScimProvision";
+import { Step20_CmekVpcSc } from "./steps/Step20_CmekVpcSc";
+import { Step21_AuditLog } from "./steps/Step21_AuditLog";
+import { Step22_QualityKpi } from "./steps/Step22_QualityKpi";
+import { Step23_ChangeMgmt } from "./steps/Step23_ChangeMgmt";
 
 const STEP_COMPONENTS: Record<string, React.ComponentType> = {
   "google-account": Step01_GoogleAccountCreate,
@@ -27,16 +35,24 @@ const STEP_COMPONENTS: Record<string, React.ComponentType> = {
   "domain-verify": Step03_DomainTxtVerify,
   "org-confirm": Step04_OrgConfirm,
   "billing-create": Step05_BillingCreate,
+  "budget-alerts": Step16_BudgetAlerts,
   "project-create": Step06_ProjectCreate,
+  "org-policy": Step17_OrgPolicy,
   "api-enable": Step07_ApiLibrary,
+  "iam-roles": Step18_IamRoles,
   "wif-pool": Step08_WorkforcePoolCreate,
+  "scim-provision": Step19_ScimProvision,
   "wif-provider": Step09_ProviderAdd,
   "ge-subscription": Step10_GeSubscription,
   "user-licensing": Step11_UserLicensing,
   "ai-app-create": Step12_AiAppCreate,
   "datastore-create": Step13_DataStoreCreate,
+  "cmek-vpc-sc": Step20_CmekVpcSc,
   "bind-datastore": Step14_BindDataStore,
   "search-preview": Step15_SearchPreview,
+  "audit-log": Step21_AuditLog,
+  "quality-kpi": Step22_QualityKpi,
+  "change-mgmt": Step23_ChangeMgmt,
 };
 
 export function DemoFrame() {

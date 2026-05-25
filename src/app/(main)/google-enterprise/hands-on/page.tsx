@@ -24,8 +24,9 @@ export default function HandsOnPage() {
             Gemini Enterprise 導入の全工程をリアルに体感
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Google アカウント作成 → Cloud Identity → 組織 / Billing / API → WIF
-            → サブスクリプション購入 → データストア → 検索デモまで 15
+            Google アカウント作成 → Cloud Identity → 組織 / Billing / 予算 /
+            組織ポリシー / IAM / SCIM / WIF / CMEK / VPC SC → サブスクリプション
+            → データストア → 監査ログ → 品質評価 → Go-Live まで 23
             ステップを実機画面で再現
           </p>
         </div>
