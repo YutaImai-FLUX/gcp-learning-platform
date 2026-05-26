@@ -480,8 +480,39 @@ export const DEMO_STEPS: DemoStep[] = [
     ],
   },
   {
-    id: "user-licensing",
+    id: "notebooklm-subscription",
     order: 15,
+    product: "NotebookLM Enterprise",
+    title: "NotebookLM Enterprise サブスクリプションを購入",
+    url: "console.cloud.google.com/vertex-ai/notebooklm/subscriptions",
+    shell: "gcp-console",
+    guide: {
+      what: "Gemini Enterprise とは別ライセンスの NotebookLM Enterprise を購入。研究・調査・ドキュメント要約用の Notebook 型 UI と Audio Overview (音声要約) を提供する。",
+      why: "Gemini Enterprise (横断検索) と NotebookLM Enterprise (深掘り研究) は用途が異なり、ユーザー層も別れる。法務・研究・企画・経営企画など『資料を構造化して読み込む業務』には NotebookLM が刺さる。両方を同じ Workforce Pool で SSO 連携できるのが Google Cloud 側で契約する最大の利点。",
+      pitfall:
+        "Gemini Enterprise の Audio Overview と勘違いされやすいが、現状は NotebookLM Enterprise Plus のみが Audio Overview を提供。データレジデンシーは asia-northeast1 で確定できるかを必ず事前確認。",
+    },
+    callouts: [
+      {
+        title: "GE と独立した課金",
+        body: "Gemini Enterprise と NotebookLM Enterprise は別 SKU。両方使うユーザーには両方のシートが必要です。",
+        tone: "blue",
+      },
+      {
+        title: "Audio Overview は Plus のみ",
+        body: "ポッドキャスト風の音声要約機能は NotebookLM Enterprise Plus のみ。役員向け資料調査で人気。",
+        tone: "yellow",
+      },
+      {
+        title: "Workforce Pool 共有 OK",
+        body: "Step 11 で作った WIF プール (wif-employees-pool) をそのまま認証に使えます。SSO 二重設定不要。",
+        tone: "green",
+      },
+    ],
+  },
+  {
+    id: "user-licensing",
+    order: 16,
     product: "Gemini Enterprise",
     title: "ライセンスの自動割当を有効化",
     url: "console.cloud.google.com/gemini-enterprise/users",
@@ -512,7 +543,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "ai-app-create",
-    order: 16,
+    order: 17,
     product: "AI Application",
     title: "AI Application（Search タイプ）を作成",
     url: "console.cloud.google.com/gen-app-builder/engines/create",
@@ -543,7 +574,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "datastore-create",
-    order: 17,
+    order: 18,
     product: "AI Application",
     title: "Data Store を作成（アクセス制御 ON）",
     url: "console.cloud.google.com/gen-app-builder/data-stores/create",
@@ -574,7 +605,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "cmek-vpc-sc",
-    order: 18,
+    order: 19,
     product: "Cloud KMS / VPC Service Controls",
     title: "CMEK と VPC Service Controls でデータ境界を強化",
     url: "console.cloud.google.com/security/vpc-service-controls",
@@ -605,7 +636,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "bind-datastore",
-    order: 19,
+    order: 20,
     product: "AI Application",
     title: "AI App にデータストアをバインド",
     url: "console.cloud.google.com/gen-app-builder/engines/internal-knowledge-search",
@@ -636,7 +667,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "search-preview",
-    order: 20,
+    order: 21,
     product: "Gemini Enterprise（エンドユーザー視点）",
     title: "検索プレビューで実際の動作を確認",
     url: "internal-knowledge-search.app.gemini.cloud.google.com",
@@ -667,7 +698,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "audit-log",
-    order: 21,
+    order: 22,
     product: "Cloud Logging / Access Transparency",
     title: "監査ログと Access Transparency を有効化",
     url: "console.cloud.google.com/iam-admin/audit",
@@ -698,7 +729,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "quality-kpi",
-    order: 22,
+    order: 23,
     product: "AI Application / 評価",
     title: "回答品質（RAG eval）と KPI ダッシュボードを構築",
     url: "console.cloud.google.com/gen-app-builder/evaluation",
@@ -729,7 +760,7 @@ export const DEMO_STEPS: DemoStep[] = [
   },
   {
     id: "change-mgmt",
-    order: 23,
+    order: 24,
     product: "Go-Live 計画",
     title: "チェンジマネジメント & 段階展開を設計",
     url: "internal-runbook/gemini-enterprise/go-live",
@@ -803,6 +834,7 @@ export const PHASES: Phase[] = [
     tone: "yellow",
     stepIds: [
       "ge-subscription",
+      "notebooklm-subscription",
       "user-licensing",
       "ai-app-create",
       "datastore-create",

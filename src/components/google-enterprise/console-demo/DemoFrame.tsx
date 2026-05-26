@@ -36,6 +36,7 @@ import { Step12_AiAppCreate } from "./steps/Step12_AiAppCreate";
 import { Step13_DataStoreCreate } from "./steps/Step13_DataStoreCreate";
 import { Step14_BindDataStore } from "./steps/Step14_BindDataStore";
 import { Step15_SearchPreview } from "./steps/Step15_SearchPreview";
+import { Step15_NotebookLmSubscription } from "./steps/Step15_NotebookLmSubscription";
 import { Step16_BudgetAlerts } from "./steps/Step16_BudgetAlerts";
 import { Step17_OrgPolicy } from "./steps/Step17_OrgPolicy";
 import { Step18_IamRoles } from "./steps/Step18_IamRoles";
@@ -60,6 +61,7 @@ const STEP_COMPONENTS: Record<string, React.ComponentType> = {
   "scim-provision": Step19_ScimProvision,
   "wif-provider": Step09_ProviderAdd,
   "ge-subscription": Step10_GeSubscription,
+  "notebooklm-subscription": Step15_NotebookLmSubscription,
   "user-licensing": Step11_UserLicensing,
   "ai-app-create": Step12_AiAppCreate,
   "datastore-create": Step13_DataStoreCreate,
