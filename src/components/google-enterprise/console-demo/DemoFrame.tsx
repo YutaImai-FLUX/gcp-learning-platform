@@ -10,6 +10,7 @@ import {
 import { DEMO_STEPS, TOTAL_STEPS } from "./demo-steps-config";
 import { DemoStepGuide } from "./DemoStepGuide";
 import { CoachBubble } from "./CoachBubble";
+import { StepListSidebar } from "./StepListSidebar";
 import {
   ChevronLeft,
   ChevronRight,
@@ -207,8 +208,9 @@ export function DemoFrame() {
         </div>
       </div>
 
-      {/* Main canvas: shell on left, guide on right */}
-      <div className="grid lg:grid-cols-[1fr_320px] gap-4">
+      {/* Main canvas: step list (left) + shell (center) + guide (right) */}
+      <div className="grid lg:grid-cols-[240px_1fr_300px] gap-4">
+        <StepListSidebar />
         <div className="h-[760px] min-h-[600px] lg:h-[820px]">
           {StepComponent ? (
             <StepComponent />
