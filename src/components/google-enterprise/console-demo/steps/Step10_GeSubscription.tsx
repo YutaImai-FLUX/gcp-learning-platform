@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useStepAutoSequence } from "@/lib/hooks/useStepAutoSequence";
 import { GcpConsoleShell } from "../shell/GcpConsoleShell";
 import { GcpButton } from "../primitives/GcpButton";
 import { GcpChip } from "../primitives/GcpChip";
@@ -44,9 +45,22 @@ const PLANS: Plan[] = [
 const FX_JPY = 155; // 仮の為替
 
 export function Step10_GeSubscription() {
-  const [planId, setPlanId] = useState<string>("standard");
-  const [seats, setSeats] = useState(50);
+  const [planId, setPlanId] = useState<string>("plus");
+  const [seats, setSeats] = useState(10);
   const [agreeTos, setAgreeTos] = useState(false);
+
+  useStepAutoSequence(
+    [
+      // 1. Standard プランを選択
+      () => setPlanId("standard"),
+      // 2. シート数を 10 → 25 → 50 と段階的に増やす
+      () => setSeats(25),
+      () => setSeats(50),
+      // 3. 利用規約に同意 (購入ボタンが有効化)
+      () => setAgreeTos(true),
+    ],
+    { intervalMs: 1100, startDelayMs: 700 },
+  );
   const plan = PLANS.find((p) => p.id === planId) ?? PLANS[0];
   const monthlyJpy = plan.price * seats * FX_JPY;
   const annualJpy = monthlyJpy * 12;

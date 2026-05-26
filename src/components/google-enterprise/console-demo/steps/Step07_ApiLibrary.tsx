@@ -6,6 +6,7 @@ import { GcpButton } from "../primitives/GcpButton";
 import { GcpChip } from "../primitives/GcpChip";
 import { Search, Brain, Bot, ShieldCheck, KeyRound, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useStepAutoSequence } from "@/lib/hooks/useStepAutoSequence";
 
 interface ApiCard {
   id: string;
@@ -58,12 +59,25 @@ const APIS: ApiCard[] = [
 export function Step07_ApiLibrary() {
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState("");
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const filtered = APIS.filter((a) =>
     `${a.name} ${a.serviceId}`.toLowerCase().includes(query.toLowerCase()),
   );
 
   const enabledCount = Object.values(enabled).filter(Boolean).length;
+
+  // 4 API を順次有効化するアニメーション
+  useStepAutoSequence(
+    APIS.flatMap((api) => [
+      () => setActiveId(api.id),
+      () => {
+        setEnabled((m) => ({ ...m, [api.id]: true }));
+        setActiveId(null);
+      },
+    ]),
+    { intervalMs: 900, startDelayMs: 800 },
+  );
 
   return (
     <GcpConsoleShell
@@ -101,15 +115,18 @@ export function Step07_ApiLibrary() {
       <div className="grid md:grid-cols-2 gap-3">
         {filtered.map((api) => {
           const isOn = enabled[api.id];
+          const isActive = activeId === api.id;
           const Icon = api.icon;
           return (
             <div
               key={api.id}
               className={cn(
-                "rounded-lg border bg-white dark:bg-[#1F1F1F] p-4 transition-all flex gap-3",
-                isOn
+                "rounded-lg border bg-white dark:bg-[#1F1F1F] p-4 transition-all duration-300 flex gap-3",
+                isActive && "ring-4 ring-[#1A73E8]/30 border-[#1A73E8] scale-[1.02]",
+                !isActive && isOn
                   ? "border-[#34A853]/40 ring-1 ring-[#34A853]/20"
-                  : "border-[#DADCE0] hover:shadow-[0_2px_6px_rgba(60,64,67,0.15)]",
+                  : !isActive &&
+                      "border-[#DADCE0] hover:shadow-[0_2px_6px_rgba(60,64,67,0.15)]",
               )}
             >
               {/* Icon */}
