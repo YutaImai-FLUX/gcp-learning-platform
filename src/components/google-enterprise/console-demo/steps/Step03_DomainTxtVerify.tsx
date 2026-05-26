@@ -6,6 +6,7 @@ import { GcpButton } from "../primitives/GcpButton";
 import { GcpChip } from "../primitives/GcpChip";
 import { Check, Copy, Plus, AlertTriangle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useStepAutoSequence } from "@/lib/hooks/useStepAutoSequence";
 
 const GOOGLE_TXT = "google-site-verification=4f2a8e7b9c1d3a6f8e0b5c2d9a7e1f3b";
 
@@ -39,9 +40,42 @@ export function Step03_DomainTxtVerify() {
   const [records, setRecords] = useState<DnsRecord[]>(INITIAL_RECORDS);
   const [txtValue, setTxtValue] = useState(GOOGLE_TXT);
   const [copied, setCopied] = useState(false);
+  const [addPulse, setAddPulse] = useState(false);
 
   const txtAdded = records.some(
     (r) => r.type === "TXT" && r.value === GOOGLE_TXT,
+  );
+
+  useStepAutoSequence(
+    [
+      // 1. コピーボタンが押される演出
+      () => setCopied(true),
+      () => setCopied(false),
+      // 2. 追加ボタンをハイライト
+      () => setAddPulse(true),
+      // 3. TXT を実際に追加 (pending 状態)
+      () =>
+        setRecords((prev) => [
+          ...prev,
+          {
+            host: "@",
+            type: "TXT",
+            ttl: 3600,
+            value: GOOGLE_TXT,
+            status: "pending" as const,
+          },
+        ]),
+      // 4. 反映待ち → Active に切替
+      () =>
+        setRecords((prev) =>
+          prev.map((r) =>
+            r.type === "TXT" && r.value === GOOGLE_TXT
+              ? { ...r, status: "active" as const }
+              : r,
+          ),
+        ),
+    ],
+    { intervalMs: 1500, startDelayMs: 700 },
   );
 
   const handleCopy = async () => {
@@ -148,6 +182,11 @@ export function Step03_DomainTxtVerify() {
                 leadingIcon={<Plus size={13} />}
                 onClick={handleAdd}
                 disabled={txtAdded}
+                className={cn(
+                  addPulse &&
+                    !txtAdded &&
+                    "ring-4 ring-[#F39200]/30 animate-pulse",
+                )}
               >
                 {txtAdded ? "追加済み" : "追加"}
               </GcpButton>

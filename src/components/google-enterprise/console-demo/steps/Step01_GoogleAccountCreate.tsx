@@ -5,14 +5,29 @@ import { AccountsShell } from "../shell/AccountsShell";
 import { GcpInput } from "../primitives/GcpInput";
 import { GcpButton } from "../primitives/GcpButton";
 import { Eye, EyeOff } from "lucide-react";
+import { useStepAutoSequence } from "@/lib/hooks/useStepAutoSequence";
+import { cn } from "@/lib/utils";
 
 export function Step01_GoogleAccountCreate() {
-  const [lastName, setLastName] = useState("田中");
-  const [firstName, setFirstName] = useState("正樹");
-  const [username, setUsername] = useState("yamato.admin");
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPw, setShowPw] = useState(false);
+  const [submitPulse, setSubmitPulse] = useState(false);
+
+  useStepAutoSequence(
+    [
+      () => setLastName("田中"),
+      () => setFirstName("正樹"),
+      () => setUsername("yamato.admin"),
+      () => setPassword("••••••••••••"),
+      () => setConfirm("••••••••••••"),
+      () => setSubmitPulse(true),
+    ],
+    { intervalMs: 900, startDelayMs: 500 }
+  );
   return (
     <AccountsShell
       title="Google アカウントの作成"
@@ -87,7 +102,15 @@ export function Step01_GoogleAccountCreate() {
         <button className="text-[14px] text-[#1A73E8] hover:underline">
           代わりにログイン
         </button>
-        <GcpButton variant="filled">次へ</GcpButton>
+        <GcpButton
+          variant="filled"
+          className={cn(
+            submitPulse &&
+              "ring-4 ring-[#1A73E8]/30 shadow-lg animate-pulse"
+          )}
+        >
+          次へ
+        </GcpButton>
       </div>
     </AccountsShell>
   );

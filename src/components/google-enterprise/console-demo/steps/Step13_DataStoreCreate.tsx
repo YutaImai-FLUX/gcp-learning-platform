@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useStepAutoSequence } from "@/lib/hooks/useStepAutoSequence";
 import { GcpConsoleShell } from "../shell/GcpConsoleShell";
 import { GcpButton } from "../primitives/GcpButton";
 import { GcpInput } from "../primitives/GcpInput";
@@ -31,13 +32,37 @@ const SOURCES: { id: Source; label: string; sub: string }[] = [
 ];
 
 export function Step13_DataStoreCreate() {
-  const [source, setSource] = useState<Source>("sharepoint");
-  const [tenantId, setTenantId] = useState("yamatoseiki.onmicrosoft.com");
-  const [siteUrl, setSiteUrl] = useState(
-    "https://yamatoseiki.sharepoint.com/sites/internal-knowledge",
+  const [source, setSource] = useState<Source>("drive");
+  const [tenantId, setTenantId] = useState("");
+  const [siteUrl, setSiteUrl] = useState("");
+  const [storeName, setStoreName] = useState("");
+  const [accessControl, setAccessControl] = useState(false);
+  const [aclPulse, setAclPulse] = useState(false);
+  const [createPulse, setCreatePulse] = useState(false);
+
+  useStepAutoSequence(
+    [
+      // 1. SharePoint ソースに切替
+      () => setSource("sharepoint"),
+      // 2. テナント / サイト / 名前を順次入力
+      () => setTenantId("yamatoseiki.onmicrosoft.com"),
+      () =>
+        setSiteUrl(
+          "https://yamatoseiki.sharepoint.com/sites/internal-knowledge",
+        ),
+      () => setStoreName("sp-internal-knowledge"),
+      // 3. アクセス制御トグルをハイライト
+      () => setAclPulse(true),
+      // 4. ACL を ON へ
+      () => {
+        setAccessControl(true);
+        setAclPulse(false);
+      },
+      // 5. 作成ボタンをハイライト
+      () => setCreatePulse(true),
+    ],
+    { intervalMs: 1100, startDelayMs: 600 },
   );
-  const [storeName, setStoreName] = useState("sp-internal-knowledge");
-  const [accessControl, setAccessControl] = useState(true);
 
   return (
     <GcpConsoleShell
@@ -133,10 +158,11 @@ export function Step13_DataStoreCreate() {
           {/* CRITICAL: Access control */}
           <section
             className={cn(
-              "rounded-lg border-2 p-5 transition-colors",
+              "rounded-lg border-2 p-5 transition-all duration-500",
               accessControl
                 ? "border-[#34A853]/50 bg-[#E6F4EA]/40"
                 : "border-[#EA4335] bg-[#FCE8E6] ring-4 ring-[#EA4335]/15",
+              aclPulse && "ring-8 ring-[#FBBC05]/40 animate-pulse",
             )}
           >
             <div className="flex items-start justify-between gap-3 mb-3">
@@ -189,7 +215,12 @@ export function Step13_DataStoreCreate() {
 
           <div className="flex justify-end gap-2">
             <GcpButton variant="text">キャンセル</GcpButton>
-            <GcpButton variant="filled">
+            <GcpButton
+              variant="filled"
+              className={cn(
+                createPulse && "ring-4 ring-[#1A73E8]/40 animate-pulse",
+              )}
+            >
               作成 (バックグラウンドでインジェスト開始)
             </GcpButton>
           </div>

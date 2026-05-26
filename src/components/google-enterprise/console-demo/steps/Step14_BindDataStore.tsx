@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GcpConsoleShell } from "../shell/GcpConsoleShell";
 import { GcpButton } from "../primitives/GcpButton";
 import { GcpChip } from "../primitives/GcpChip";
@@ -46,8 +46,28 @@ export function Step14_BindDataStore() {
   const [bound, setBound] = useState<Record<string, boolean>>({
     "sp-internal-knowledge": true,
   });
+  const [ingestPct, setIngestPct] = useState(38);
+  const [ingestStatus, setIngestStatus] = useState<
+    "complete" | "ingesting" | "queued"
+  >("ingesting");
 
   const toggleBind = (id: string) => setBound((m) => ({ ...m, [id]: !m[id] }));
+
+  // SharePoint データストアのインジェスト進捗を時間とともに進める
+  useEffect(() => {
+    if (ingestStatus === "complete") return;
+    const id = setInterval(() => {
+      setIngestPct((cur) => {
+        if (cur >= 100) {
+          clearInterval(id);
+          setIngestStatus("complete");
+          return 100;
+        }
+        return Math.min(100, cur + 4);
+      });
+    }, 600);
+    return () => clearInterval(id);
+  }, [ingestStatus]);
 
   return (
     <GcpConsoleShell
@@ -104,11 +124,16 @@ export function Step14_BindDataStore() {
           <div className="rounded-lg border border-[#DADCE0] bg-white dark:bg-[#1F1F1F] divide-y divide-[#DADCE0]">
             {STORES.map((s) => {
               const isBound = !!bound[s.id];
+              // SharePoint データストアは動的進捗、Drive は完了固定
+              const dynamicStatus =
+                s.id === "sp-internal-knowledge" ? ingestStatus : s.ingestStatus;
               const pct =
-                s.ingestStatus === "complete"
+                dynamicStatus === "complete"
                   ? 100
-                  : s.ingestStatus === "ingesting"
-                    ? 64
+                  : dynamicStatus === "ingesting"
+                    ? s.id === "sp-internal-knowledge"
+                      ? ingestPct
+                      : 64
                     : 0;
               return (
                 <div
@@ -148,17 +173,18 @@ export function Step14_BindDataStore() {
                     <div className="flex items-center gap-2 max-w-md">
                       <Activity
                         size={11}
-                        className={
-                          s.ingestStatus === "complete"
+                        className={cn(
+                          dynamicStatus === "complete"
                             ? "text-[#137333]"
-                            : "text-[#B26A00]"
-                        }
+                            : "text-[#B26A00]",
+                          dynamicStatus === "ingesting" && "animate-pulse",
+                        )}
                       />
                       <div className="flex-1 h-1.5 rounded-full bg-[#E8EAED] overflow-hidden">
                         <div
                           className={cn(
-                            "h-full rounded-full transition-all",
-                            s.ingestStatus === "complete"
+                            "h-full rounded-full transition-all duration-500",
+                            dynamicStatus === "complete"
                               ? "bg-[#34A853]"
                               : "bg-[#FBBC05]",
                           )}
@@ -170,9 +196,9 @@ export function Step14_BindDataStore() {
                       </span>
                     </div>
                     <div className="text-[10px] text-[#5F6368] mt-1">
-                      {s.ingestStatus === "ingesting"
+                      {dynamicStatus === "ingesting"
                         ? `インジェスト中 (${Math.round((s.docs * pct) / 100).toLocaleString()} / ${s.docs.toLocaleString()})`
-                        : s.ingestStatus === "complete"
+                        : dynamicStatus === "complete"
                           ? "インジェスト完了"
                           : "キューイング中"}
                     </div>
