@@ -34,6 +34,16 @@ export interface DemoStep {
   callouts: Callout[];
 }
 
+export type PhaseTone = "blue" | "green" | "purple" | "yellow" | "red";
+
+export interface Phase {
+  id: string;
+  label: string;
+  shortLabel: string;
+  tone: PhaseTone;
+  stepIds: string[];
+}
+
 export const DEMO_STEPS: DemoStep[] = [
   {
     id: "google-account",
@@ -751,3 +761,65 @@ export const DEMO_STEPS: DemoStep[] = [
 ];
 
 export const TOTAL_STEPS = DEMO_STEPS.length;
+
+export const PHASES: Phase[] = [
+  {
+    id: "setup",
+    label: "アカウント & 組織立ち上げ",
+    shortLabel: "立ち上げ",
+    tone: "blue",
+    stepIds: [
+      "google-account",
+      "cloud-identity-signup",
+      "domain-verify",
+      "org-confirm",
+    ],
+  },
+  {
+    id: "foundation",
+    label: "課金 / プロジェクト / ガバナンス",
+    shortLabel: "基盤",
+    tone: "green",
+    stepIds: [
+      "billing-create",
+      "budget-alerts",
+      "project-create",
+      "org-policy",
+      "api-enable",
+      "iam-roles",
+    ],
+  },
+  {
+    id: "identity",
+    label: "ID 連携",
+    shortLabel: "ID連携",
+    tone: "purple",
+    stepIds: ["wif-pool", "scim-provision", "wif-provider"],
+  },
+  {
+    id: "ge",
+    label: "Gemini Enterprise 利用開始",
+    shortLabel: "GE 利用",
+    tone: "yellow",
+    stepIds: [
+      "ge-subscription",
+      "user-licensing",
+      "ai-app-create",
+      "datastore-create",
+      "cmek-vpc-sc",
+      "bind-datastore",
+      "search-preview",
+    ],
+  },
+  {
+    id: "ops",
+    label: "監査 / 品質 / 運用",
+    shortLabel: "運用",
+    tone: "red",
+    stepIds: ["audit-log", "quality-kpi", "change-mgmt"],
+  },
+];
+
+export function getPhaseForStep(stepId: string): Phase | undefined {
+  return PHASES.find((p) => p.stepIds.includes(stepId));
+}
